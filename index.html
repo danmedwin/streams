@@ -159,7 +159,7 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.13 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.14 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -655,11 +655,31 @@ function sceneInk(g,t){
 
 /* ══════════════ SKIN 2: DEEP GLOW ══════════════ */
 var GLOW=[["#3FE0D0","#1A8FA8"],["#FF7BAE","#B3438F"],["#FFC96B","#D98A2B"],["#9D8CFF","#5E4FC2"]];
+/* ⚠ NEVER use ctx.shadowBlur in a frame loop — each blurred draw re-blurs at full
+   surface cost on the GPU and dropped this skin from 120fps to ~25fps (profiled
+   2026-07-13; the exact same thing bit Alien World). All glow here is FAKED:
+   pre-rendered halo sprites (radial gradient, made once) + wide low-alpha
+   under-strokes. Future inks that want glow must do the same. */
+var HALOS={};
+function halo(color){                        // color must be 6-digit hex
+  var c=HALOS[color];
+  if(!c){
+    c=HALOS[color]=document.createElement("canvas"); c.width=c.height=64;
+    var g=c.getContext("2d"), gr=g.createRadialGradient(32,32,0,32,32,32);
+    gr.addColorStop(0,color+"E6"); gr.addColorStop(.35,color+"73");
+    gr.addColorStop(.7,color+"26"); gr.addColorStop(1,color+"00");
+    g.fillStyle=gr; g.beginPath(); g.arc(32,32,32,0,7); g.fill();
+  }
+  return c;
+}
+function drawHalo(g,color,x,y,rx,ry,alpha){
+  g.globalAlpha=alpha; g.drawImage(halo(color),x-rx,y-ry,rx*2,ry*2); g.globalAlpha=1;
+}
 function drawGlowFish(g,f,t){
   var s=f.size*.95,c=GLOW[f.species];
   g.save(); g.translate(f.x,f.y); g.rotate(f.a);
   var wag=Math.sin(f.phase)*.45;
-  g.shadowColor=c[0]; g.shadowBlur=38;
+  drawHalo(g,c[0],0,0,s*1.6,s*1.05,.5);      // the aura the shadowBlur used to paint
   var grd=g.createLinearGradient(s,0,-s,0);
   grd.addColorStop(0,c[0]); grd.addColorStop(1,c[1]);
   g.fillStyle=grd; g.globalAlpha=.92;
@@ -682,13 +702,14 @@ function drawGlowFish(g,f,t){
   g.quadraticCurveTo(s*.55,s*.28,s*.8,s*.78);
   g.quadraticCurveTo(s*.28,s*.6,0,0); g.fill();
   g.restore();
-  g.globalAlpha=1; g.shadowBlur=14;
+  g.globalAlpha=1;
   for(var i=0;i<4;i++){
     var px=s*.55-i*s*.38, tw=.5+.5*Math.sin(t*.004+f.phase*2+i);
+    drawHalo(g,"#FFFFFF",px,s*.08,s*.16,s*.16,.2+.3*tw);
     g.fillStyle="rgba(255,255,255,"+(.35+.55*tw)+")";
     g.beginPath(); g.arc(px,s*.08,s*.045+tw*s*.02,0,7); g.fill();
   }
-  g.shadowBlur=0; g.fillStyle="rgba(255,255,255,.95)";
+  g.fillStyle="rgba(255,255,255,.95)";
   g.beginPath(); g.arc(s*.62,-s*.06,s*.09,0,7); g.fill();
   g.fillStyle="#0A1230"; g.beginPath(); g.arc(s*.64,-s*.06,s*.045,0,7); g.fill();
   g.restore();
@@ -696,25 +717,22 @@ function drawGlowFish(g,f,t){
 function drawGlowPred(g,t){
   if(pred.segs.length<4)return;
   g.lineCap="round"; g.lineJoin="round";
-  g.strokeStyle="rgba(9,13,26,.96)";
-  g.shadowColor="rgba(100,140,255,.5)"; g.shadowBlur=16;
   g.beginPath();
   for(var i=0;i<pred.segs.length;i+=2){
     var p=pred.segs[i];
     if(i===0)g.moveTo(p[0],p[1]); else g.lineTo(p[0],p[1]);
   }
-  g.lineWidth=36; g.stroke();
-  g.shadowBlur=0;
+  g.strokeStyle="rgba(100,140,255,.14)"; g.lineWidth=54; g.stroke(); // faint aura pass
+  g.strokeStyle="rgba(9,13,26,.96)"; g.lineWidth=36; g.stroke();
   // the lure: a thin stalk ahead of the head, ending in a hungry little star
   var lx=pred.x+Math.cos(pred.a)*90, ly=pred.y+Math.sin(pred.a)*90-26;
   g.strokeStyle="rgba(150,180,220,.4)"; g.lineWidth=3;
   g.beginPath(); g.moveTo(pred.x+Math.cos(pred.a)*24,pred.y+Math.sin(pred.a)*24-8);
   g.quadraticCurveTo(pred.x+Math.cos(pred.a)*60,pred.y+Math.sin(pred.a)*60-34,lx,ly); g.stroke();
   var pulse=.6+.4*Math.sin(t*.006);
-  g.shadowColor="#FFE9B8"; g.shadowBlur=30;
+  drawHalo(g,"#FFE9B8",lx,ly,(7+pulse*3)*3.2,(7+pulse*3)*3.2,.45+.3*pulse);
   g.fillStyle="rgba(255,236,190,"+(.75+.25*pulse)+")";
   g.beginPath(); g.arc(lx,ly,7+pulse*3,0,7); g.fill();
-  g.shadowBlur=0;
   g.fillStyle="rgba(190,220,255,.9)"; g.beginPath(); g.arc(pred.x+Math.cos(pred.a)*14,pred.y+Math.sin(pred.a)*14-8,4.5,0,7); g.fill();
 }
 function sceneGlow(g,t){
@@ -734,67 +752,65 @@ function sceneGlow(g,t){
   g.lineCap="round";
   KELP.forEach(function(k){
     var kx=W*k.fx, sway=kelpSway(k,t);
-    var pulse=.5+.5*Math.sin(t*.0018+k.ph*2);
-    g.strokeStyle="rgba(63,224,208,"+(.16+.1*pulse)+")";
-    g.shadowColor="#3FE0D0"; g.shadowBlur=14;
-    g.lineWidth=k.w*.45;
+    var pulse=.5+.5*Math.sin(t*.0018+k.ph*2), stemA=.16+.1*pulse;
     g.beginPath(); g.moveTo(kx,H+20);
-    g.quadraticCurveTo(kx+sway*.4,H*.8,kx+sway,k.top); g.stroke();
+    g.quadraticCurveTo(kx+sway*.4,H*.8,kx+sway,k.top);
+    g.strokeStyle="rgba(63,224,208,"+(stemA*.4)+")"; g.lineWidth=k.w*1.2; g.stroke();
+    g.strokeStyle="rgba(63,224,208,"+stemA+")"; g.lineWidth=k.w*.45; g.stroke();
     for(var L=0;L<4;L++){
       var frac=.35+L*.18, ly=H+20-(H+20-k.top)*frac;
       var lx=kx+sway*frac*frac*1.6, side=(L%2?1:-1);
-      var la=side*(.35+.12*Math.sin(t*.0012+k.ph+L));
-      g.strokeStyle="rgba(63,224,208,"+(.08+.06*pulse)+")";
-      g.lineWidth=k.w*.22;
+      var la=side*(.35+.12*Math.sin(t*.0012+k.ph+L)), lfA=.08+.06*pulse;
       g.beginPath(); g.moveTo(lx,ly);
       g.quadraticCurveTo(lx+Math.cos(la)*70*side,ly+Math.sin(la)*40-14,lx+Math.cos(la)*120*side,ly+Math.sin(la)*65-20);
-      g.stroke();
+      g.strokeStyle="rgba(63,224,208,"+(lfA*.5)+")"; g.lineWidth=k.w*.6; g.stroke();
+      g.strokeStyle="rgba(63,224,208,"+lfA+")"; g.lineWidth=k.w*.22; g.stroke();
     }
-    g.shadowBlur=22;
+    drawHalo(g,"#AAFFF4",kx+sway,k.top,(5+3*pulse)*3,(5+3*pulse)*3,.3+.25*pulse);
     g.fillStyle="rgba(170,255,244,"+(.5+.4*pulse)+")";
     g.beginPath(); g.arc(kx+sway,k.top,5+3*pulse,0,7); g.fill();
-    g.shadowBlur=0;
   });
   ripples.forEach(function(rp){
     var c=GLOW[rp.species][0];
-    g.strokeStyle=c; g.globalAlpha=rp.a*1.4;
-    g.shadowColor=c; g.shadowBlur=12;
-    g.lineWidth=2.6;
-    g.beginPath(); g.arc(rp.x,rp.y,rp.r,0,7); g.stroke();
-    g.globalAlpha=1; g.shadowBlur=0;
+    g.strokeStyle=c;
+    g.beginPath(); g.arc(rp.x,rp.y,rp.r,0,7);
+    g.globalAlpha=Math.min(1,rp.a*.7); g.lineWidth=7; g.stroke();
+    g.globalAlpha=Math.min(1,rp.a*1.4); g.lineWidth=2.6; g.stroke();
+    g.globalAlpha=1;
   });
   food.forEach(function(fd){
-    g.shadowColor="#FFD9A0"; g.shadowBlur=14;
+    drawHalo(g,"#FFD9A0",fd.x,fd.y,fd.size*2.2,fd.size*2.2,.7*fd.alpha);
     g.fillStyle="rgba(255,222,160,"+(.92*fd.alpha)+")";
     g.beginPath(); g.arc(fd.x,fd.y,fd.size*.55,0,7); g.fill();
-    g.shadowBlur=0;
   });
   eggs.forEach(function(e){
     var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
     var pulse=.5+.5*Math.sin(t*.005);
-    g.shadowColor="#AFFBEF"; g.shadowBlur=16;
+    drawHalo(g,"#AFFBEF",ex,ey,30,26,.25+.2*pulse);
     for(var i=0;i<5;i++){
       g.fillStyle="rgba(175,251,239,"+(.4+.4*pulse)+")";
       g.beginPath(); g.arc(ex+Math.cos(i*1.26)*10,ey+Math.sin(i*1.26)*8,4,0,7); g.fill();
     }
-    g.shadowBlur=0;
   });
   deathFx.forEach(function(fx){   // winks out like an ember: drifting sparks
     var k=1-fx.age/130, c=GLOW[fx.species][0];
-    g.shadowColor=c; g.shadowBlur=14;
     fx.parts.forEach(function(p){
+      var r=p.sz*.5*k+.5;
+      drawHalo(g,c,fx.x+p.dx,fx.y+p.dy,r*3.2,r*3.2,.55*k);
       g.fillStyle=c; g.globalAlpha=.8*k;
-      g.beginPath(); g.arc(fx.x+p.dx,fx.y+p.dy,p.sz*.5*k+.5,0,7); g.fill();
+      g.beginPath(); g.arc(fx.x+p.dx,fx.y+p.dy,r,0,7); g.fill();
     });
-    g.globalAlpha=1; g.shadowBlur=0;
+    g.globalAlpha=1;
   });
   GAME.rings.forEach(function(rg){          // rings → golden hoops of light
     if(rg.fade<=0)return;
     var bob=Math.sin(t*.001+rg.ph)*7, pu=.6+.4*Math.sin(t*.003+rg.ph);
-    g.strokeStyle="rgba(255,214,130,"+((rg.done?rg.fade*.5:.75)*pu)+")";
-    g.shadowColor="#FFD682"; g.shadowBlur=18; g.lineWidth=6;
-    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,0,7); g.stroke();
-    g.shadowBlur=0;
+    var a=(rg.done?rg.fade*.5:.75)*pu;
+    g.strokeStyle="#FFD682";
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,0,7);
+    g.globalAlpha=a*.4; g.lineWidth=16; g.stroke();
+    g.globalAlpha=a; g.lineWidth=6; g.stroke();
+    g.globalAlpha=1;
   });
   drawGlowPred(g,t);
   fish.forEach(function(f){drawGlowFish(g,f,t);});
