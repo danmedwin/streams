@@ -159,7 +159,7 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.17 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.18 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -698,7 +698,7 @@ function drawGlowFish(g,f,t){
   g.quadraticCurveTo(0,-s*.72,-s*.55,-s*.12);
   g.quadraticCurveTo(0,-s*.26,s*.5,-s*.14); g.fill();
   g.save(); if(f.odd)g.scale(1,-1);          // the odd fish's fins ride its back
-  var flut3=Math.sin(f.phase*2+.7)*.48;      // far fin strokes on its own beat
+  var flut3=Math.sin(f.phase*2+2.1)*.48;     // far fin strokes well behind the near one — reads as two fins
   g.globalAlpha=.3;                           // far-side pectoral, glimpsed past the body
   g.save(); g.translate(s*.06,s*.04); g.rotate(.38+flut3);
   g.beginPath(); g.moveTo(0,0);
