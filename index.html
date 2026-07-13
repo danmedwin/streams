@@ -156,7 +156,7 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.11 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.12 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -1000,21 +1000,25 @@ function autoAdvanceTarget(){
   var i; do{ i=Math.floor(rand(0,DIRECTIONS.length)); }while(i===cur);
   return i;
 }
-var AUTO_ARCS='<path d="M20.5 9A8 8 0 0 0 6.9 5.6L4.5 8"/><polyline points="4.5 3.5 4.5 8 9 8"/>'+
-  '<path d="M3.5 15a8 8 0 0 0 13.6 3.4l2.4-2.4"/><polyline points="19.5 20.5 19.5 16 15 16"/>';
+var AUTO_TOP='<path d="M20.5 9A8 8 0 0 0 6.9 5.6L4.5 8"/><polyline points="4.5 3.5 4.5 8 9 8"/>';
+var AUTO_BOT='<path d="M3.5 15a8 8 0 0 0 13.6 3.4l2.4-2.4"/><polyline points="19.5 20.5 19.5 16 15 16"/>';
 function autoIcon(){
   var open='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">';
   if(autoMode==="random"){
     return open+'<polyline points="16 3 21 3 21 8"/><path d="M4 20L21 3"/>'+
       '<polyline points="21 16 21 21 16 21"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>';
   }
-  var s=open+AUTO_ARCS;
   if(autoMode==="selected"){
+    // arrows part top/bottom to clear room; ALWAYS exactly 3 symbolic dots, however many inks exist
+    var s2=open+'<g transform="translate(0,-2)">'+AUTO_TOP+'</g>'+
+               '<g transform="translate(0,2)">'+AUTO_BOT+'</g>';
     for(var i=0;i<3;i++){
-      s+='<circle cx="'+(8+i*4)+'" cy="12" r="1.7" stroke-width="1.6"'+
+      s2+='<circle cx="'+(4.5+i*7.5)+'" cy="12" r="2.4" stroke-width="1.6"'+
          (rotation[i]?' fill="currentColor"':' fill="none"')+'/>';
     }
+    return s2+"</svg>";
   }
+  var s=open+AUTO_TOP+AUTO_BOT;
   if(autoMode==="off")s+='<line x1="4.5" y1="19.5" x2="19.5" y2="4.5"/>';
   return s+"</svg>";
 }
