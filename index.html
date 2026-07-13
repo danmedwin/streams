@@ -6,6 +6,9 @@
 <title>Streams — one school of fish, three inks</title>
 <meta name="description" content="Streams: a living aquarium where the same fish flow through three styles of art — sumi-e ink, bioluminescent deep sea, and cut-paper diorama. Feed them. Mind the serpent.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232E6E63'/%3E%3Cpath d='M18 34 Q34 24 50 34 T82 34 M18 52 Q34 42 50 52 T82 52 M18 70 Q34 60 50 70 T82 70' stroke='%23F4E9D4' stroke-width='7' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#14131A; --panel:#1D1B24; --text:#EAE6DC; --muted:#8B8577; --line:#2E2B38; --accent:#D2412E;
@@ -28,12 +31,43 @@ main > div{width:min(960px,100%);}
 .stage{width:100%; aspect-ratio:16/9; border-radius:14px; overflow:hidden; position:relative;
   box-shadow:0 10px 40px rgba(0,0,0,.5); border:1px solid var(--line);}
 canvas.view{width:100%; height:100%; display:block; cursor:pointer;}
-#hud{position:absolute; top:12px; left:14px; font-size:14px; padding:6px 14px; border-radius:99px;
-  opacity:0; transition:opacity .5s ease, background .6s ease, color .6s ease; pointer-events:none;}
+#hud{position:absolute; top:12px; left:14px; opacity:0; pointer-events:none;
+  transition:opacity .5s ease, background .6s ease, color .6s ease, box-shadow .6s ease;}
 #hud.show{opacity:1;}
-body[data-skin="ink"] #hud{background:rgba(241,235,221,.92); color:#3A362C;}
-body[data-skin="glow"] #hud{background:rgba(10,18,48,.88); color:#9FE8DC;}
-body[data-skin="paper"] #hud{background:rgba(244,233,212,.92); color:#2E6E63;}
+/* alerts speak the skin's language too */
+body[data-skin="ink"] #hud{                 /* handwritten note on a paper scrap */
+  font-family:"Caveat",cursive; font-size:20px; color:#3A362C; padding:5px 18px 7px;
+  background:#F6F1E2; border:1px solid #D8D0B8; border-radius:4px 16px 6px 14px;
+  transform:rotate(-1.4deg); box-shadow:2px 3px 9px rgba(60,50,30,.22);}
+body[data-skin="glow"] #hud{                /* glowing digital sign */
+  font-family:"Share Tech Mono",monospace; font-size:13.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:#7FF7E8; padding:8px 16px;
+  background:rgba(6,12,32,.92); border:1px solid rgba(63,224,208,.55); border-radius:6px;
+  text-shadow:0 0 9px rgba(63,224,208,.85);
+  box-shadow:0 0 20px rgba(63,224,208,.28), inset 0 0 14px rgba(63,224,208,.08);}
+body[data-skin="paper"] #hud{               /* unrolled paper scroll */
+  font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#2E5B52; padding:8px 28px;
+  background:#F4E9D4; border-radius:3px; box-shadow:3px 4px 7px rgba(20,40,38,.28);}
+body[data-skin="paper"] #hud::before, body[data-skin="paper"] #hud::after{
+  content:""; position:absolute; top:-3px; bottom:-3px; width:13px; border-radius:8px;
+  background:#E2D3B4; box-shadow:inset 0 0 5px rgba(20,40,38,.4);}
+body[data-skin="paper"] #hud::before{left:-6px;}
+body[data-skin="paper"] #hud::after{right:-6px;}
+/* zen mode: nothing but the tank */
+body.zen header, body.zen .caption, body.zen .panelrow, body.zen #panel, body.zen footer{display:none;}
+body.zen main{padding:0; min-height:100dvh;}
+body.zen main > div{width:100%; max-width:none; display:grid; place-items:center; min-height:100dvh;}
+body.zen .stage{width:min(100vw, calc(100dvh * 16 / 9)); border-radius:0; border:none; box-shadow:none;}
+#zenExit{position:absolute; top:10px; right:10px; z-index:5; width:38px; height:38px; border-radius:50%;
+  display:none; place-items:center; background:rgba(0,0,0,.28); color:rgba(255,255,255,.75);
+  border:none; cursor:pointer; opacity:.22; transition:opacity .3s ease;}
+#zenExit:hover, #zenExit:focus-visible{opacity:1;}
+#zenExit svg{width:16px; height:16px;}
+body.zen #zenExit{display:grid;}
+.zenbtn{width:40px; height:40px; border-radius:12px; padding:0; display:grid; place-items:center;}
+.zenbtn svg{width:18px; height:18px;}
+#panel .rot{min-width:34px; text-align:center; opacity:.45;}
+#panel .rot.on{opacity:1;}
 .caption{margin:14px auto 0; display:flex; justify-content:space-between; gap:16px; align-items:baseline; padding:0 4px;}
 .caption .name{font-size:15px; font-weight:600; white-space:nowrap;}
 .caption .blurb{font-size:13.5px; color:var(--muted); text-align:right; text-wrap:pretty; transition:opacity .8s ease;}
@@ -90,11 +124,21 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
         <path d="M3.5 15a8 8 0 0 0 13.6 3.4l2.4-2.4"/><polyline points="19.5 20.5 19.5 16 15 16"/>
       </svg>
     </button>
+    <button id="zenBtn" class="zenbtn" aria-label="just the tank — hide everything else" title="just the tank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 3 3 3 3 9"/><polyline points="15 3 21 3 21 9"/>
+        <polyline points="9 21 3 21 3 15"/><polyline points="15 21 21 21 21 15"/>
+      </svg>
+    </button>
   </div>
 </header>
 <main>
   <div>
-    <div class="stage"><canvas id="cv" class="view" width="1920" height="1080"></canvas><div id="hud"></div></div>
+    <div class="stage"><canvas id="cv" class="view" width="1920" height="1080"></canvas><div id="hud"></div>
+      <button id="zenExit" aria-label="bring back the controls" title="bring back the controls">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
+    </div>
     <div class="caption">
       <span class="name" id="capName"></span>
       <span class="blurb" id="capBlurb"></span>
@@ -108,11 +152,15 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
       <button class="mode" data-m="eat">Eat a fish</button>
       <button class="mode" data-m="nocatch">No catch</button>
       <button class="mode" data-m="peaceful">Peaceful</button>
+      <span class="lbl">In rotation:</span>
+      <button class="rot on" data-r="0">1</button>
+      <button class="rot on" data-r="1">2</button>
+      <button class="rot on" data-r="2">3</button>
       <span class="lbl" id="pearlLbl"></span>
     </div>
   </div>
 </main>
-<footer>Streams · v0.9 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.10 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -789,35 +837,42 @@ function drawPaperFish(g,f){
 }
 function drawPaperPred(g){
   if(pred.segs.length<4)return;
-  // cut-paper sea serpent: shadow layer, body path, dorsal triangles, big eye
+  /* cut-paper serpent that quietly remembers it is a pair of scissors:
+     long slender body, two handle-loop eyes, a snout hinting at open blades */
   g.lineCap="round"; g.lineJoin="round";
-  g.strokeStyle="rgba(20,40,38,.3)"; g.lineWidth=42;
+  var i,p;
+  g.strokeStyle="rgba(20,40,38,.3)"; g.lineWidth=24;   // paper drop shadow
   g.beginPath();
-  for(var i=0;i<pred.segs.length;i+=2){
-    var p=pred.segs[i];
-    if(i===0)g.moveTo(p[0]+7,p[1]+11); else g.lineTo(p[0]+7,p[1]+11);
+  for(i=0;i<pred.segs.length;i+=2){
+    p=pred.segs[i];
+    if(i===0)g.moveTo(p[0]+6,p[1]+9); else g.lineTo(p[0]+6,p[1]+9);
   }
   g.stroke();
-  g.strokeStyle="#1E4A42"; g.lineWidth=38;
+  g.strokeStyle="#1E4A42"; g.lineWidth=20;             // slender body
   g.beginPath();
   for(i=0;i<pred.segs.length;i+=2){
     p=pred.segs[i];
     if(i===0)g.moveTo(p[0],p[1]); else g.lineTo(p[0],p[1]);
   }
   g.stroke();
-  g.fillStyle="#163832";
-  for(i=4;i<pred.segs.length-4;i+=8){
-    p=pred.segs[i];
-    var q=pred.segs[i+2]||p;
-    var na=Math.atan2(q[1]-p[1],q[0]-p[0])-Math.PI/2;
+  var hx=pred.x, hy=pred.y, ha=pred.a, s;
+  g.fillStyle="#1E4A42";                                // snout: two slim blades, slightly open
+  for(s=-1;s<=1;s+=2){
+    var ba=ha+s*.14;
     g.beginPath();
-    g.moveTo(p[0]+Math.cos(na)*16,p[1]+Math.sin(na)*16);
-    g.lineTo(p[0]+Math.cos(na)*44,p[1]+Math.sin(na)*44);
-    g.lineTo(p[0]+Math.cos(na)*16+26,p[1]+Math.sin(na)*16+4);
+    g.moveTo(hx+Math.cos(ha)*4,hy+Math.sin(ha)*4);
+    g.lineTo(hx+Math.cos(ba)*76,hy+Math.sin(ba)*76);
+    g.lineTo(hx+Math.cos(ba+s*.1)*26,hy+Math.sin(ba+s*.1)*26);
     g.closePath(); g.fill();
   }
-  g.fillStyle="#FFFDF5"; g.beginPath(); g.arc(pred.x+Math.cos(pred.a)*18,pred.y+Math.sin(pred.a)*18-8,11,0,7); g.fill();
-  g.fillStyle="#22303A"; g.beginPath(); g.arc(pred.x+Math.cos(pred.a)*20,pred.y+Math.sin(pred.a)*20-8,5.5,0,7); g.fill();
+  var na=ha-Math.PI/2;                                  // eyes: big round handle-loops
+  for(s=-1;s<=1;s+=2){
+    var ex=hx-Math.cos(ha)*24+Math.cos(na)*s*15, ey=hy-Math.sin(ha)*24+Math.sin(na)*s*15;
+    g.strokeStyle="#163832"; g.lineWidth=6.5;
+    g.beginPath(); g.arc(ex,ey,13,0,7); g.stroke();
+    g.fillStyle="#F4E9D4"; g.beginPath(); g.arc(ex,ey,9.5,0,7); g.fill();
+    g.fillStyle="#22303A"; g.beginPath(); g.arc(ex+Math.cos(ha)*3.5,ey+Math.sin(ha)*3.5,4.2,0,7); g.fill();
+  }
 }
 function waveBand(g,y0,amp,col,t,speed,wl){
   g.fillStyle=col;
@@ -924,6 +979,16 @@ cvA.width=cvB.width=W; cvA.height=cvB.height=H;
 var gA=cvA.getContext("2d"),gB=cvB.getContext("2d");
 
 var cur=0,nxt=-1,fadeT=0,autoOn=true,lastSwitch=0,last=0;
+/* which skins ride the auto-rotation (manual tabs always work) */
+var rotation=(function(){
+  try{ var r=JSON.parse(localStorage.getItem("st_rotation")); if(Array.isArray(r)&&r.length===3&&r.some(Boolean))return r; }catch(e){}
+  return [true,true,true];
+})();
+function saveRotation(){ try{ localStorage.setItem("st_rotation",JSON.stringify(rotation)); }catch(e){} }
+function nextInRotation(from){
+  for(var k=1;k<=3;k++){ var i=(from+k)%3; if(rotation[i])return i; }
+  return from;
+}
 function ease(x){ return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2; }
 function setCaption(i){
   document.getElementById("capName").textContent=DIRECTIONS[i].name;
@@ -943,7 +1008,10 @@ function startFade(i,t){
 function loop(t){
   var dt=Math.min(3,(t-last)/16.7); last=t;
   worldStep(dt,t);
-  if(autoOn&&nxt<0&&t-lastSwitch>AUTO_EVERY_MS)startFade((cur+1)%3,t);
+  if(autoOn&&nxt<0&&t-lastSwitch>AUTO_EVERY_MS){
+    var ni=nextInRotation(cur);
+    if(ni!==cur)startFade(ni,t); else lastSwitch=t;
+  }
   if(nxt>=0){
     fadeT+=(dt*16.7)/FADE_MS;
     DIRECTIONS[cur].scene(gA,t);
@@ -966,7 +1034,22 @@ autoBtn.onclick=function(){
   autoBtn.classList.toggle("on",autoOn);
   autoBtn.setAttribute("aria-pressed",autoOn);
 };
-document.addEventListener("keydown",function(e){ if(e.key>="1"&&e.key<="3")startFade(+e.key-1); });
+document.addEventListener("keydown",function(e){
+  if(e.key>="1"&&e.key<="3")startFade(+e.key-1);
+  if(e.key==="Escape")document.body.classList.remove("zen");
+});
+document.getElementById("zenBtn").onclick=function(){ document.body.classList.add("zen"); };
+document.getElementById("zenExit").onclick=function(){ document.body.classList.remove("zen"); };
+Array.prototype.forEach.call(document.querySelectorAll("#panel .rot"),function(btn){
+  var idx=parseInt(btn.getAttribute("data-r"),10);
+  btn.classList.toggle("on",rotation[idx]);
+  btn.onclick=function(){
+    if(rotation[idx]&&rotation.filter(Boolean).length===1)return;  // keep at least one stream flowing
+    rotation[idx]=!rotation[idx];
+    btn.classList.toggle("on",rotation[idx]);
+    saveRotation();
+  };
+});
 
 /* ─── Tank controls panel ─────────────────────────────────── */
 var panel=document.getElementById("panel");
