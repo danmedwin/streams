@@ -159,7 +159,7 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.16 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.17 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -692,13 +692,13 @@ function drawGlowFish(g,f,t){
   g.beginPath(); g.moveTo(-s*.9,wag*s*.3);
   g.quadraticCurveTo(-s*1.9,wag*s*1.2-s*.5,-s*2.2,wag*s*1.4);
   g.quadraticCurveTo(-s*1.8,wag*s*1.2+s*.5,-s*.9,wag*s*.3); g.fill();
-  var flut=Math.sin(f.phase*2)*.28, flut2=Math.sin(f.phase*2+1.2)*.22;  // dorsal beats offset from the paddle
-  // dorsal: low and flat, hugging the curve of the back
-  g.beginPath(); g.moveTo(s*.45,-s*.29);
-  g.quadraticCurveTo(-flut2*s*.3,-s*(.55+flut2*.18),-s*.5,-s*.27);
-  g.quadraticCurveTo(0,-s*.33,s*.45,-s*.29); g.fill();
+  var flut=Math.sin(f.phase*2)*.55;
+  // dorsal: still, low and flat along the back — base sunk into the body so it never gaps
+  g.beginPath(); g.moveTo(s*.5,-s*.14);
+  g.quadraticCurveTo(0,-s*.72,-s*.55,-s*.12);
+  g.quadraticCurveTo(0,-s*.26,s*.5,-s*.14); g.fill();
   g.save(); if(f.odd)g.scale(1,-1);          // the odd fish's fins ride its back
-  var flut3=Math.sin(f.phase*2+.7)*.24;      // far fin strokes on its own beat
+  var flut3=Math.sin(f.phase*2+.7)*.48;      // far fin strokes on its own beat
   g.globalAlpha=.3;                           // far-side pectoral, glimpsed past the body
   g.save(); g.translate(s*.06,s*.04); g.rotate(.38+flut3);
   g.beginPath(); g.moveTo(0,0);
