@@ -28,6 +28,12 @@ main > div{width:min(960px,100%);}
 .stage{width:100%; aspect-ratio:16/9; border-radius:14px; overflow:hidden; position:relative;
   box-shadow:0 10px 40px rgba(0,0,0,.5); border:1px solid var(--line);}
 canvas.view{width:100%; height:100%; display:block; cursor:pointer;}
+#hud{position:absolute; top:12px; left:14px; font-size:14px; padding:6px 14px; border-radius:99px;
+  opacity:0; transition:opacity .5s ease, background .6s ease, color .6s ease; pointer-events:none;}
+#hud.show{opacity:1;}
+body[data-skin="ink"] #hud{background:rgba(241,235,221,.92); color:#3A362C;}
+body[data-skin="glow"] #hud{background:rgba(10,18,48,.88); color:#9FE8DC;}
+body[data-skin="paper"] #hud{background:rgba(244,233,212,.92); color:#2E6E63;}
 .caption{margin:14px auto 0; display:flex; justify-content:space-between; gap:16px; align-items:baseline; padding:0 4px;}
 .caption .name{font-size:15px; font-weight:600; white-space:nowrap;}
 .caption .blurb{font-size:13.5px; color:var(--muted); text-align:right; text-wrap:pretty; transition:opacity .8s ease;}
@@ -88,7 +94,7 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
 </header>
 <main>
   <div>
-    <div class="stage"><canvas id="cv" class="view" width="1920" height="1080"></canvas></div>
+    <div class="stage"><canvas id="cv" class="view" width="1920" height="1080"></canvas><div id="hud"></div></div>
     <div class="caption">
       <span class="name" id="capName"></span>
       <span class="blurb" id="capBlurb"></span>
@@ -102,10 +108,11 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
       <button class="mode" data-m="eat">Eat a fish</button>
       <button class="mode" data-m="nocatch">No catch</button>
       <button class="mode" data-m="peaceful">Peaceful</button>
+      <span class="lbl" id="pearlLbl"></span>
     </div>
   </div>
 </main>
-<footer>Streams · v0.8 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b></footer>
+<footer>Streams · v0.9 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -197,6 +204,7 @@ Fish.prototype.step=function(dt,school){
   if(this.trail.length>26)this.trail.pop();
 };
 var fish=[]; for(var fi=0;fi<TARGET_POP;fi++)fish.push(new Fish(fi%4));
+setTimeout(function(){ assignOdd(); },0);   // after game code loads
 
 /* ─── WORLD: ripples, food, motes, kelp, light shaft ──────── */
 var ripples=[];
@@ -310,6 +318,7 @@ var deathFx=[];
 function catchFish(f){
   var idx=fish.indexOf(f); if(idx<0)return;
   fish.splice(idx,1);
+  if(f.odd)setTimeout(assignOdd,3000);       // the oddness moves on
   var parts=[];
   for(var i=0;i<10;i++){
     var a=rand(0,Math.PI*2),v=rand(.6,2.4);
@@ -339,7 +348,69 @@ function eggStep(dt,t){
   }
 }
 
+/* ─── WORLD: pearls, the Odd Fish, and the Rings game ──────
+   One fish is always subtly wrong — something sits on the
+   wrong side of it. Clicking it opens the Rings game: guide
+   the school through rings with food. No clock, no failure.
+   Each threaded ring pays a pearl. */
+function loadPearls(){ try{ return parseInt(localStorage.getItem("st_pearls")||"0",10)||0; }catch(e){ return 0; } }
+var pearls=loadPearls();
+function savePearls(){ try{ localStorage.setItem("st_pearls",String(pearls)); }catch(e){} }
+var GAME={active:false, rings:[], threaded:0};
+function assignOdd(){
+  fish.forEach(function(f){ f.odd=false; });
+  if(fish.length)fish[Math.floor(rand(0,fish.length))].odd=true;
+}
+function startRings(){
+  GAME.active=true; GAME.threaded=0; GAME.rings=[];
+  for(var i=0;i<5;i++){
+    var rx,ry,tries=0;                       // spawn away from the school — threading should be earned
+    do{
+      rx=rand(W*.18,W*.82); ry=rand(H*.22,H*.68); tries++;
+    }while(tries<40&&fish.some(function(f){return Math.hypot(f.x-rx,f.y-ry)<300;}));
+    GAME.rings.push({x:rx, y:ry, r:rand(85,120), done:false, fade:1, ph:rand(0,7)});
+  }
+  pred.visitAt=Math.max(pred.visitAt,performance.now()+180000);  // the serpent gives you space
+  updateHud();
+}
+function endRings(){
+  GAME.active=false;
+  assignOdd(); updatePanel();
+  var hud=document.getElementById("hud");
+  hud.textContent="five rings threaded · +5 pearls · "+pearls+" in the inkwell";
+  hud.classList.add("show");
+  setTimeout(function(){ hud.classList.remove("show"); },6000);
+}
+function updateHud(){
+  var hud=document.getElementById("hud");
+  if(GAME.active){
+    hud.textContent="rings · "+GAME.threaded+"/5 — lead the fish through with food";
+    hud.classList.add("show");
+  }
+}
+function gameStep(dt){
+  if(!GAME.active){
+    GAME.rings.forEach(function(rg){ if(rg.fade>0)rg.fade-=.015*dt; });
+    return;
+  }
+  GAME.rings.forEach(function(rg){
+    if(rg.done){ if(rg.fade>0)rg.fade-=.015*dt; return; }
+    for(var i=0;i<fish.length;i++){
+      if(Math.hypot(fish[i].x-rg.x,fish[i].y-rg.y)<rg.r*.45){
+        rg.done=true; GAME.threaded++;
+        pearls++; savePearls();
+        ripples.push({x:rg.x,y:rg.y,r:rg.r*.4,a:.22,species:fish[i].species});
+        ripples.push({x:rg.x,y:rg.y,r:rg.r*.7,a:.14,species:fish[i].species});
+        updateHud();
+        if(GAME.threaded>=GAME.rings.length)endRings();
+        break;
+      }
+    }
+  });
+}
+
 function worldStep(dt,t){
+  gameStep(dt);
   fish.forEach(function(f){
     f.step(dt,fish);
     if(Math.random()<0.014*SPEED){
@@ -378,6 +449,16 @@ cv.addEventListener("pointerdown",function(e){
   if(pred.active){
     for(var i=0;i<pred.segs.length;i+=3){
       if(Math.hypot(pred.segs[i][0]-x,pred.segs[i][1]-y)<110){ startlePred(); return; }
+    }
+  }
+  if(!GAME.active){                          // did you find the odd fish?
+    for(var fi3=0;fi3<fish.length;fi3++){
+      var f3=fish[fi3];
+      if(f3.odd&&Math.hypot(f3.x-x,f3.y-y)<Math.max(72,f3.size*1.6)){
+        ripples.push({x:f3.x,y:f3.y,r:12,a:.22,species:f3.species});
+        startRings();
+        return;
+      }
     }
   }
   dropFood(x,y);
@@ -424,8 +505,9 @@ function drawInkFish(g,f){
   g.lineWidth=s*.06;
   g.beginPath(); g.moveTo(-s*.92,wag*s*.28);
   g.quadraticCurveTo(-s*1.35,wag*s*.9+s*.1,-s*1.6,wag*s*1.15+s*.15); g.stroke();
-  g.fillStyle="#F1EBDD"; g.beginPath(); g.arc(s*.55,-s*.05,s*.1,0,7); g.fill();
-  g.fillStyle="#1B1917"; g.beginPath(); g.arc(s*.57,-s*.05,s*.05,0,7); g.fill();
+  var ey=f.odd?s*.12:-s*.05;                 // the odd fish wears its eye low
+  g.fillStyle="#F1EBDD"; g.beginPath(); g.arc(s*.55,ey,s*.1,0,7); g.fill();
+  g.fillStyle="#1B1917"; g.beginPath(); g.arc(s*.57,ey,s*.05,0,7); g.fill();
   g.restore();
 }
 function drawInkPred(g){
@@ -511,6 +593,15 @@ function sceneInk(g,t){
     gr.addColorStop(0,"rgba(22,20,18,"+(.5*k)+")"); gr.addColorStop(1,"rgba(22,20,18,0)");
     g.fillStyle=gr; g.beginPath(); g.arc(fx.x,fx.y,60+fx.age*1.2,0,7); g.fill();
   });
+  GAME.rings.forEach(function(rg){          // rings → open brush circles
+    if(rg.fade<=0)return;
+    var a=rg.done?rg.fade*.4:.55, bob=Math.sin(t*.001+rg.ph)*7;
+    g.lineCap="round";
+    g.strokeStyle="rgba(35,32,28,"+(a*.9)+")"; g.lineWidth=7;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,.25,6.0); g.stroke();
+    g.strokeStyle="rgba(35,32,28,"+(a*.4)+")"; g.lineWidth=3;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r*.93,2.8,5.7); g.stroke();
+  });
   drawInkPred(g);
   fish.forEach(function(f){drawInkFish(g,f);});
 }
@@ -538,7 +629,8 @@ function drawGlowFish(g,f,t){
   g.quadraticCurveTo(s*.1,-s*1.1+wag*s*.2,s*.6,-s*.8); g.quadraticCurveTo(s*.3,-s*.3,0,-s*.25); g.fill();
   var flut=Math.sin(f.phase*2)*.28;
   g.globalAlpha=.42;
-  g.save(); g.translate(s*.18,s*.1); g.rotate(.65+flut);
+  g.save(); if(f.odd)g.scale(1,-1);          // the odd fish's fin rides its back
+  g.translate(s*.18,s*.1); g.rotate(.65+flut);
   g.beginPath(); g.moveTo(0,0);
   g.quadraticCurveTo(s*.55,s*.28,s*.8,s*.78);
   g.quadraticCurveTo(s*.28,s*.6,0,0); g.fill();
@@ -649,6 +741,14 @@ function sceneGlow(g,t){
     });
     g.globalAlpha=1; g.shadowBlur=0;
   });
+  GAME.rings.forEach(function(rg){          // rings → golden hoops of light
+    if(rg.fade<=0)return;
+    var bob=Math.sin(t*.001+rg.ph)*7, pu=.6+.4*Math.sin(t*.003+rg.ph);
+    g.strokeStyle="rgba(255,214,130,"+((rg.done?rg.fade*.5:.75)*pu)+")";
+    g.shadowColor="#FFD682"; g.shadowBlur=18; g.lineWidth=6;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,0,7); g.stroke();
+    g.shadowBlur=0;
+  });
   drawGlowPred(g,t);
   fish.forEach(function(f){drawGlowFish(g,f,t);});
 }
@@ -682,7 +782,7 @@ function drawPaperFish(g,f){
   g.fillStyle="rgba(255,252,240,.25)";
   g.beginPath(); g.ellipse(s*.1,s*.16,s*.72,s*.16,0,0,7); g.fill();
   g.fillStyle=c[1];
-  g.beginPath(); g.ellipse(-s*.05,s*.1,s*.3,s*.18,-.5+wag*.4,0,7); g.fill();
+  g.beginPath(); g.ellipse(-s*.05,f.odd?-s*.1:s*.1,s*.3,s*.18,f.odd?(.5-wag*.4):(-.5+wag*.4),0,7); g.fill();
   g.fillStyle="#FFFDF5"; g.beginPath(); g.arc(s*.55,-s*.08,s*.16,0,7); g.fill();
   g.fillStyle="#22303A"; g.beginPath(); g.arc(s*.6,-s*.08,s*.08,0,7); g.fill();
   g.restore();
@@ -796,6 +896,15 @@ function scenePaper(g,t){
       g.globalAlpha=1; g.restore();
     });
   });
+  GAME.rings.forEach(function(rg){          // rings → cut-paper hoops with drop shadow
+    if(rg.fade<=0)return;
+    var bob=Math.sin(t*.001+rg.ph)*7, a=rg.done?rg.fade:1;
+    g.globalAlpha=a*.35; g.strokeStyle="#1E4A42"; g.lineWidth=14;
+    g.beginPath(); g.arc(rg.x+5,rg.y+bob+8,rg.r,0,7); g.stroke();
+    g.globalAlpha=a*.9; g.strokeStyle="#F4E9D4"; g.lineWidth=13;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,0,7); g.stroke();
+    g.globalAlpha=1;
+  });
   drawPaperPred(g);
   fish.forEach(function(f){drawPaperFish(g,f);});
   g.globalAlpha=.5; g.drawImage(grainTex,0,0,W,H); g.globalAlpha=1;
@@ -867,6 +976,8 @@ document.getElementById("panelToggle").onclick=function(){
 function updatePanel(){
   document.getElementById("summonBtn").disabled=pred.active;
   document.getElementById("startleBtn").disabled=!pred.active;
+  var pl=document.getElementById("pearlLbl");
+  if(pl)pl.textContent="⚬ "+(typeof pearls==="number"?pearls:0)+" pearls";
 }
 document.getElementById("summonBtn").onclick=function(){ summonPred(); };
 document.getElementById("startleBtn").onclick=function(){ startlePred(); };
