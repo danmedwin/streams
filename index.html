@@ -15,10 +15,10 @@
 }
 *{box-sizing:border-box; margin:0; padding:0;}
 body{background:var(--bg); color:var(--text); font-family:"Avenir Next","Helvetica Neue",system-ui,sans-serif; min-height:100vh; display:flex; flex-direction:column;}
-header{display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--line); flex-wrap:wrap; gap:10px;}
-header h1{font-size:17px; font-weight:600; letter-spacing:.02em;}
-header h1 small{color:var(--muted); font-weight:400; margin-left:8px;}
-.tabs{display:flex; gap:6px; align-items:center;}
+.titlebar{padding:16px 4px 0;}
+.titlebar h1{font-size:17px; font-weight:600; letter-spacing:.02em;}
+.titlebar h1 small{color:var(--muted); font-weight:400; margin-left:8px;}
+.tabs{display:flex; gap:6px; align-items:center; flex-wrap:wrap; padding:10px 4px 0;}
 .tabs button{font-family:inherit; font-size:14px; padding:8px 16px; border-radius:99px; cursor:pointer;
   transition:background .6s ease, color .6s ease, border-color .6s ease, box-shadow .6s ease;}
 .tabs button:focus-visible{outline:2px solid currentColor; outline-offset:2px;}
@@ -53,8 +53,13 @@ body[data-skin="paper"] #hud::before, body[data-skin="paper"] #hud::after{
   background:#E2D3B4; box-shadow:inset 0 0 5px rgba(20,40,38,.4);}
 body[data-skin="paper"] #hud::before{left:-6px;}
 body[data-skin="paper"] #hud::after{right:-6px;}
+/* selection dots live on the skin chips, visible only in "selected" mode */
+.tabs button .seldot{display:none; width:13px; height:13px; border-radius:50%;
+  border:2px solid currentColor; margin-left:7px; pointer-events:auto; flex:none;}
+body.mode-selected .tabs button .seldot{display:inline-block; vertical-align:-2px;}
+.tabs button .seldot.on{background:currentColor;}
 /* zen mode: nothing but the tank */
-body.zen header, body.zen .caption, body.zen .panelrow, body.zen #panel, body.zen footer{display:none;}
+body.zen .titlebar, body.zen .tabs, body.zen .caption, body.zen .panelrow, body.zen #panel, body.zen footer{display:none;}
 body.zen main{padding:0; min-height:100dvh;}
 body.zen main > div{width:100%; max-width:none; display:grid; place-items:center; min-height:100dvh;}
 body.zen .stage{width:min(100vw, calc(100dvh * 16 / 9)); border-radius:0; border:none; box-shadow:none;}
@@ -64,10 +69,10 @@ body.zen .stage{width:min(100vw, calc(100dvh * 16 / 9)); border-radius:0; border
 #zenExit:hover, #zenExit:focus-visible{opacity:1;}
 #zenExit svg{width:16px; height:16px;}
 body.zen #zenExit{display:grid;}
-.zenbtn{width:40px; height:40px; border-radius:12px; padding:0; display:grid; place-items:center;}
-.zenbtn svg{width:18px; height:18px;}
-#panel .rot{min-width:34px; text-align:center; opacity:.45;}
-#panel .rot.on{opacity:1;}
+.tabs .zenbtn{width:40px; height:40px; border-radius:12px; padding:0; display:flex; align-items:center; justify-content:center;}
+.tabs .zenbtn svg{width:19px; height:19px; display:block; flex:none;}
+#autoBtn{display:flex; align-items:center; justify-content:center;}
+#autoBtn svg{display:block; flex:none;}
 .caption{margin:14px auto 0; display:flex; justify-content:space-between; gap:16px; align-items:baseline; padding:0 4px;}
 .caption .name{font-size:15px; font-weight:600; white-space:nowrap;}
 .caption .blurb{font-size:13.5px; color:var(--muted); text-align:right; text-wrap:pretty; transition:opacity .8s ease;}
@@ -112,31 +117,26 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
 </style>
 </head>
 <body>
-<header>
-  <h1>Streams<small>one school of fish · three inks · every element flows between them</small></h1>
-  <div class="tabs" role="tablist">
-    <button id="t0" class="on" role="tab">1 · Ink Wash</button>
-    <button id="t1" role="tab">2 · Deep Glow</button>
-    <button id="t2" role="tab">3 · Paper Reef</button>
-    <button id="autoBtn" class="on" aria-pressed="true" aria-label="auto-cycle the styles" title="auto-cycle the styles">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20.5 9A8 8 0 0 0 6.9 5.6L4.5 8"/><polyline points="4.5 3.5 4.5 8 9 8"/>
-        <path d="M3.5 15a8 8 0 0 0 13.6 3.4l2.4-2.4"/><polyline points="19.5 20.5 19.5 16 15 16"/>
-      </svg>
-    </button>
-    <button id="zenBtn" class="zenbtn" aria-label="just the tank — hide everything else" title="just the tank">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="9 3 3 3 3 9"/><polyline points="15 3 21 3 21 9"/>
-        <polyline points="9 21 3 21 3 15"/><polyline points="15 21 21 21 21 15"/>
-      </svg>
-    </button>
-  </div>
-</header>
 <main>
   <div>
     <div class="stage"><canvas id="cv" class="view" width="1920" height="1080"></canvas><div id="hud"></div>
       <button id="zenExit" aria-label="bring back the controls" title="bring back the controls">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
+    </div>
+    <div class="titlebar">
+      <h1>Streams<small>one school of fish · three inks · every element flows between them</small></h1>
+    </div>
+    <div class="tabs" role="tablist">
+      <button id="t0" class="on" role="tab">1 · Ink Wash<span class="seldot" aria-hidden="true"></span></button>
+      <button id="t1" role="tab">2 · Deep Glow<span class="seldot" aria-hidden="true"></span></button>
+      <button id="t2" role="tab">3 · Paper Reef<span class="seldot" aria-hidden="true"></span></button>
+      <button id="autoBtn" class="on"></button>
+      <button id="zenBtn" class="zenbtn" aria-label="just the tank — hide everything else" title="just the tank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 3 3 3 3 9"/><polyline points="15 3 21 3 21 9"/>
+          <polyline points="9 21 3 21 3 15"/><polyline points="15 21 21 21 21 15"/>
+        </svg>
       </button>
     </div>
     <div class="caption">
@@ -152,15 +152,11 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
       <button class="mode" data-m="eat">Eat a fish</button>
       <button class="mode" data-m="nocatch">No catch</button>
       <button class="mode" data-m="peaceful">Peaceful</button>
-      <span class="lbl">In rotation:</span>
-      <button class="rot on" data-r="0">1</button>
-      <button class="rot on" data-r="1">2</button>
-      <button class="rot on" data-r="2">3</button>
       <span class="lbl" id="pearlLbl"></span>
     </div>
   </div>
 </main>
-<footer>Streams · v0.10 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.11 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -978,7 +974,7 @@ var cvA=document.createElement("canvas"),cvB=document.createElement("canvas");
 cvA.width=cvB.width=W; cvA.height=cvB.height=H;
 var gA=cvA.getContext("2d"),gB=cvB.getContext("2d");
 
-var cur=0,nxt=-1,fadeT=0,autoOn=true,lastSwitch=0,last=0;
+var cur=0,nxt=-1,fadeT=0,lastSwitch=0,last=0;
 /* which skins ride the auto-rotation (manual tabs always work) */
 var rotation=(function(){
   try{ var r=JSON.parse(localStorage.getItem("st_rotation")); if(Array.isArray(r)&&r.length===3&&r.some(Boolean))return r; }catch(e){}
@@ -988,6 +984,53 @@ function saveRotation(){ try{ localStorage.setItem("st_rotation",JSON.stringify(
 function nextInRotation(from){
   for(var k=1;k<=3;k++){ var i=(from+k)%3; if(rotation[i])return i; }
   return from;
+}
+/* the cycle button: auto-play → selected → random → off */
+var AUTOMODES=["auto","selected","random","off"];
+var autoMode=(function(){
+  try{ var m=localStorage.getItem("st_automode"); if(AUTOMODES.indexOf(m)>=0)return m; }catch(e){}
+  return "auto";
+})();
+function saveAutoMode(){ try{ localStorage.setItem("st_automode",autoMode); }catch(e){} }
+function autoAdvanceTarget(){
+  if(autoMode==="off")return -1;
+  if(autoMode==="auto")return (cur+1)%DIRECTIONS.length;
+  if(autoMode==="selected")return nextInRotation(cur);
+  if(DIRECTIONS.length<2)return -1;            // random
+  var i; do{ i=Math.floor(rand(0,DIRECTIONS.length)); }while(i===cur);
+  return i;
+}
+var AUTO_ARCS='<path d="M20.5 9A8 8 0 0 0 6.9 5.6L4.5 8"/><polyline points="4.5 3.5 4.5 8 9 8"/>'+
+  '<path d="M3.5 15a8 8 0 0 0 13.6 3.4l2.4-2.4"/><polyline points="19.5 20.5 19.5 16 15 16"/>';
+function autoIcon(){
+  var open='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">';
+  if(autoMode==="random"){
+    return open+'<polyline points="16 3 21 3 21 8"/><path d="M4 20L21 3"/>'+
+      '<polyline points="21 16 21 21 16 21"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>';
+  }
+  var s=open+AUTO_ARCS;
+  if(autoMode==="selected"){
+    for(var i=0;i<3;i++){
+      s+='<circle cx="'+(8+i*4)+'" cy="12" r="1.7" stroke-width="1.6"'+
+         (rotation[i]?' fill="currentColor"':' fill="none"')+'/>';
+    }
+  }
+  if(autoMode==="off")s+='<line x1="4.5" y1="19.5" x2="19.5" y2="4.5"/>';
+  return s+"</svg>";
+}
+var AUTO_TITLES={auto:"auto-play: cycle all styles", selected:"auto-play: selected styles only (tap a chip's dot)", random:"auto-play: random order", off:"auto-play off"};
+function refreshAutoBtn(){
+  autoBtn.innerHTML=autoIcon();
+  autoBtn.classList.toggle("on",autoMode!=="off");
+  document.body.classList.toggle("mode-selected",autoMode==="selected");
+  autoBtn.title=AUTO_TITLES[autoMode];
+  autoBtn.setAttribute("aria-label",AUTO_TITLES[autoMode]);
+}
+function refreshSelDots(){
+  for(var k=0;k<3;k++){
+    var d=document.querySelector("#t"+k+" .seldot");
+    if(d)d.classList.toggle("on",rotation[k]);
+  }
 }
 function ease(x){ return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2; }
 function setCaption(i){
@@ -1008,9 +1051,9 @@ function startFade(i,t){
 function loop(t){
   var dt=Math.min(3,(t-last)/16.7); last=t;
   worldStep(dt,t);
-  if(autoOn&&nxt<0&&t-lastSwitch>AUTO_EVERY_MS){
-    var ni=nextInRotation(cur);
-    if(ni!==cur)startFade(ni,t); else lastSwitch=t;
+  if(nxt<0&&t-lastSwitch>AUTO_EVERY_MS){
+    var ni=autoAdvanceTarget();
+    if(ni>=0&&ni!==cur)startFade(ni,t); else lastSwitch=t;
   }
   if(nxt>=0){
     fadeT+=(dt*16.7)/FADE_MS;
@@ -1026,13 +1069,21 @@ function loop(t){
   requestAnimationFrame(loop);
 }
 for(var bi=0;bi<3;bi++)(function(i){
-  document.getElementById("t"+i).onclick=function(){ startFade(i); };
+  document.getElementById("t"+i).onclick=function(e){
+    if(e.target.classList&&e.target.classList.contains("seldot")){
+      if(rotation[i]&&rotation.filter(Boolean).length===1)return;  // one stream must keep flowing
+      rotation[i]=!rotation[i]; saveRotation();
+      refreshSelDots(); refreshAutoBtn();
+      return;
+    }
+    startFade(i);
+  };
 })(bi);
 var autoBtn=document.getElementById("autoBtn");
 autoBtn.onclick=function(){
-  autoOn=!autoOn; lastSwitch=performance.now();
-  autoBtn.classList.toggle("on",autoOn);
-  autoBtn.setAttribute("aria-pressed",autoOn);
+  autoMode=AUTOMODES[(AUTOMODES.indexOf(autoMode)+1)%AUTOMODES.length];
+  saveAutoMode(); lastSwitch=performance.now();
+  refreshAutoBtn();
 };
 document.addEventListener("keydown",function(e){
   if(e.key>="1"&&e.key<="3")startFade(+e.key-1);
@@ -1040,16 +1091,6 @@ document.addEventListener("keydown",function(e){
 });
 document.getElementById("zenBtn").onclick=function(){ document.body.classList.add("zen"); };
 document.getElementById("zenExit").onclick=function(){ document.body.classList.remove("zen"); };
-Array.prototype.forEach.call(document.querySelectorAll("#panel .rot"),function(btn){
-  var idx=parseInt(btn.getAttribute("data-r"),10);
-  btn.classList.toggle("on",rotation[idx]);
-  btn.onclick=function(){
-    if(rotation[idx]&&rotation.filter(Boolean).length===1)return;  // keep at least one stream flowing
-    rotation[idx]=!rotation[idx];
-    btn.classList.toggle("on",rotation[idx]);
-    saveRotation();
-  };
-});
 
 /* ─── Tank controls panel ─────────────────────────────────── */
 var panel=document.getElementById("panel");
@@ -1076,6 +1117,7 @@ Array.prototype.forEach.call(document.querySelectorAll("#panel .mode"),function(
 
 pred.visitAt=performance.now()+rand(90000,150000);   // first natural visit: 1.5–2.5 min in
 setCaption(0); lastSwitch=performance.now(); updatePanel();
+refreshAutoBtn(); refreshSelDots();
 requestAnimationFrame(loop);
 </script>
 </body>
