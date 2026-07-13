@@ -159,7 +159,7 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.19 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.20 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -702,18 +702,11 @@ function drawGlowFish(g,f,t){
   g.beginPath(); g.moveTo(-s*.3,s*.24);
   g.quadraticCurveTo(-s*.48,s*.52,-s*.62,s*.46);
   g.quadraticCurveTo(-s*.44,s*.28,-s*.3,s*.24); g.fill();
-  /* pectorals: rooted behind the gill, blades sweeping BACK toward the tail,
-     sculling around their base — pointing them down + alternating reads as
-     shrimp legs, which is how we learned this */
-  g.save(); if(f.odd)g.scale(1,-1);          // the odd fish's fins ride its back
-  var flut4=Math.sin(f.phase*2+.9)*.35;      // far fin trails the near one by a beat
-  g.globalAlpha=.26;                          // far-side pectoral peeking past the body
-  g.save(); g.translate(s*.38,s*.02); g.rotate(flut4); g.scale(.75,.75);
-  g.beginPath(); g.moveTo(0,0);
-  g.quadraticCurveTo(-s*.28,s*.16,-s*.48,s*.4);
-  g.quadraticCurveTo(-s*.16,s*.3,0,0); g.fill();
-  g.restore();
-  g.globalAlpha=.4;                           // near pectoral
+  /* pectoral: rooted behind the gill, blade sweeping BACK toward the tail,
+     sculling around its base — pointing it down + alternating a second one
+     reads as shrimp legs, which is how we learned this. ONE fin only. */
+  g.save(); if(f.odd)g.scale(1,-1);          // the odd fish's fin rides its back
+  g.globalAlpha=.4;
   g.translate(s*.3,s*.1); g.rotate(flut);
   g.beginPath(); g.moveTo(0,0);
   g.quadraticCurveTo(-s*.28,s*.16,-s*.48,s*.4);
