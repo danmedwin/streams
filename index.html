@@ -55,7 +55,7 @@ body[data-skin="paper"] #hud::before{left:-6px;}
 body[data-skin="paper"] #hud::after{right:-6px;}
 body[data-skin="chalk"] #hud{                /* chalk writing pinned to the board */
   font-family:"Caveat",cursive; font-size:21px; color:#F4F2E9; padding:5px 16px 7px;
-  background:#2A3330; border:2px solid rgba(244,242,233,.55); border-radius:8px;
+  background:#294137; border:2px solid rgba(244,242,233,.55); border-radius:8px;
   transform:rotate(-.8deg); box-shadow:2px 3px 9px rgba(0,0,0,.45);}
 /* selected mode: membership shows as an inner ring on the chip itself —
    nothing changes size, so the row never shifts as modes cycle */
@@ -126,10 +126,10 @@ body[data-skin="paper"] #panel, body[data-skin="paper"] #store{background:#F4E9D
 body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
 
 body[data-skin="chalk"] .tabs button, body[data-skin="chalk"] #panel button, body[data-skin="chalk"] #store button{
-  background:#2A3330; color:#E8E6DC; border:1px solid #4A554F;}
+  background:#294137; color:#E8E6DC; border:1px solid #4C6156;}
 body[data-skin="chalk"] .tabs button.on, body[data-skin="chalk"] #panel button.on, body[data-skin="chalk"] #store button.on{
   background:#F4F2E9; color:#232A27; border-color:#F4F2E9;}
-body[data-skin="chalk"] #panel, body[data-skin="chalk"] #store{background:#2A3330; border-color:#4A554F; color:#E8E6DC;}
+body[data-skin="chalk"] #panel, body[data-skin="chalk"] #store{background:#294137; border-color:#4C6156; color:#E8E6DC;}
 body[data-skin="chalk"] #autoBtn.on{box-shadow:0 0 0 3px rgba(244,242,233,.22);}
 </style>
 </head>
@@ -174,7 +174,7 @@ body[data-skin="chalk"] #autoBtn.on{box-shadow:0 0 0 3px rgba(244,242,233,.22);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.24 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.25 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -345,9 +345,10 @@ function predStep(dt,t){
       // lead the target slightly
       var lx=tg.x+Math.cos(tg.a)*60, ly=tg.y+Math.sin(tg.a)*60;
       var g=angTo(pred.a,Math.atan2(ly-pred.y,lx-pred.x));
-      var maxTurn=.018*dt*SPEED;                            // serpents turn like barges — fish can dodge
-      pred.a+=Math.max(-maxTurn,Math.min(maxTurn,g));
       var d2t=Math.pow(tg.x-pred.x,2)+Math.pow(tg.y-pred.y,2);
+      var maxTurn=.018*dt*SPEED;                            // serpents turn like barges — fish can dodge
+      if(d2t<36000)maxTurn*=1.9;                            // …but the final lunge commits
+      pred.a+=Math.max(-maxTurn,Math.min(maxTurn,g));
       if(mode!=="nocatch"&&d2t<3600){                       // 60px: caught
         catchFish(tg);
         pred.state="leave"; pred.target=null;
@@ -374,7 +375,9 @@ function predStep(dt,t){
   pred.a+=Math.sin(pred.phase*2)*.004*dt*SPEED;             // body wave in the heading
   var v=sp*dt*SPEED;
   pred.x+=Math.cos(pred.a)*v; pred.y+=Math.sin(pred.a)*v;
-  if(pred.state!=="leave"){ pred.y=Math.max(120,Math.min(H-120,pred.y)); }
+  // hunts may reach the edge strips — fish used to be uncatchable hugging the top
+  var yPad=(pred.state==="hunt")?55:120;
+  if(pred.state!=="leave"){ pred.y=Math.max(yPad,Math.min(H-yPad,pred.y)); }
   pred.segs.unshift([pred.x,pred.y]);
   if(pred.segs.length>46)pred.segs.pop();
 }
@@ -583,14 +586,14 @@ function eggZoomDraw(g,t,style){
   if(EGG.zoom<=0||!EGG.egg)return;
   var f=eggZoomFrame(t), e=EGG.egg;
   g.globalAlpha=f.z*(style==="glow"?.42:style==="chalk"?.5:.32);   // light veil — the zoomed scene itself carries the focus
-  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#1B211F":"#AFD9CC";
+  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
   for(var i=0;i<6;i++){
     var px=EGG_POS[i][0], py=EGG_POS[i][1];
     if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
     if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
-    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2E3834":"#F4E9D4";
+    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":"#F4E9D4";
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.fill();
     g.save();
     g.beginPath(); g.arc(px,py,EGG_R-6,0,7); g.clip();
@@ -1162,7 +1165,7 @@ var slateTex=null;
 function makeSlate(){
   var c=document.createElement("canvas"); c.width=W; c.height=H;
   var g=c.getContext("2d");
-  g.fillStyle="#26302C"; g.fillRect(0,0,W,H);
+  g.fillStyle="#26443A"; g.fillRect(0,0,W,H);
   for(var i=0;i<9;i++){                        // ghosts of old erasings
     var x=rand(0,W),y=rand(0,H);
     var gr=g.createRadialGradient(x,y,0,x+rand(-120,120),y+rand(-40,40),rand(220,520));
@@ -1211,19 +1214,21 @@ function drawChalkPred(g){
     var p=pred.segs[i];
     if(i===0)g.moveTo(p[0],p[1]); else g.lineTo(p[0],p[1]);
   }
-  g.strokeStyle="rgba(27,33,31,.6)"; g.lineWidth=66; g.stroke();     // the wipe: freshly cleaned slate
-  g.strokeStyle="rgba(244,242,233,.05)"; g.lineWidth=48; g.stroke(); // faint smear of what was written
-  g.save(); g.translate(pred.x,pred.y); g.rotate(pred.a+Math.PI/2);  // the eraser swipes broadside
+  g.strokeStyle="rgba(24,40,34,.6)"; g.lineWidth=58; g.stroke();     // the wipe: freshly cleaned slate
+  g.strokeStyle="rgba(244,242,233,.05)"; g.lineWidth=42; g.stroke(); // faint smear of what was written
+  /* the serpent's BODY is the eraser: a long block gliding lengthwise,
+     leading edge at the head, wood back up, chalked felt down */
+  g.save(); g.translate(pred.x-Math.cos(pred.a)*62,pred.y-Math.sin(pred.a)*62); g.rotate(pred.a);
   g.fillStyle="rgba(0,0,0,.35)";
-  g.beginPath(); g.roundRect(-52+5,-20+8,104,40,10); g.fill();
+  g.beginPath(); g.roundRect(-72+5,-22+8,144,44,11); g.fill();
   g.fillStyle="#3D4441";                                             // felt
-  g.beginPath(); g.roundRect(-52,-20,104,40,10); g.fill();
+  g.beginPath(); g.roundRect(-72,-22,144,44,11); g.fill();
   g.fillStyle="rgba(244,242,233,.16)";                               // chalk-caked working edge
-  g.beginPath(); g.roundRect(-52,10,104,10,5); g.fill();
+  g.beginPath(); g.roundRect(-72,12,144,10,5); g.fill();
   g.fillStyle="#B98E5A";                                             // wooden back
-  g.beginPath(); g.roundRect(-52,-20,104,15,7); g.fill();
+  g.beginPath(); g.roundRect(-72,-22,144,16,8); g.fill();
   g.strokeStyle="rgba(0,0,0,.25)"; g.lineWidth=2;
-  g.beginPath(); g.moveTo(-52,-5); g.lineTo(52,-5); g.stroke();
+  g.beginPath(); g.moveTo(-72,-6); g.lineTo(72,-6); g.stroke();
   g.restore();
 }
 function sceneChalk(g,t){
@@ -1251,11 +1256,14 @@ function sceneChalk(g,t){
       g.quadraticCurveTo(lx+side*34,ly-50+bend*16,lx+side*(88+k.i*7),ly-64-k.i*5+bend*28); g.stroke();
     }
   });
-  ripples.forEach(function(rp){
-    g.strokeStyle="rgba(244,242,233,"+Math.min(.6,rp.a*1.3)+")"; g.lineWidth=3;
-    g.beginPath(); g.arc(rp.x,rp.y,rp.r,0,7); g.stroke();
-    g.strokeStyle="rgba(244,242,233,"+Math.min(.3,rp.a*.6)+")"; g.lineWidth=2;
-    g.beginPath(); g.arc(rp.x,rp.y,rp.r*.62,0,7); g.stroke();
+  ripples.forEach(function(rp){                 // not rings here — little puffs of chalk dust dispersing
+    var seed=rp.x*.37+rp.y*.53;
+    g.fillStyle="rgba(244,242,233,"+Math.min(.5,rp.a*1.2)+")";
+    for(var i=0;i<8;i++){
+      var da=seed+i*2.39996, dr=rp.r*(.5+.5*Math.abs(Math.sin(seed*3+i*1.7)));
+      var sz=1.1+1.7*Math.abs(Math.sin(seed+i*2.3));
+      g.beginPath(); g.arc(rp.x+Math.cos(da)*dr,rp.y+Math.sin(da)*dr*.8,sz,0,7); g.fill();
+    }
   });
   food.forEach(function(fd){
     g.fillStyle="rgba("+(fd.tint?"249,231,159":"244,242,233")+","+(.85*fd.alpha)+")";
