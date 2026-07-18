@@ -159,7 +159,7 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.20 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.21 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -456,8 +456,126 @@ function gameStep(dt){
   });
 }
 
+/* ─── WORLD: the Egg Zoom ──────────────────────────────────
+   Click a sleeping clutch and the water leans in: five eggs,
+   each holding a turned fragment of one flowing stream.
+   Tap an egg to turn it. When the stream runs whole, the
+   clutch wakes and hatches on the spot. No clock, no failure —
+   walk away and the eggs simply hatch on their own later. */
+var EGG={active:false, zoom:0, egg:null, solved:false, solvedT:0};
+var EGG_R=104, EGG_POS=[[0,0],[210,0],[-210,0],[0,-210],[0,210]];
+function eggZoomOpen(eg){
+  if(!eg.puz){                                // first visit: scramble the fragments
+    eg.puz=[0,0,0,0,0]; var scrambled=0;
+    for(var i=0;i<5;i++){ if(Math.random()<.65){ eg.puz[i]=Math.floor(rand(1,8)); scrambled++; } }
+    if(!scrambled)eg.puz[Math.floor(rand(0,5))]=Math.floor(rand(1,8));
+    eg.vrot=eg.puz.map(function(s){return s*Math.PI/4;});
+  }
+  EGG.active=true; EGG.egg=eg; EGG.solved=false;
+  pred.visitAt=Math.max(pred.visitAt,performance.now()+150000);   // the serpent leaves nurseries alone
+  var hud=document.getElementById("hud");
+  hud.textContent="turn the eggs — let the stream run whole";
+  hud.classList.add("show");
+}
+function eggZoomClose(){
+  EGG.active=false;
+  document.getElementById("hud").classList.remove("show");
+}
+function eggClusterXY(e,t){ return [W*e.k.fx+kelpSway(e.k,t), e.k.top+46]; }
+function eggZoomFrame(t){                     // current cluster transform (zoom eases in/out)
+  var z=ease(Math.min(1,EGG.zoom)), e=EGG.egg, p=eggClusterXY(e,t);
+  return {cx:p[0]+(W*.5-p[0])*z, cy:p[1]+(H*.52-p[1])*z, sc:.06+.94*z, z:z};
+}
+function eggZoomClick(x,y){
+  if(EGG.solved)return;
+  var t=performance.now(), e=EGG.egg, f=eggZoomFrame(t);
+  var px=(x-f.cx)/f.sc, py=(y-f.cy)/f.sc;
+  for(var i=0;i<5;i++){
+    if(Math.hypot(px-EGG_POS[i][0],py-EGG_POS[i][1])<EGG_R){ e.puz[i]++; return; }
+  }
+  eggZoomClose();                             // open water: leave them sleeping
+}
+function eggZoomStep(dt,t){
+  if(!EGG.active){
+    if(EGG.zoom>0){ EGG.zoom=Math.max(0,EGG.zoom-.04*dt); if(EGG.zoom<=0)EGG.egg=null; }
+    return;
+  }
+  EGG.zoom=Math.min(1,EGG.zoom+.04*dt);
+  var e=EGG.egg;
+  e.hatch+=dt*16.7;                           // eggs being attended wait for you
+  var settled=true, aligned=true;
+  for(var i=0;i<5;i++){
+    var target=e.puz[i]*Math.PI/4;
+    e.vrot[i]+=(target-e.vrot[i])*Math.min(1,.16*dt);
+    if(Math.abs(target-e.vrot[i])>.02)settled=false;
+    if(e.puz[i]%8!==0)aligned=false;
+  }
+  if(!EGG.solved&&aligned&&settled){
+    EGG.solved=true; EGG.solvedT=t;
+    pearls+=5; savePearls(); updatePanel();
+    document.getElementById("hud").textContent="the stream runs whole · the clutch wakes · +5 pearls";
+  }
+  if(EGG.solved&&t>EGG.solvedT+2600){         // linger on the whole stream, then the fry arrive
+    var p=eggClusterXY(e,t), idx=eggs.indexOf(e);
+    if(idx>=0)eggs.splice(idx,1);
+    for(var i2=0;i2<5;i2++)fish.push(new Fish(Math.floor(rand(0,4)),p[0]+rand(-40,40),p[1]+rand(-26,26),true));
+    ripples.push({x:p[0],y:p[1],r:14,a:.22,species:Math.floor(rand(0,4))});
+    ripples.push({x:p[0],y:p[1],r:34,a:.15,species:Math.floor(rand(0,4))});
+    EGG.active=false; EGG.egg=null; EGG.zoom=0;
+    var hud=document.getElementById("hud");
+    setTimeout(function(){ hud.classList.remove("show"); },4500);
+  }
+}
+/* the shared pattern: six stream-lines in the cluster's frame; each egg clips
+   its circle and rotates its fragment. All fragments at rest = one river. */
+function strokeEggPattern(g,style,t){
+  var pulse=EGG.solved?(.6+.4*Math.sin((t-EGG.solvedT)*.012)):1;
+  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":"46,110,99";
+  g.lineCap="round";
+  for(var pass=0;pass<(style==="glow"?2:1);pass++){
+    g.strokeStyle="rgba("+col+","+((pass===0&&style==="glow")?.22*pulse:(style==="glow"?.9:.85)*pulse)+")";
+    for(var b=0;b<8;b++){
+      var y0=-252+b*72, ph=b*1.7;
+      g.lineWidth=(b%2?6:9)*((pass===0&&style==="glow")?2.3:1);
+      g.beginPath();
+      for(var x=-340;x<=340;x+=20){
+        var yy=y0+Math.sin(x/140+ph)*38+Math.sin(x/57+ph*2.3)*12;
+        if(x===-340)g.moveTo(x,yy); else g.lineTo(x,yy);
+      }
+      g.stroke();
+    }
+  }
+}
+function eggZoomDraw(g,t,style){
+  if(EGG.zoom<=0||!EGG.egg)return;
+  var f=eggZoomFrame(t), e=EGG.egg;
+  g.globalAlpha=f.z*(style==="glow"?.66:.55);                      // the veil
+  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":"#AFD9CC";
+  g.fillRect(0,0,W,H); g.globalAlpha=1;
+  g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
+  for(var i=0;i<5;i++){
+    var px=EGG_POS[i][0], py=EGG_POS[i][1];
+    if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
+    if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
+    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":"#F4E9D4";
+    g.beginPath(); g.arc(px,py,EGG_R,0,7); g.fill();
+    g.save();
+    g.beginPath(); g.arc(px,py,EGG_R-6,0,7); g.clip();
+    g.translate(px,py); g.rotate(e.vrot[i]); g.translate(-px,-py);
+    strokeEggPattern(g,style,t);
+    g.restore();
+    if(style==="glow"){ g.strokeStyle="rgba(63,224,208,.3)"; g.lineWidth=10;
+      g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke(); g.strokeStyle="#3FE0D0"; g.lineWidth=3.5; }
+    else if(style==="ink"){ g.strokeStyle="rgba(35,32,28,.8)"; g.lineWidth=6; }
+    else { g.strokeStyle="rgba(46,110,99,.5)"; g.lineWidth=4; }
+    g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
+  }
+  g.restore();
+}
+
 function worldStep(dt,t){
   gameStep(dt);
+  eggZoomStep(dt,t);
   fish.forEach(function(f){
     f.step(dt,fish);
     if(Math.random()<0.014*SPEED){
@@ -489,17 +607,23 @@ function worldStep(dt,t){
   }
 }
 
-/* click: shoo the serpent if you hit it, otherwise feed */
+/* click: the zoomed clutch owns the pointer; else shoo the serpent if you hit it,
+   wake a sleeping clutch, find the odd fish — otherwise feed */
 cv.addEventListener("pointerdown",function(e){
   var r=cv.getBoundingClientRect();
   var x=(e.clientX-r.left)/r.width*W, y=(e.clientY-r.top)/r.height*H;
+  if(EGG.active){ eggZoomClick(x,y); return; }
   if(pred.active){
     for(var i=0;i<pred.segs.length;i+=3){
       if(Math.hypot(pred.segs[i][0]-x,pred.segs[i][1]-y)<110){ startlePred(); return; }
     }
   }
-  if(!GAME.active){                          // did you find the odd fish?
-    for(var fi3=0;fi3<fish.length;fi3++){
+  if(!GAME.active){
+    for(var ei=0;ei<eggs.length;ei++){       // lean in to a sleeping clutch?
+      var p=eggClusterXY(eggs[ei],performance.now());
+      if(Math.hypot(p[0]-x,p[1]-y)<80){ eggZoomOpen(eggs[ei]); return; }
+    }
+    for(var fi3=0;fi3<fish.length;fi3++){    // did you find the odd fish?
       var f3=fish[fi3];
       if(f3.odd&&Math.hypot(f3.x-x,f3.y-y)<Math.max(72,f3.size*1.6)){
         ripples.push({x:f3.x,y:f3.y,r:12,a:.22,species:f3.species});
@@ -651,6 +775,7 @@ function sceneInk(g,t){
   });
   drawInkPred(g);
   fish.forEach(function(f){drawInkFish(g,f);});
+  eggZoomDraw(g,t,"ink");
 }
 
 /* ══════════════ SKIN 2: DEEP GLOW ══════════════ */
@@ -824,6 +949,7 @@ function sceneGlow(g,t){
   });
   drawGlowPred(g,t);
   fish.forEach(function(f){drawGlowFish(g,f,t);});
+  eggZoomDraw(g,t,"glow");
 }
 
 /* ══════════════ SKIN 3: PAPER REEF ══════════════ */
@@ -987,6 +1113,7 @@ function scenePaper(g,t){
   });
   drawPaperPred(g);
   fish.forEach(function(f){drawPaperFish(g,f);});
+  eggZoomDraw(g,t,"paper");
   g.globalAlpha=.5; g.drawImage(grainTex,0,0,W,H); g.globalAlpha=1;
   var vg=g.createRadialGradient(W/2,H/2,H*.4,W/2,H/2,H*.95);
   vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,"rgba(10,30,26,.28)");
@@ -1119,7 +1246,7 @@ autoBtn.onclick=function(){
 };
 document.addEventListener("keydown",function(e){
   if(e.key>="1"&&e.key<="3")startFade(+e.key-1);
-  if(e.key==="Escape")document.body.classList.remove("zen");
+  if(e.key==="Escape"){ if(EGG.active)eggZoomClose(); else document.body.classList.remove("zen"); }
 });
 document.getElementById("zenBtn").onclick=function(){ document.body.classList.add("zen"); };
 document.getElementById("zenExit").onclick=function(){ document.body.classList.remove("zen"); };
