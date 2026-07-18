@@ -159,7 +159,7 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.22 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.23 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -382,7 +382,7 @@ function catchFish(f){
 var eggs=[],eggAt=null;
 function eggStep(dt,t){
   if(fish.length>=TARGET_POP){ eggAt=null; return; }
-  if(eggs.length===0&&eggAt===null){ eggAt=t+rand(18000,35000); }
+  if(eggs.length===0&&eggAt===null){ eggAt=t+rand(5000,10000); }   // the kelp answers a loss quickly
   if(eggs.length===0&&eggAt!==null&&t>eggAt){
     var k=KELP[Math.floor(rand(0,KELP.length))];
     eggs.push({k:k, hatch:t+15000, laid:t});
@@ -466,12 +466,16 @@ function gameStep(dt){
    clutch wakes and hatches on the spot. No clock, no failure —
    walk away and the eggs simply hatch on their own later. */
 var EGG={active:false, zoom:0, egg:null, solved:false, solvedT:0};
-var EGG_R=104, EGG_POS=[[0,0],[210,0],[-210,0],[0,-210],[0,210]];
+var EGG_R=104, EGG_POS=[[0,0]];               // one in the center, five in a circle
+for(var eri=0;eri<5;eri++){
+  var era=-Math.PI/2+eri*Math.PI*2/5;
+  EGG_POS.push([Math.cos(era)*210,Math.sin(era)*210]);
+}
 function eggZoomOpen(eg){
   if(!eg.puz){                                // first visit: scramble the fragments
-    eg.puz=[0,0,0,0,0]; var scrambled=0;
-    for(var i=0;i<5;i++){ if(Math.random()<.65){ eg.puz[i]=Math.floor(rand(1,8)); scrambled++; } }
-    if(!scrambled)eg.puz[Math.floor(rand(0,5))]=Math.floor(rand(1,8));
+    eg.puz=[0,0,0,0,0,0]; var scrambled=0;
+    for(var i=0;i<6;i++){ if(Math.random()<.65){ eg.puz[i]=Math.floor(rand(1,8)); scrambled++; } }
+    if(!scrambled)eg.puz[Math.floor(rand(0,6))]=Math.floor(rand(1,8));
     eg.vrot=eg.puz.map(function(s){return s*Math.PI/4;});
   }
   EGG.active=true; EGG.egg=eg; EGG.solved=false;
@@ -504,7 +508,7 @@ function eggZoomClick(x,y){
   if(EGG.solved)return;
   var t=performance.now(), e=EGG.egg, f=eggZoomFrame(t);
   var px=(x-f.cx)/f.sc, py=(y-f.cy)/f.sc;
-  for(var i=0;i<5;i++){
+  for(var i=0;i<6;i++){
     if(Math.hypot(px-EGG_POS[i][0],py-EGG_POS[i][1])<EGG_R){ e.puz[i]++; return; }
   }
   eggZoomClose();                             // open water: leave them sleeping
@@ -514,11 +518,11 @@ function eggZoomStep(dt,t){
     if(EGG.zoom>0){ EGG.zoom=Math.max(0,EGG.zoom-.04*dt); if(EGG.zoom<=0)EGG.egg=null; }
     return;
   }
-  EGG.zoom=Math.min(1,EGG.zoom+.04*dt);
+  EGG.zoom=Math.min(1,EGG.zoom+.024*dt);      // an unhurried lean-in
   var e=EGG.egg;
   e.hatch+=dt*16.7;                           // eggs being attended wait for you
   var settled=true, aligned=true;
-  for(var i=0;i<5;i++){
+  for(var i=0;i<6;i++){
     var target=e.puz[i]*Math.PI/4;
     e.vrot[i]+=(target-e.vrot[i])*Math.min(1,.16*dt);
     if(Math.abs(target-e.vrot[i])>.02)settled=false;
@@ -567,7 +571,7 @@ function eggZoomDraw(g,t,style){
   g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
-  for(var i=0;i<5;i++){
+  for(var i=0;i<6;i++){
     var px=EGG_POS[i][0], py=EGG_POS[i][1];
     if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
     if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
@@ -767,9 +771,10 @@ function sceneInk(g,t){
   });
   eggs.forEach(function(e){
     var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
-    for(var i=0;i<5;i++){
+    for(var i=0;i<6;i++){                     // one center, five in a circle — same as the zoom
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.257)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.257)*9:0;
       g.fillStyle="rgba(35,32,28,.55)";
-      g.beginPath(); g.arc(ex+Math.cos(i*1.26)*10,ey+Math.sin(i*1.26)*8,4,0,7); g.fill();
+      g.beginPath(); g.arc(ex+dx,ey+dy,4,0,7); g.fill();
     }
   });
   deathFx.forEach(function(fx){   // a brushstroke un-paints itself: spreading ink bloom
@@ -935,9 +940,10 @@ function sceneGlow(g,t){
     var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
     var pulse=.5+.5*Math.sin(t*.005);
     drawHalo(g,"#AFFBEF",ex,ey,30,26,.25+.2*pulse);
-    for(var i=0;i<5;i++){
+    for(var i=0;i<6;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.257)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.257)*9:0;
       g.fillStyle="rgba(175,251,239,"+(.4+.4*pulse)+")";
-      g.beginPath(); g.arc(ex+Math.cos(i*1.26)*10,ey+Math.sin(i*1.26)*8,4,0,7); g.fill();
+      g.beginPath(); g.arc(ex+dx,ey+dy,4,0,7); g.fill();
     }
   });
   deathFx.forEach(function(fx){   // winks out like an ember: drifting sparks
@@ -1097,11 +1103,12 @@ function scenePaper(g,t){
   });
   eggs.forEach(function(e){
     var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
-    for(var i=0;i<5;i++){
+    for(var i=0;i<6;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.257)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.257)*9:0;
       g.fillStyle="#F4E9D4";
-      g.beginPath(); g.arc(ex+Math.cos(i*1.26)*10,ey+Math.sin(i*1.26)*8,4.5,0,7); g.fill();
+      g.beginPath(); g.arc(ex+dx,ey+dy,4.5,0,7); g.fill();
       g.strokeStyle="rgba(46,110,99,.5)"; g.lineWidth=1.5;
-      g.beginPath(); g.arc(ex+Math.cos(i*1.26)*10,ey+Math.sin(i*1.26)*8,4.5,0,7); g.stroke();
+      g.beginPath(); g.arc(ex+dx,ey+dy,4.5,0,7); g.stroke();
     }
   });
   deathFx.forEach(function(fx){   // bursts into scattering confetti
