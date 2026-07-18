@@ -185,7 +185,7 @@ body[data-skin="laser"] #autoBtn.on{box-shadow:0 0 0 3px rgba(58,36,16,.2);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.29 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.30 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -495,16 +495,16 @@ function gameStep(dt){
    clutch wakes and hatches on the spot. No clock, no failure —
    walk away and the eggs simply hatch on their own later. */
 var EGG={active:false, zoom:0, egg:null, solved:false, solvedT:0};
-var EGG_R=104, EGG_POS=[[0,0]];               // one in the center, five in a circle
-for(var eri=0;eri<5;eri++){
-  var era=-Math.PI/2+eri*Math.PI*2/5;
+var EGG_R=104, EGG_POS=[[0,0]];               // one in the center, six in a circle — all touching
+for(var eri=0;eri<6;eri++){
+  var era=-Math.PI/2+eri*Math.PI/3;
   EGG_POS.push([Math.cos(era)*210,Math.sin(era)*210]);
 }
 function eggZoomOpen(eg){
   if(!eg.puz){                                // first visit: scramble the fragments
-    eg.puz=[0,0,0,0,0,0]; var scrambled=0;
-    for(var i=0;i<6;i++){ if(Math.random()<.65){ eg.puz[i]=Math.floor(rand(1,8)); scrambled++; } }
-    if(!scrambled)eg.puz[Math.floor(rand(0,6))]=Math.floor(rand(1,8));
+    eg.puz=[0,0,0,0,0,0,0]; var scrambled=0;
+    for(var i=0;i<7;i++){ if(Math.random()<.6){ eg.puz[i]=Math.floor(rand(1,8)); scrambled++; } }
+    if(!scrambled)eg.puz[Math.floor(rand(0,7))]=Math.floor(rand(1,8));
     eg.vrot=eg.puz.map(function(s){return s*Math.PI/4;});
   }
   EGG.active=true; EGG.egg=eg; EGG.solved=false;
@@ -537,7 +537,7 @@ function eggZoomClick(x,y){
   if(EGG.solved)return;
   var t=performance.now(), e=EGG.egg, f=eggZoomFrame(t);
   var px=(x-f.cx)/f.sc, py=(y-f.cy)/f.sc;
-  for(var i=0;i<6;i++){
+  for(var i=0;i<7;i++){
     if(Math.hypot(px-EGG_POS[i][0],py-EGG_POS[i][1])<EGG_R){ e.puz[i]++; return; }
   }
   eggZoomClose();                             // open water: leave them sleeping
@@ -551,7 +551,7 @@ function eggZoomStep(dt,t){
   var e=EGG.egg;
   e.hatch+=dt*16.7;                           // eggs being attended wait for you
   var settled=true, aligned=true;
-  for(var i=0;i<6;i++){
+  for(var i=0;i<7;i++){
     var target=e.puz[i]*Math.PI/4;
     e.vrot[i]+=(target-e.vrot[i])*Math.min(1,.16*dt);
     if(Math.abs(target-e.vrot[i])>.02)settled=false;
@@ -583,7 +583,7 @@ function strokeEggPattern(g,style,t){
     g.strokeStyle="rgba("+col+","+((pass===0&&style==="glow")?.22*pulse:(style==="glow"?.9:.85)*pulse)+")";
     for(var b=0;b<8;b++){
       var y0=-252+b*72, ph=b*1.7;
-      g.lineWidth=(b%2?6:9)*((pass===0&&style==="glow")?2.3:1);
+      g.lineWidth=(b%2?3.5:12)*((pass===0&&style==="glow")?2.3:1);   // thick and thin must read at a glance
       g.beginPath();
       for(var x=-340;x<=340;x+=20){
         var yy=y0+Math.sin(x/140+ph)*38+Math.sin(x/57+ph*2.3)*12;
@@ -600,7 +600,7 @@ function eggZoomDraw(g,t,style){
   g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
-  for(var i=0;i<6;i++){
+  for(var i=0;i<7;i++){
     var px=EGG_POS[i][0], py=EGG_POS[i][1];
     if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
     if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
@@ -802,8 +802,8 @@ function sceneInk(g,t){
   });
   eggs.forEach(function(e){
     var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
-    for(var i=0;i<6;i++){                     // one center, five in a circle — same as the zoom
-      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.257)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.257)*9:0;
+    for(var i=0;i<7;i++){                     // one center, six in a circle — same as the zoom
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
       g.fillStyle="rgba(35,32,28,.55)";
       g.beginPath(); g.arc(ex+dx,ey+dy,4,0,7); g.fill();
     }
@@ -971,8 +971,8 @@ function sceneGlow(g,t){
     var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
     var pulse=.5+.5*Math.sin(t*.005);
     drawHalo(g,"#AFFBEF",ex,ey,30,26,.25+.2*pulse);
-    for(var i=0;i<6;i++){
-      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.257)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.257)*9:0;
+    for(var i=0;i<7;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
       g.fillStyle="rgba(175,251,239,"+(.4+.4*pulse)+")";
       g.beginPath(); g.arc(ex+dx,ey+dy,4,0,7); g.fill();
     }
@@ -1134,8 +1134,8 @@ function scenePaper(g,t){
   });
   eggs.forEach(function(e){
     var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
-    for(var i=0;i<6;i++){
-      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.257)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.257)*9:0;
+    for(var i=0;i<7;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
       g.fillStyle="#F4E9D4";
       g.beginPath(); g.arc(ex+dx,ey+dy,4.5,0,7); g.fill();
       g.strokeStyle="rgba(46,110,99,.5)"; g.lineWidth=1.5;
@@ -1315,8 +1315,8 @@ function sceneChalk(g,t){
   });
   eggs.forEach(function(e){
     var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
-    for(var i=0;i<6;i++){
-      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.257)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.257)*9:0;
+    for(var i=0;i<7;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
       g.strokeStyle="rgba(244,242,233,.75)"; g.lineWidth=1.8;
       g.beginPath(); g.arc(ex+dx,ey+dy,4.2,0,7); g.stroke();
     }
@@ -1494,8 +1494,8 @@ function sceneLaser(g,t){
   });
   eggs.forEach(function(e){
     var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
-    for(var i=0;i<6;i++){
-      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.257)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.257)*9:0;
+    for(var i=0;i<7;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
       g.strokeStyle="rgba(74,46,20,.7)"; g.lineWidth=1.8;
       g.beginPath(); g.arc(ex+dx,ey+dy,4.2,0,7); g.stroke();
     }
