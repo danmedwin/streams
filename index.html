@@ -174,7 +174,7 @@ body[data-skin="chalk"] #autoBtn.on{box-shadow:0 0 0 3px rgba(244,242,233,.22);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.26 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.27 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -1206,19 +1206,10 @@ function drawChalkFish(g,f){
   g.beginPath(); g.arc(s*.55,ey,s*.055,0,7); g.fill();
   g.globalAlpha=1; g.restore();
 }
-var wipeTrail=[];                              // chalk-skin memory: where the board was wiped, and how long ago
+var wipeTrail=[];                              // chalk-skin memory: smears the eraser left behind, and how long ago
 function drawChalkPred(g){
-  g.lineCap="round"; g.lineJoin="round";
   for(var w=wipeTrail.length-1;w>=0;w--){ if(++wipeTrail[w][2]>240)wipeTrail.splice(w,1); }
-  if(pred.active)wipeTrail.unshift([pred.x,pred.y,0]);
-  // the wipe: a long band of freshly-cleaned board, healing as the dust resettles
-  for(var i=3;i<wipeTrail.length;i+=3){
-    var q0=wipeTrail[i-3], q1=wipeTrail[i];
-    var k=1-q1[2]/240;
-    g.strokeStyle="rgba(15,28,23,"+(.62*k)+")"; g.lineWidth=48;
-    g.beginPath(); g.moveTo(q0[0],q0[1]); g.lineTo(q1[0],q1[1]); g.stroke();
-  }
-  if(pred.segs.length<4)return;
+  var hasBody=pred.segs.length>=4;
   /* the eraser IS the body: three spine points along the trail (extrapolated
      when the path runs short, so its length never changes) let it flex with
      the swim. Wood back up, chalked felt down, and an eye up front. */
@@ -1237,7 +1228,21 @@ function drawChalkPred(g){
     var dl=Math.hypot(l2[0]-l1[0],l2[1]-l1[1])||1;
     return [l2[0]+(l2[0]-l1[0])/dl*(dist-acc), l2[1]+(l2[1]-l1[1])/dl*(dist-acc)];
   }
-  var P0=[pred.x,pred.y], P1=spine(72), P2=spine(144);
+  var P0,P1,P2;
+  if(hasBody){
+    P0=[pred.x,pred.y]; P1=spine(72); P2=spine(144);
+    if(pred.active)wipeTrail.unshift([P2[0],P2[1],0]);   // the smear emerges from the BACK edge
+  }
+  // white chalk smear: laid down once, never moves, only slowly fades
+  g.lineCap="butt"; g.lineJoin="round";
+  for(var i=3;i<wipeTrail.length;i+=3){
+    var q0=wipeTrail[i-3], q1=wipeTrail[i];
+    var k=1-q1[2]/240;
+    g.strokeStyle="rgba(244,242,233,"+(.13*k)+")"; g.lineWidth=46;
+    g.beginPath(); g.moveTo(q0[0],q0[1]); g.lineTo(q1[0],q1[1]); g.stroke();
+  }
+  g.lineCap="round";
+  if(!hasBody)return;
   var side=(Math.cos(pred.a)>=0)?1:-1;         // wood stays board-up whichever way it glides
   function norm(from,to){
     var dx=to[0]-from[0], dy=to[1]-from[1], d=Math.hypot(dx,dy)||1;
