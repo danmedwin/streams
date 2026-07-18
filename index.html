@@ -196,7 +196,7 @@ body[data-skin="glass"] #autoBtn.on{box-shadow:0 0 0 3px rgba(224,163,46,.3);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.31 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.32 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -1624,32 +1624,59 @@ function drawGlassFish(g,f){
   g.fillStyle="#14141C"; g.beginPath(); g.arc(s*.64,ey,s*.04,0,7); g.fill();
   g.restore();
 }
+var crackTrail=[], crackForks=[];              // the crack lives beyond the serpent: laid once, healing slowly
 function drawGlassPred(g,t){
-  if(pred.segs.length<4)return;
-  g.lineCap="round"; g.lineJoin="round";
-  function crackPath(off){                       // the crack jags; the jag is deterministic
-    g.beginPath();
-    for(var i=0;i<pred.segs.length;i+=2){
-      var p=pred.segs[i], nx=0, ny=0;
-      if(i+2<pred.segs.length){
-        var q=pred.segs[i+2], dx=q[0]-p[0], dy=q[1]-p[1], d=Math.hypot(dx,dy)||1;
-        nx=-dy/d; ny=dx/d;
+  for(var w=crackTrail.length-1;w>=0;w--){ if(++crackTrail[w][2]>360)crackTrail.splice(w,1); }
+  for(w=crackForks.length-1;w>=0;w--){ if(++crackForks[w].age>360)crackForks.splice(w,1); }
+  if(pred.active){
+    var na=pred.a+Math.PI/2, jag=rand(-8,8);   // each point is jagged at birth and never moves
+    crackTrail.unshift([pred.x+Math.cos(na)*jag, pred.y+Math.sin(na)*jag, 0]);
+    if(Math.random()<.07){                     // the crack forks as it runs
+      var fa=pred.a+(Math.random()<.5?1:-1)*rand(.5,1.1), fl=rand(26,64);
+      var pts=[[pred.x,pred.y]], px=pred.x, py=pred.y, segN=Math.max(2,Math.ceil(fl/18));
+      for(var s=0;s<segN;s++){
+        fa+=rand(-.35,.35);
+        px+=Math.cos(fa)*fl/segN; py+=Math.sin(fa)*fl/segN;
+        pts.push([px,py]);
       }
-      var jag=Math.sin(i*2.7)*7;
-      if(i===0)g.moveTo(p[0]+nx*(jag+off),p[1]+ny*(jag+off));
-      else g.lineTo(p[0]+nx*(jag+off),p[1]+ny*(jag+off));
+      var fork={pts:pts, age:0, sub:null};
+      if(Math.random()<.45){                   // and sometimes the fork forks
+        var m=pts[1], sa=fa+(Math.random()<.5?.9:-.9), sl=rand(14,30);
+        fork.sub=[[m[0],m[1]],[m[0]+Math.cos(sa)*sl*.6, m[1]+Math.sin(sa)*sl*.6],
+                  [m[0]+Math.cos(sa+.3)*sl, m[1]+Math.sin(sa+.3)*sl]];
+      }
+      crackForks.push(fork);
     }
   }
-  g.strokeStyle="rgba(240,246,255,.28)"; g.lineWidth=5; crackPath(1.8); g.stroke();  // light caught in the fracture
-  g.strokeStyle="rgba(10,10,16,.85)"; g.lineWidth=3; crackPath(0); g.stroke();
-  g.strokeStyle="rgba(10,10,16,.6)"; g.lineWidth=2;
-  for(var i=4;i<pred.segs.length;i+=8){          // side fractures
-    var p=pred.segs[i], q=pred.segs[i-2]||p;
-    var a=Math.atan2(p[1]-q[1],p[0]-q[0]);
-    var side=(i%16<8)?1:-1, ln=12+((i*13)%18);
-    g.beginPath(); g.moveTo(p[0],p[1]);
-    g.lineTo(p[0]+Math.cos(a+side*.9)*ln, p[1]+Math.sin(a+side*.9)*ln); g.stroke();
+  g.lineCap="round"; g.lineJoin="round";
+  for(var i=2;i<crackTrail.length;i+=2){       // the main fracture, healing from the tail
+    var q0=crackTrail[i-2], q1=crackTrail[i], k=1-q1[2]/360;
+    g.strokeStyle="rgba(240,246,255,"+(.3*k)+")"; g.lineWidth=5;
+    g.beginPath(); g.moveTo(q0[0],q0[1]); g.lineTo(q1[0],q1[1]); g.stroke();
+    g.strokeStyle="rgba(10,10,16,"+(.85*k)+")"; g.lineWidth=2.6;
+    g.beginPath(); g.moveTo(q0[0]+1.5,q0[1]+1.5); g.lineTo(q1[0]+1.5,q1[1]+1.5); g.stroke();
   }
+  function growLine(pts,prog,k){               // a branch extends over time, then heals like the rest
+    if(prog<=0)return;
+    var total=pts.length-1, fseg=prog*total;
+    g.beginPath(); g.moveTo(pts[0][0],pts[0][1]);
+    for(var s2=1;s2<=total;s2++){
+      if(s2<=fseg)g.lineTo(pts[s2][0],pts[s2][1]);
+      else{
+        var f=fseg-(s2-1); if(f<=0)break;
+        g.lineTo(pts[s2-1][0]+(pts[s2][0]-pts[s2-1][0])*f, pts[s2-1][1]+(pts[s2][1]-pts[s2-1][1])*f);
+        break;
+      }
+    }
+    g.strokeStyle="rgba(240,246,255,"+(.25*k)+")"; g.lineWidth=4; g.stroke();
+    g.strokeStyle="rgba(10,10,16,"+(.72*k)+")"; g.lineWidth=1.8; g.stroke();
+  }
+  crackForks.forEach(function(fk){
+    var k=1-fk.age/360;
+    growLine(fk.pts, Math.min(1,fk.age/22), k);
+    if(fk.sub)growLine(fk.sub, Math.min(1,(fk.age-10)/20), k);
+  });
+  if(!pred.active)return;
   drawHalo(g,"#DCE8FF",pred.x,pred.y,30,30,.18); // stress shimmer at the running tip
   g.strokeStyle="rgba(10,10,16,.9)"; g.lineWidth=2.4;
   g.beginPath(); g.moveTo(pred.x,pred.y);
@@ -1718,13 +1745,26 @@ function sceneGlass(g,t){
       g.beginPath(); g.arc(ex+dx,ey+dy,4.2,0,7); g.stroke();
     }
   });
-  deathFx.forEach(function(fx){                  // the pane gives way: a star of stress, then shards
-    var k=1-fx.age/130, c=GLASSC[fx.species];
-    g.strokeStyle="rgba(10,10,16,"+(.7*k)+")"; g.lineWidth=2;
+  deathFx.forEach(function(fx){                  // the pane gives way: forking fracture rays, then shards
+    var k=1-fx.age/130, c=GLASSC[fx.species], seed=fx.x*.013+fx.y*.017;
+    var L=30+fx.age*.9;
     for(var i2=0;i2<6;i2++){
-      var a2=i2*1.047+.3;
-      g.beginPath(); g.moveTo(fx.x,fx.y);
-      g.lineTo(fx.x+Math.cos(a2)*(30+fx.age*.6), fx.y+Math.sin(a2)*(30+fx.age*.6)); g.stroke();
+      var a2=i2*1.047+seed, aa=a2, x0=fx.x, y0=fx.y, pts=[[x0,y0]];
+      for(var s3=0;s3<3;s3++){                   // three jagged reaches per ray
+        aa=a2+Math.sin(seed*7+i2*3+s3*5)*.38;
+        x0+=Math.cos(aa)*L*(.45-.1*s3); y0+=Math.sin(aa)*L*(.45-.1*s3);
+        pts.push([x0,y0]);
+      }
+      g.beginPath(); g.moveTo(pts[0][0],pts[0][1]);
+      for(var s4=1;s4<pts.length;s4++)g.lineTo(pts[s4][0],pts[s4][1]);
+      g.strokeStyle="rgba(240,246,255,"+(.25*k)+")"; g.lineWidth=3.6; g.stroke();
+      g.strokeStyle="rgba(10,10,16,"+(.75*k)+")"; g.lineWidth=2; g.stroke();
+      var fa2=a2+(i2%2?.7:-.7), bx=pts[1][0], by=pts[1][1];   // each ray forks at its first joint
+      g.beginPath(); g.moveTo(bx,by);
+      g.lineTo(bx+Math.cos(fa2)*L*.3, by+Math.sin(fa2)*L*.3);
+      g.lineTo(bx+Math.cos(fa2+(i2%2?.4:-.4))*L*.5, by+Math.sin(fa2+(i2%2?.4:-.4))*L*.5);
+      g.strokeStyle="rgba(240,246,255,"+(.2*k)+")"; g.lineWidth=3; g.stroke();
+      g.strokeStyle="rgba(10,10,16,"+(.6*k)+")"; g.lineWidth=1.5; g.stroke();
     }
     fx.parts.forEach(function(p,pi){
       g.save(); g.translate(fx.x+p.dx,fx.y+p.dy+fx.age*p.sz*.06); g.rotate(p.spin+fx.age*.06);
