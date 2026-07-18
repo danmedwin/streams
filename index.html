@@ -174,7 +174,7 @@ body[data-skin="chalk"] #autoBtn.on{box-shadow:0 0 0 3px rgba(244,242,233,.22);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.25 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.26 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -1206,30 +1206,57 @@ function drawChalkFish(g,f){
   g.beginPath(); g.arc(s*.55,ey,s*.055,0,7); g.fill();
   g.globalAlpha=1; g.restore();
 }
+var wipeTrail=[];                              // chalk-skin memory: where the board was wiped, and how long ago
 function drawChalkPred(g){
-  if(pred.segs.length<4)return;
   g.lineCap="round"; g.lineJoin="round";
-  g.beginPath();
-  for(var i=0;i<pred.segs.length;i+=2){
-    var p=pred.segs[i];
-    if(i===0)g.moveTo(p[0],p[1]); else g.lineTo(p[0],p[1]);
+  for(var w=wipeTrail.length-1;w>=0;w--){ if(++wipeTrail[w][2]>240)wipeTrail.splice(w,1); }
+  if(pred.active)wipeTrail.unshift([pred.x,pred.y,0]);
+  // the wipe: a long band of freshly-cleaned board, healing as the dust resettles
+  for(var i=3;i<wipeTrail.length;i+=3){
+    var q0=wipeTrail[i-3], q1=wipeTrail[i];
+    var k=1-q1[2]/240;
+    g.strokeStyle="rgba(15,28,23,"+(.62*k)+")"; g.lineWidth=48;
+    g.beginPath(); g.moveTo(q0[0],q0[1]); g.lineTo(q1[0],q1[1]); g.stroke();
   }
-  g.strokeStyle="rgba(24,40,34,.6)"; g.lineWidth=58; g.stroke();     // the wipe: freshly cleaned slate
-  g.strokeStyle="rgba(244,242,233,.05)"; g.lineWidth=42; g.stroke(); // faint smear of what was written
-  /* the serpent's BODY is the eraser: a long block gliding lengthwise,
-     leading edge at the head, wood back up, chalked felt down */
-  g.save(); g.translate(pred.x-Math.cos(pred.a)*62,pred.y-Math.sin(pred.a)*62); g.rotate(pred.a);
-  g.fillStyle="rgba(0,0,0,.35)";
-  g.beginPath(); g.roundRect(-72+5,-22+8,144,44,11); g.fill();
-  g.fillStyle="#3D4441";                                             // felt
-  g.beginPath(); g.roundRect(-72,-22,144,44,11); g.fill();
-  g.fillStyle="rgba(244,242,233,.16)";                               // chalk-caked working edge
-  g.beginPath(); g.roundRect(-72,12,144,10,5); g.fill();
-  g.fillStyle="#B98E5A";                                             // wooden back
-  g.beginPath(); g.roundRect(-72,-22,144,16,8); g.fill();
-  g.strokeStyle="rgba(0,0,0,.25)"; g.lineWidth=2;
-  g.beginPath(); g.moveTo(-72,-6); g.lineTo(72,-6); g.stroke();
-  g.restore();
+  if(pred.segs.length<4)return;
+  /* the eraser IS the body: three spine points along the trail (extrapolated
+     when the path runs short, so its length never changes) let it flex with
+     the swim. Wood back up, chalked felt down, and an eye up front. */
+  function spine(dist){
+    var acc=0;
+    for(var j=1;j<pred.segs.length;j++){
+      var a=pred.segs[j-1], b=pred.segs[j];
+      var d=Math.hypot(b[0]-a[0],b[1]-a[1]);
+      if(acc+d>=dist){
+        var f=(dist-acc)/(d||1);
+        return [a[0]+(b[0]-a[0])*f, a[1]+(b[1]-a[1])*f];
+      }
+      acc+=d;
+    }
+    var l1=pred.segs[pred.segs.length-2], l2=pred.segs[pred.segs.length-1];
+    var dl=Math.hypot(l2[0]-l1[0],l2[1]-l1[1])||1;
+    return [l2[0]+(l2[0]-l1[0])/dl*(dist-acc), l2[1]+(l2[1]-l1[1])/dl*(dist-acc)];
+  }
+  var P0=[pred.x,pred.y], P1=spine(72), P2=spine(144);
+  var side=(Math.cos(pred.a)>=0)?1:-1;         // wood stays board-up whichever way it glides
+  function norm(from,to){
+    var dx=to[0]-from[0], dy=to[1]-from[1], d=Math.hypot(dx,dy)||1;
+    return [dy/d*side,-dx/d*side];
+  }
+  var n0=norm(P1,P0), n1=norm(P2,P0), n2=norm(P2,P1);
+  function bodyPass(off,width,style){
+    var a=[P0[0]+n0[0]*off,P0[1]+n0[1]*off], b=[P1[0]+n1[0]*off,P1[1]+n1[1]*off], c=[P2[0]+n2[0]*off,P2[1]+n2[1]*off];
+    g.strokeStyle=style; g.lineWidth=width;
+    g.beginPath(); g.moveTo(a[0],a[1]);
+    g.quadraticCurveTo(2*b[0]-(a[0]+c[0])/2, 2*b[1]-(a[1]+c[1])/2, c[0],c[1]);
+    g.stroke();
+  }
+  bodyPass(0,44,"#3D4441");                    // felt
+  bodyPass(15,13,"#B98E5A");                   // wooden back
+  bodyPass(-16,9,"rgba(244,242,233,.16)");     // chalk-caked working edge
+  var ex=P0[0]-Math.cos(pred.a)*12+n0[0]*5, ey=P0[1]-Math.sin(pred.a)*12+n0[1]*5;
+  g.fillStyle="#F4F2E9"; g.beginPath(); g.arc(ex,ey,7,0,7); g.fill();
+  g.fillStyle="#1E2A24"; g.beginPath(); g.arc(ex+Math.cos(pred.a)*2.6,ey+Math.sin(pred.a)*2.6,3.4,0,7); g.fill();
 }
 function sceneChalk(g,t){
   if(!slateTex)slateTex=makeSlate();
