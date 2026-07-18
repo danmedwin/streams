@@ -159,7 +159,7 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.21 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.22 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -326,7 +326,7 @@ function predStep(dt,t){
     else{
       pred.huntT+=dt;
       var mode=pred.visitMode;
-      sp=(mode==="eat")?4.6:(mode==="eat-try")?4.0:3.4;
+      sp=(mode==="eat")?5.4:(mode==="eat-try")?4.0:3.4;   // eat must outswim the fastest flee (speed*1.6 ≤ 4.8)
       // lead the target slightly
       var lx=tg.x+Math.cos(tg.a)*60, ly=tg.y+Math.sin(tg.a)*60;
       var g=angTo(pred.a,Math.atan2(ly-pred.y,lx-pred.x));
@@ -337,8 +337,11 @@ function predStep(dt,t){
         catchFish(tg);
         pred.state="leave"; pred.target=null;
       }
-      var giveUp=(mode==="eat")?1400:(mode==="eat-try")?650:520;
-      if(pred.huntT>giveUp){ pred.state="leave"; pred.target=null; }
+      var giveUp=(mode==="eat")?2400:(mode==="eat-try")?650:520;
+      if(pred.huntT>giveUp){
+        if(mode==="eat"){ pred.state="patrol"; pred.patrolT=400; pred.target=null; }  // an eat visit doesn't leave hungry
+        else { pred.state="leave"; pred.target=null; }
+      }
     }
   }else{ // leave
     sp=pred.startled>0?5.2:2.6;
@@ -482,9 +485,20 @@ function eggZoomClose(){
   document.getElementById("hud").classList.remove("show");
 }
 function eggClusterXY(e,t){ return [W*e.k.fx+kelpSway(e.k,t), e.k.top+46]; }
-function eggZoomFrame(t){                     // current cluster transform (zoom eases in/out)
-  var z=ease(Math.min(1,EGG.zoom)), e=EGG.egg, p=eggClusterXY(e,t);
-  return {cx:p[0]+(W*.5-p[0])*z, cy:p[1]+(H*.52-p[1])*z, sc:.06+.94*z, z:z};
+/* the WHOLE SCENE dives toward the clutch: a camera transform every skin
+   renders through, clamped so the viewport never leaves the world */
+function camFrame(t){
+  if(EGG.zoom<=0||!EGG.egg)return null;
+  var z=ease(Math.min(1,EGG.zoom)), Z=1+z*4, p=eggClusterXY(EGG.egg,t);
+  var hw=W/(2*Z), hh=H/(2*Z);
+  var cx=W/2+(p[0]-W/2)*z, cy=H/2+(p[1]-H/2)*z;
+  cx=Math.max(hw,Math.min(W-hw,cx)); cy=Math.max(hh,Math.min(H-hh,cy));
+  return {Z:Z, cx:cx, cy:cy, z:z, px:p[0], py:p[1]};
+}
+function eggZoomFrame(t){                     // puzzle anchor: the clutch's on-screen spot under the camera
+  var cam=camFrame(t);
+  if(!cam){ var p=eggClusterXY(EGG.egg,t); return {cx:p[0], cy:p[1], sc:.04, z:0}; }
+  return {cx:(cam.px-cam.cx)*cam.Z+W/2, cy:(cam.py-cam.cy)*cam.Z+H/2, sc:.04+.96*cam.z, z:cam.z};
 }
 function eggZoomClick(x,y){
   if(EGG.solved)return;
@@ -513,12 +527,12 @@ function eggZoomStep(dt,t){
   if(!EGG.solved&&aligned&&settled){
     EGG.solved=true; EGG.solvedT=t;
     pearls+=5; savePearls(); updatePanel();
-    document.getElementById("hud").textContent="the stream runs whole · the clutch wakes · +5 pearls";
+    document.getElementById("hud").textContent="the stream runs whole · a new fish wakes · +5 pearls";
   }
-  if(EGG.solved&&t>EGG.solvedT+2600){         // linger on the whole stream, then the fry arrive
+  if(EGG.solved&&t>EGG.solvedT+2600){         // linger on the whole stream, then the fry arrives
     var p=eggClusterXY(e,t), idx=eggs.indexOf(e);
     if(idx>=0)eggs.splice(idx,1);
-    for(var i2=0;i2<5;i2++)fish.push(new Fish(Math.floor(rand(0,4)),p[0]+rand(-40,40),p[1]+rand(-26,26),true));
+    fish.push(new Fish(Math.floor(rand(0,4)),p[0]+rand(-20,20),p[1]+rand(-14,14),true));  // ONE fry — the tank stays balanced at 8
     ripples.push({x:p[0],y:p[1],r:14,a:.22,species:Math.floor(rand(0,4))});
     ripples.push({x:p[0],y:p[1],r:34,a:.15,species:Math.floor(rand(0,4))});
     EGG.active=false; EGG.egg=null; EGG.zoom=0;
@@ -549,7 +563,7 @@ function strokeEggPattern(g,style,t){
 function eggZoomDraw(g,t,style){
   if(EGG.zoom<=0||!EGG.egg)return;
   var f=eggZoomFrame(t), e=EGG.egg;
-  g.globalAlpha=f.z*(style==="glow"?.66:.55);                      // the veil
+  g.globalAlpha=f.z*(style==="glow"?.42:.32);   // light veil — the zoomed scene itself carries the focus
   g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
@@ -775,7 +789,6 @@ function sceneInk(g,t){
   });
   drawInkPred(g);
   fish.forEach(function(f){drawInkFish(g,f);});
-  eggZoomDraw(g,t,"ink");
 }
 
 /* ══════════════ SKIN 2: DEEP GLOW ══════════════ */
@@ -949,7 +962,6 @@ function sceneGlow(g,t){
   });
   drawGlowPred(g,t);
   fish.forEach(function(f){drawGlowFish(g,f,t);});
-  eggZoomDraw(g,t,"glow");
 }
 
 /* ══════════════ SKIN 3: PAPER REEF ══════════════ */
@@ -1113,7 +1125,6 @@ function scenePaper(g,t){
   });
   drawPaperPred(g);
   fish.forEach(function(f){drawPaperFish(g,f);});
-  eggZoomDraw(g,t,"paper");
   g.globalAlpha=.5; g.drawImage(grainTex,0,0,W,H); g.globalAlpha=1;
   var vg=g.createRadialGradient(W/2,H/2,H*.4,W/2,H/2,H*.95);
   vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,"rgba(10,30,26,.28)");
@@ -1207,6 +1218,13 @@ function startFade(i,t){
   nxt=i; fadeT=0; lastSwitch=t||performance.now();
   setCaption(i);
 }
+/* every skin renders through the camera; the puzzle rides on top in screen space */
+function renderScene(g,i,t){
+  var cam=camFrame(t);
+  if(cam){ g.save(); g.translate(W/2,H/2); g.scale(cam.Z,cam.Z); g.translate(-cam.cx,-cam.cy); }
+  DIRECTIONS[i].scene(g,t);
+  if(cam){ g.restore(); eggZoomDraw(g,t,DIRECTIONS[i].key); }
+}
 function loop(t){
   var dt=Math.min(3,(t-last)/16.7); last=t;
   worldStep(dt,t);
@@ -1216,14 +1234,14 @@ function loop(t){
   }
   if(nxt>=0){
     fadeT+=(dt*16.7)/FADE_MS;
-    DIRECTIONS[cur].scene(gA,t);
-    DIRECTIONS[nxt].scene(gB,t);
+    renderScene(gA,cur,t);
+    renderScene(gB,nxt,t);
     ctx.globalAlpha=1; ctx.drawImage(cvA,0,0);
     ctx.globalAlpha=ease(Math.min(1,fadeT)); ctx.drawImage(cvB,0,0);
     ctx.globalAlpha=1;
     if(fadeT>=1){ cur=nxt; nxt=-1; }
   }else{
-    DIRECTIONS[cur].scene(ctx,t);
+    renderScene(ctx,cur,t);
   }
   requestAnimationFrame(loop);
 }
