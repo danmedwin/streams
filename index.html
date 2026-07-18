@@ -53,6 +53,10 @@ body[data-skin="paper"] #hud::before, body[data-skin="paper"] #hud::after{
   background:#E2D3B4; box-shadow:inset 0 0 5px rgba(20,40,38,.4);}
 body[data-skin="paper"] #hud::before{left:-6px;}
 body[data-skin="paper"] #hud::after{right:-6px;}
+body[data-skin="chalk"] #hud{                /* chalk writing pinned to the board */
+  font-family:"Caveat",cursive; font-size:21px; color:#F4F2E9; padding:5px 16px 7px;
+  background:#2A3330; border:2px solid rgba(244,242,233,.55); border-radius:8px;
+  transform:rotate(-.8deg); box-shadow:2px 3px 9px rgba(0,0,0,.45);}
 /* selected mode: membership shows as an inner ring on the chip itself —
    nothing changes size, so the row never shifts as modes cycle */
 .tabs button[role="tab"]{position:relative; transition:background .6s ease, color .6s ease,
@@ -62,7 +66,7 @@ body[data-skin="paper"] #hud::after{right:-6px;}
 body.mode-selected .tabs button[role="tab"].inrot::after{opacity:.85;}
 body.mode-selected .tabs button[role="tab"]:not(.inrot){opacity:.42;}
 /* zen mode: nothing but the tank */
-body.zen .titlebar, body.zen .tabs, body.zen .caption, body.zen .panelrow, body.zen #panel, body.zen footer{display:none;}
+body.zen .titlebar, body.zen .tabs, body.zen .caption, body.zen .panelrow, body.zen #panel, body.zen #store, body.zen footer{display:none;}
 body.zen main{padding:0; min-height:100dvh;}
 body.zen main > div{width:100%; max-width:none; display:grid; place-items:center; min-height:100dvh;}
 body.zen .stage{width:min(100vw, calc(100dvh * 16 / 9)); border-radius:0; border:none; box-shadow:none;}
@@ -81,42 +85,52 @@ body.zen #zenExit{display:grid;}
 .caption .blurb{font-size:13.5px; color:var(--muted); text-align:right; text-wrap:pretty; transition:opacity .8s ease;}
 /* tank controls */
 .panelrow{margin-top:10px; padding:0 4px;}
-#panelToggle{background:none; border:none; cursor:pointer; font-family:inherit; font-size:13px;
+#panelToggle, #storeToggle{background:none; border:none; cursor:pointer; font-family:inherit; font-size:13px;
   color:var(--muted); text-decoration:underline; text-underline-offset:3px; padding:2px 0;
   transition:color .3s ease;}
-#panelToggle:hover{color:var(--text);}
-#panel{margin-top:10px; padding:12px 14px; border-radius:12px; border:1px solid var(--line);
+#panelToggle:hover, #storeToggle:hover{color:var(--text);}
+.panelrow{color:var(--muted); font-size:13px;}
+#panel, #store{margin-top:10px; padding:12px 14px; border-radius:12px; border:1px solid var(--line);
   display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:13px;
   transition:background .6s ease, border-color .6s ease, color .6s ease;}
-#panel[hidden]{display:none;}
-#panel .lbl{opacity:.7; margin-left:6px;}
-#panel button{font-family:inherit; font-size:13px; padding:6px 13px; border-radius:99px; cursor:pointer;
+#panel[hidden], #store[hidden]{display:none;}
+#panel .lbl, #store .lbl{opacity:.7; margin-left:6px;}
+#store b{font-weight:600; margin-left:4px;}
+#panel button, #store button{font-family:inherit; font-size:13px; padding:6px 13px; border-radius:99px; cursor:pointer;
   transition:background .6s ease, color .6s ease, border-color .6s ease, opacity .3s ease;}
-#panel button:disabled{opacity:.35; cursor:default;}
+#panel button:disabled, #store button:disabled{opacity:.35; cursor:default;}
+#store button.on:disabled{opacity:.8;}
 footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; letter-spacing:.04em;}
 @media (max-width:700px){ .caption{flex-direction:column; gap:4px;} .caption .blurb{text-align:left;} }
 
 /* ─── skin-aware UI: the chrome dresses to match the scene ── */
-body[data-skin="ink"] .tabs button, body[data-skin="ink"] #panel button{
+body[data-skin="ink"] .tabs button, body[data-skin="ink"] #panel button, body[data-skin="ink"] #store button{
   background:#F1EBDD; color:#57503F; border:1px solid #CFC7AE;}
-body[data-skin="ink"] .tabs button.on, body[data-skin="ink"] #panel button.on{
+body[data-skin="ink"] .tabs button.on, body[data-skin="ink"] #panel button.on, body[data-skin="ink"] #store button.on{
   background:#22201C; color:#F1EBDD; border-color:#22201C;}
-body[data-skin="ink"] #panel{background:#F1EBDD; border-color:#CFC7AE; color:#57503F;}
+body[data-skin="ink"] #panel, body[data-skin="ink"] #store{background:#F1EBDD; border-color:#CFC7AE; color:#57503F;}
 body[data-skin="ink"] #autoBtn.on{box-shadow:0 0 0 3px rgba(34,32,28,.15);}
 
-body[data-skin="glow"] .tabs button, body[data-skin="glow"] #panel button{
+body[data-skin="glow"] .tabs button, body[data-skin="glow"] #panel button, body[data-skin="glow"] #store button{
   background:#0A1230; color:#8FBBDD; border:1px solid #1E2C55;}
-body[data-skin="glow"] .tabs button.on, body[data-skin="glow"] #panel button.on{
+body[data-skin="glow"] .tabs button.on, body[data-skin="glow"] #panel button.on, body[data-skin="glow"] #store button.on{
   background:#3FE0D0; color:#04222B; border-color:#3FE0D0; box-shadow:0 0 16px rgba(63,224,208,.45);}
-body[data-skin="glow"] #panel{background:#0A1230; border-color:#1E2C55; color:#8FBBDD;}
+body[data-skin="glow"] #panel, body[data-skin="glow"] #store{background:#0A1230; border-color:#1E2C55; color:#8FBBDD;}
 body[data-skin="glow"] #autoBtn.on{box-shadow:0 0 14px rgba(63,224,208,.5);}
 
-body[data-skin="paper"] .tabs button, body[data-skin="paper"] #panel button{
+body[data-skin="paper"] .tabs button, body[data-skin="paper"] #panel button, body[data-skin="paper"] #store button{
   background:#F4E9D4; color:#2E6E63; border:1px solid #D9C9A8;}
-body[data-skin="paper"] .tabs button.on, body[data-skin="paper"] #panel button.on{
+body[data-skin="paper"] .tabs button.on, body[data-skin="paper"] #panel button.on, body[data-skin="paper"] #store button.on{
   background:#E8654F; color:#FFFDF5; border-color:#E8654F;}
-body[data-skin="paper"] #panel{background:#F4E9D4; border-color:#D9C9A8; color:#2E6E63;}
+body[data-skin="paper"] #panel, body[data-skin="paper"] #store{background:#F4E9D4; border-color:#D9C9A8; color:#2E6E63;}
 body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
+
+body[data-skin="chalk"] .tabs button, body[data-skin="chalk"] #panel button, body[data-skin="chalk"] #store button{
+  background:#2A3330; color:#E8E6DC; border:1px solid #4A554F;}
+body[data-skin="chalk"] .tabs button.on, body[data-skin="chalk"] #panel button.on, body[data-skin="chalk"] #store button.on{
+  background:#F4F2E9; color:#232A27; border-color:#F4F2E9;}
+body[data-skin="chalk"] #panel, body[data-skin="chalk"] #store{background:#2A3330; border-color:#4A554F; color:#E8E6DC;}
+body[data-skin="chalk"] #autoBtn.on{box-shadow:0 0 0 3px rgba(244,242,233,.22);}
 </style>
 </head>
 <body>
@@ -146,7 +160,8 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
       <span class="name" id="capName"></span>
       <span class="blurb" id="capBlurb"></span>
     </div>
-    <div class="panelrow"><button id="panelToggle">≋ tank controls</button></div>
+    <div class="panelrow"><button id="panelToggle">≋ tank controls</button> · <button id="storeToggle" class="panellink">⚬ the inkwell</button></div>
+    <div id="store" hidden></div>
     <div id="panel" hidden>
       <button id="summonBtn">Summon the serpent</button>
       <button id="startleBtn" disabled>Startle it away</button>
@@ -159,7 +174,7 @@ body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
     </div>
   </div>
 </main>
-<footer>Streams · v0.23 · keys 1/2/3 switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.24 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -548,7 +563,7 @@ function eggZoomStep(dt,t){
    its circle and rotates its fragment. All fragments at rest = one river. */
 function strokeEggPattern(g,style,t){
   var pulse=EGG.solved?(.6+.4*Math.sin((t-EGG.solvedT)*.012)):1;
-  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":"46,110,99";
+  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":"46,110,99";
   g.lineCap="round";
   for(var pass=0;pass<(style==="glow"?2:1);pass++){
     g.strokeStyle="rgba("+col+","+((pass===0&&style==="glow")?.22*pulse:(style==="glow"?.9:.85)*pulse)+")";
@@ -567,15 +582,15 @@ function strokeEggPattern(g,style,t){
 function eggZoomDraw(g,t,style){
   if(EGG.zoom<=0||!EGG.egg)return;
   var f=eggZoomFrame(t), e=EGG.egg;
-  g.globalAlpha=f.z*(style==="glow"?.42:.32);   // light veil — the zoomed scene itself carries the focus
-  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":"#AFD9CC";
+  g.globalAlpha=f.z*(style==="glow"?.42:style==="chalk"?.5:.32);   // light veil — the zoomed scene itself carries the focus
+  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#1B211F":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
   for(var i=0;i<6;i++){
     var px=EGG_POS[i][0], py=EGG_POS[i][1];
     if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
     if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
-    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":"#F4E9D4";
+    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2E3834":"#F4E9D4";
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.fill();
     g.save();
     g.beginPath(); g.arc(px,py,EGG_R-6,0,7); g.clip();
@@ -585,6 +600,7 @@ function eggZoomDraw(g,t,style){
     if(style==="glow"){ g.strokeStyle="rgba(63,224,208,.3)"; g.lineWidth=10;
       g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke(); g.strokeStyle="#3FE0D0"; g.lineWidth=3.5; }
     else if(style==="ink"){ g.strokeStyle="rgba(35,32,28,.8)"; g.lineWidth=6; }
+    else if(style==="chalk"){ g.strokeStyle="rgba(244,242,233,.7)"; g.lineWidth=4; }
     else { g.strokeStyle="rgba(46,110,99,.5)"; g.lineWidth=4; }
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
   }
@@ -1138,12 +1154,168 @@ function scenePaper(g,t){
   g.fillStyle=vg; g.fillRect(0,0,W,H);
 }
 
+/* ══════════════ SKIN 4: CHALKBOARD (the first store ink) ══════════════
+   Everything is chalk on green slate — and the serpent is the ERASER.
+   It wipes the board clean as it passes; a caught fish is simply erased. */
+var CHALKC=["#F4F2E9","#F9E79F","#F5B7C1","#AED6F1"];   // white, yellow, pink, blue chalk
+var slateTex=null;
+function makeSlate(){
+  var c=document.createElement("canvas"); c.width=W; c.height=H;
+  var g=c.getContext("2d");
+  g.fillStyle="#26302C"; g.fillRect(0,0,W,H);
+  for(var i=0;i<9;i++){                        // ghosts of old erasings
+    var x=rand(0,W),y=rand(0,H);
+    var gr=g.createRadialGradient(x,y,0,x+rand(-120,120),y+rand(-40,40),rand(220,520));
+    gr.addColorStop(0,"rgba(244,242,233,.035)"); gr.addColorStop(1,"rgba(244,242,233,0)");
+    g.fillStyle=gr; g.fillRect(0,0,W,H);
+  }
+  for(i=0;i<1400;i++){                         // settled chalk dust
+    g.fillStyle="rgba(244,242,233,"+rand(.01,.06)+")";
+    g.beginPath(); g.arc(rand(0,W),rand(0,H),rand(.5,1.8),0,7); g.fill();
+  }
+  return c;
+}
+function drawChalkFish(g,f){
+  var s=f.size*1.15, c=CHALKC[f.species];
+  g.save(); g.translate(f.x,f.y); g.rotate(f.a);
+  var wag=Math.sin(f.phase)*.5;
+  g.lineCap="round"; g.lineJoin="round"; g.strokeStyle=c;
+  for(var p=0;p<2;p++){                        // soft ghost pass under the crisp line = chalk
+    var o=p?0:2.5;
+    g.globalAlpha=p?.85:.2; g.lineWidth=p?4.2:7.5;
+    g.beginPath(); g.moveTo(s+o,o);
+    g.bezierCurveTo(s*.55+o,-s*.38+o,-s*.35+o,-s*.34+o,-s+o,wag*s*.28+o);
+    g.bezierCurveTo(-s*.35+o,s*.34+o,s*.55+o,s*.38+o,s+o,o);
+    g.stroke();
+  }
+  g.globalAlpha=.8; g.lineWidth=3.4;
+  g.beginPath(); g.moveTo(-s*.95,wag*s*.28);
+  g.quadraticCurveTo(-s*1.35,wag*s*.8-s*.2,-s*1.6,wag*s-s*.28); g.stroke();
+  g.beginPath(); g.moveTo(-s*.95,wag*s*.28);
+  g.quadraticCurveTo(-s*1.3,wag*s*.8+s*.12,-s*1.5,wag*s+s*.2); g.stroke();
+  g.globalAlpha=.5; g.lineWidth=2.6;           // three quick gill ticks
+  for(var k=0;k<3;k++){
+    g.beginPath(); g.moveTo(s*.3-k*s*.26,s*.1);
+    g.quadraticCurveTo(s*.24-k*s*.26,s*.19,s*.14-k*s*.26,s*.24); g.stroke();
+  }
+  var ey=f.odd?s*.14:-s*.06;                   // the odd fish wears its eye low, like the ink
+  g.globalAlpha=.95; g.fillStyle=c;
+  g.beginPath(); g.arc(s*.55,ey,s*.055,0,7); g.fill();
+  g.globalAlpha=1; g.restore();
+}
+function drawChalkPred(g){
+  if(pred.segs.length<4)return;
+  g.lineCap="round"; g.lineJoin="round";
+  g.beginPath();
+  for(var i=0;i<pred.segs.length;i+=2){
+    var p=pred.segs[i];
+    if(i===0)g.moveTo(p[0],p[1]); else g.lineTo(p[0],p[1]);
+  }
+  g.strokeStyle="rgba(27,33,31,.6)"; g.lineWidth=66; g.stroke();     // the wipe: freshly cleaned slate
+  g.strokeStyle="rgba(244,242,233,.05)"; g.lineWidth=48; g.stroke(); // faint smear of what was written
+  g.save(); g.translate(pred.x,pred.y); g.rotate(pred.a+Math.PI/2);  // the eraser swipes broadside
+  g.fillStyle="rgba(0,0,0,.35)";
+  g.beginPath(); g.roundRect(-52+5,-20+8,104,40,10); g.fill();
+  g.fillStyle="#3D4441";                                             // felt
+  g.beginPath(); g.roundRect(-52,-20,104,40,10); g.fill();
+  g.fillStyle="rgba(244,242,233,.16)";                               // chalk-caked working edge
+  g.beginPath(); g.roundRect(-52,10,104,10,5); g.fill();
+  g.fillStyle="#B98E5A";                                             // wooden back
+  g.beginPath(); g.roundRect(-52,-20,104,15,7); g.fill();
+  g.strokeStyle="rgba(0,0,0,.25)"; g.lineWidth=2;
+  g.beginPath(); g.moveTo(-52,-5); g.lineTo(52,-5); g.stroke();
+  g.restore();
+}
+function sceneChalk(g,t){
+  if(!slateTex)slateTex=makeSlate();
+  g.drawImage(slateTex,0,0);
+  g.save(); g.globalAlpha=.045+.02*Math.sin(t*.0005);                // a pale wash of board light
+  g.fillStyle="#F4F2E9"; rayPath(g); g.fill(); g.restore();
+  motes.forEach(function(m){                                         // drifting chalk dust
+    var tw=.4+.6*Math.abs(Math.sin(t*.001+m.tw));
+    g.fillStyle="rgba(244,242,233,"+(.13*tw)+")";
+    g.beginPath(); g.arc(m.x,m.y,m.r,0,7); g.fill();
+  });
+  g.lineCap="round";
+  KELP.forEach(function(k){                                          // chalk reeds in pale sage
+    var kx=W*k.fx, sway=kelpSway(k,t);
+    g.strokeStyle="rgba(191,216,194,.5)"; g.lineWidth=k.w*.4;
+    g.beginPath(); g.moveTo(kx,H+20);
+    g.quadraticCurveTo(kx+sway*.4,H*.8,kx+sway,k.top); g.stroke();
+    for(var L=0;L<4;L++){
+      var frac=.35+L*.18, ly=H+20-(H+20-k.top)*frac;
+      var lx=kx+sway*frac*frac*1.6, side=(L%2?1:-1);
+      var bend=.25*Math.sin(t*.0012+k.ph+L);
+      g.strokeStyle="rgba(191,216,194,"+(.3+.1*(L%2))+")"; g.lineWidth=k.w*.24;
+      g.beginPath(); g.moveTo(lx,ly);
+      g.quadraticCurveTo(lx+side*34,ly-50+bend*16,lx+side*(88+k.i*7),ly-64-k.i*5+bend*28); g.stroke();
+    }
+  });
+  ripples.forEach(function(rp){
+    g.strokeStyle="rgba(244,242,233,"+Math.min(.6,rp.a*1.3)+")"; g.lineWidth=3;
+    g.beginPath(); g.arc(rp.x,rp.y,rp.r,0,7); g.stroke();
+    g.strokeStyle="rgba(244,242,233,"+Math.min(.3,rp.a*.6)+")"; g.lineWidth=2;
+    g.beginPath(); g.arc(rp.x,rp.y,rp.r*.62,0,7); g.stroke();
+  });
+  food.forEach(function(fd){
+    g.fillStyle="rgba("+(fd.tint?"249,231,159":"244,242,233")+","+(.85*fd.alpha)+")";
+    g.beginPath(); g.arc(fd.x,fd.y,fd.size*.6,0,7); g.fill();
+  });
+  eggs.forEach(function(e){
+    var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
+    for(var i=0;i<6;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.257)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.257)*9:0;
+      g.strokeStyle="rgba(244,242,233,.75)"; g.lineWidth=1.8;
+      g.beginPath(); g.arc(ex+dx,ey+dy,4.2,0,7); g.stroke();
+    }
+  });
+  deathFx.forEach(function(fx){                                      // erased into a puff of dust
+    var k=1-fx.age/130;
+    var gr=g.createRadialGradient(fx.x,fx.y,0,fx.x,fx.y,50+fx.age);
+    gr.addColorStop(0,"rgba(244,242,233,"+(.22*k)+")"); gr.addColorStop(1,"rgba(244,242,233,0)");
+    g.fillStyle=gr; g.beginPath(); g.arc(fx.x,fx.y,50+fx.age,0,7); g.fill();
+    fx.parts.forEach(function(p){
+      g.fillStyle="rgba(244,242,233,"+(.55*k)+")";
+      g.beginPath(); g.arc(fx.x+p.dx,fx.y+p.dy,p.sz*.4*k+.4,0,7); g.fill();
+    });
+  });
+  GAME.rings.forEach(function(rg){                                   // rings → chalked hoops
+    if(rg.fade<=0)return;
+    var a=rg.done?rg.fade*.4:.6, bob=Math.sin(t*.001+rg.ph)*7;
+    g.strokeStyle="rgba(244,242,233,"+a+")"; g.lineWidth=5;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,.3,6.1); g.stroke();
+    g.strokeStyle="rgba(244,242,233,"+(a*.4)+")"; g.lineWidth=2.5;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r*.94,2.9,5.6); g.stroke();
+  });
+  drawChalkPred(g);
+  fish.forEach(function(f){drawChalkFish(g,f);});
+}
+
 /* ─── Director ────────────────────────────────────────────── */
 var DIRECTIONS=[
   {key:"ink",  name:"1 · Ink Wash",  blurb:"Brushstroke koi, ink-ring ripples, calligraphic reeds — and a serpent of darker ink.", scene:sceneInk},
   {key:"glow", name:"2 · Deep Glow", blurb:"Lanternfish, bioluminescent ripple-rings, glowing sea whips — and a gulper eel with a hungry little lure.", scene:sceneGlow},
   {key:"paper",name:"3 · Paper Reef",blurb:"Cut-paper fish, paper-ring ripples, leafy kelp, rising bubbles — and a storybook sea serpent.", scene:scenePaper},
 ];
+/* ─── the ink collection: store inks join the base three ──── */
+var CATALOG=[
+  {key:"chalk", name:"Chalkboard", price:25,
+   tease:"green slate, chalk-line fish — and the eraser",
+   blurb:"Chalk-drawn fish on green slate, dusty ripples, sage reeds — and the board's eraser, wiping as it hunts.",
+   scene:sceneChalk},
+];
+var owned=(function(){ try{ var v=JSON.parse(localStorage.getItem("st_inks")); return Array.isArray(v)?v:[]; }catch(e){ return []; } })();
+function saveInks(){ try{ localStorage.setItem("st_inks",JSON.stringify(owned)); }catch(e){} }
+function addInkToTank(cat){                    // one chip, one DIRECTIONS entry; rotation handled by caller
+  var idx=DIRECTIONS.length;
+  DIRECTIONS.push({key:cat.key, name:(idx+1)+" · "+cat.name, blurb:cat.blurb, scene:cat.scene});
+  var b=document.createElement("button");
+  b.id="t"+idx; b.setAttribute("role","tab"); b.textContent=(idx+1)+" · "+cat.name;
+  document.querySelector(".tabs").insertBefore(b,document.getElementById("autoBtn"));
+  bindChip(idx);
+}
+CATALOG.forEach(function(c){ if(owned.indexOf(c.key)>=0)addInkToTank(c); });
+
 var cvA=document.createElement("canvas"),cvB=document.createElement("canvas");
 cvA.width=cvB.width=W; cvA.height=cvB.height=H;
 var gA=cvA.getContext("2d"),gB=cvB.getContext("2d");
@@ -1151,12 +1323,20 @@ var gA=cvA.getContext("2d"),gB=cvB.getContext("2d");
 var cur=0,nxt=-1,fadeT=0,lastSwitch=0,last=0;
 /* which skins ride the auto-rotation (manual tabs always work) */
 var rotation=(function(){
-  try{ var r=JSON.parse(localStorage.getItem("st_rotation")); if(Array.isArray(r)&&r.length===3&&r.some(Boolean))return r; }catch(e){}
-  return [true,true,true];
+  try{
+    var r=JSON.parse(localStorage.getItem("st_rotation"));
+    if(Array.isArray(r)){
+      r=r.slice(0,DIRECTIONS.length);
+      while(r.length<DIRECTIONS.length)r.push(true);   // newly owned inks join the flow
+      if(r.some(Boolean))return r;
+    }
+  }catch(e){}
+  var d=[]; for(var di=0;di<DIRECTIONS.length;di++)d.push(true); return d;
 })();
 function saveRotation(){ try{ localStorage.setItem("st_rotation",JSON.stringify(rotation)); }catch(e){} }
 function nextInRotation(from){
-  for(var k=1;k<=3;k++){ var i=(from+k)%3; if(rotation[i])return i; }
+  var n=DIRECTIONS.length;
+  for(var k=1;k<=n;k++){ var i=(from+k)%n; if(rotation[i])return i; }
   return from;
 }
 /* the cycle button: auto-play → selected → random → off */
@@ -1205,7 +1385,7 @@ function refreshAutoBtn(){
   autoBtn.setAttribute("aria-label",AUTO_TITLES[autoMode]);
 }
 function refreshChips(){
-  for(var k=0;k<3;k++){
+  for(var k=0;k<DIRECTIONS.length;k++){
     document.getElementById("t"+k).classList.toggle("inrot",rotation[k]);
   }
 }
@@ -1216,7 +1396,7 @@ function setCaption(i){
   var b=document.getElementById("capBlurb");
   b.style.opacity=0;
   setTimeout(function(){ b.textContent=DIRECTIONS[i].blurb; b.style.opacity=1; },400);
-  for(var k=0;k<3;k++)document.getElementById("t"+k).classList.toggle("on",k===i);
+  for(var k=0;k<DIRECTIONS.length;k++)document.getElementById("t"+k).classList.toggle("on",k===i);
 }
 function startFade(i,t){
   if(i===cur&&nxt<0)return;
@@ -1252,7 +1432,7 @@ function loop(t){
   }
   requestAnimationFrame(loop);
 }
-for(var bi=0;bi<3;bi++)(function(i){
+function bindChip(i){
   document.getElementById("t"+i).onclick=function(){
     if(autoMode==="selected"){                 // chips become the toggles themselves
       if(rotation[i]&&rotation.filter(Boolean).length===1)return;  // one stream must keep flowing
@@ -1262,7 +1442,8 @@ for(var bi=0;bi<3;bi++)(function(i){
     }
     startFade(i);
   };
-})(bi);
+}
+for(var bi=0;bi<3;bi++)bindChip(bi);           // store chips bind themselves in addInkToTank
 var autoBtn=document.getElementById("autoBtn");
 autoBtn.onclick=function(){
   autoMode=AUTOMODES[(AUTOMODES.indexOf(autoMode)+1)%AUTOMODES.length];
@@ -1270,7 +1451,7 @@ autoBtn.onclick=function(){
   refreshAutoBtn();
 };
 document.addEventListener("keydown",function(e){
-  if(e.key>="1"&&e.key<="3")startFade(+e.key-1);
+  if(e.key>="1"&&e.key<="9"&&+e.key<=DIRECTIONS.length)startFade(+e.key-1);
   if(e.key==="Escape"){ if(EGG.active)eggZoomClose(); else document.body.classList.remove("zen"); }
 });
 document.getElementById("zenBtn").onclick=function(){ document.body.classList.add("zen"); };
@@ -1286,6 +1467,44 @@ function updatePanel(){
   document.getElementById("startleBtn").disabled=!pred.active;
   var pl=document.getElementById("pearlLbl");
   if(pl)pl.textContent="⚬ "+(typeof pearls==="number"?pearls:0)+" pearls";
+  var st=document.getElementById("store");
+  if(st&&!st.hidden)renderStore();
+}
+
+/* ─── The inkwell: spend pearls, gain inks ────────────────── */
+var store=document.getElementById("store");
+document.getElementById("storeToggle").onclick=function(){
+  store.hidden=!store.hidden;
+  if(!store.hidden)renderStore();
+};
+function renderStore(){
+  var h='<span class="lbl">⚬ '+pearls+' pearls in the inkwell</span>';
+  for(var i=0;i<CATALOG.length;i++){
+    var c=CATALOG[i], has=owned.indexOf(c.key)>=0;
+    h+='<b>'+c.name+'</b><span class="lbl">'+c.tease+'</span>';
+    h+=has?'<button class="on" disabled>in the water</button>'
+          :'<button data-ink="'+c.key+'"'+(pearls<c.price?' disabled title="the games pay in pearls"':'')+'>'+c.price+' ⚬</button>';
+  }
+  h+='<span class="lbl">· more inks are still settling…</span>';
+  store.innerHTML=h;
+  Array.prototype.forEach.call(store.querySelectorAll("button[data-ink]"),function(b){
+    b.onclick=function(){ buyInk(b.getAttribute("data-ink")); };
+  });
+}
+function buyInk(key){
+  var cat=null;
+  for(var i=0;i<CATALOG.length;i++)if(CATALOG[i].key===key)cat=CATALOG[i];
+  if(!cat||owned.indexOf(key)>=0||pearls<cat.price)return;
+  pearls-=cat.price; savePearls();
+  owned.push(key); saveInks();
+  addInkToTank(cat);
+  rotation.push(true); saveRotation();         // a new ink joins the flow at once
+  refreshChips(); refreshAutoBtn(); updatePanel(); renderStore();
+  startFade(DIRECTIONS.length-1);              // and the tank shows it off
+  var hud=document.getElementById("hud");
+  hud.textContent="a new ink joins the water";
+  hud.classList.add("show");
+  setTimeout(function(){ hud.classList.remove("show"); },5000);
 }
 document.getElementById("summonBtn").onclick=function(){ summonPred(); };
 document.getElementById("startleBtn").onclick=function(){ startlePred(); };
