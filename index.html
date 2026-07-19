@@ -166,6 +166,10 @@ body[data-skin="frost"] #hud{                /* written on the fogged glass with
   font-family:"Caveat",cursive; font-size:20px; color:#DCEBF5; padding:5px 17px 7px;
   background:rgba(16,26,44,.72); border:1px solid rgba(220,235,245,.45); border-radius:10px;
   transform:rotate(-1deg); box-shadow:0 3px 12px rgba(0,0,0,.5);}
+body[data-skin="pearl"] #hud{                /* gold leaf on lacquer */
+  font-family:Georgia,serif; font-size:14px; font-style:italic; color:#E8C96A;
+  padding:8px 18px; background:#17100C; border:1px solid rgba(201,162,39,.75); border-radius:3px;
+  box-shadow:inset 0 0 0 3px rgba(201,162,39,.15), 2px 3px 10px rgba(0,0,0,.6);}
 body[data-skin="glass"] #hud{                /* an inscription in a small leaded pane */
   font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#F2E3B6;
   padding:7px 18px; background:#1C2F58; border:3px solid #14141C; border-radius:3px;
@@ -247,7 +251,7 @@ footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; lett
     </div>
   </div>
 </main>
-<footer>Streams · v0.45 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.46 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -639,7 +643,7 @@ function eggZoomStep(dt,t){
    its circle and rotates its fragment. All fragments at rest = one river. */
 function strokeEggPattern(g,style,t){
   var pulse=EGG.solved?(.6+.4*Math.sin((t-EGG.solvedT)*.012)):1;
-  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":style==="stitch"?"166,58,64":style==="crayon"?"58,50,48":style==="printed"?"94,214,240":style==="sand"?"104,96,80":style==="wood"?"42,36,28":style==="frost"?"216,235,245":"46,110,99";
+  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":style==="stitch"?"166,58,64":style==="crayon"?"58,50,48":style==="printed"?"94,214,240":style==="sand"?"104,96,80":style==="wood"?"42,36,28":style==="frost"?"216,235,245":style==="pearl"?"232,201,106":"46,110,99";
   g.lineCap="round";
   for(var pass=0;pass<(style==="glow"?2:1);pass++){
     g.strokeStyle="rgba("+col+","+((pass===0&&style==="glow")?.22*pulse:(style==="glow"?.9:.85)*pulse)+")";
@@ -659,14 +663,14 @@ function eggZoomDraw(g,t,style){
   if(EGG.zoom<=0||!EGG.egg)return;
   var f=eggZoomFrame(t), e=EGG.egg;
   g.globalAlpha=f.z*(style==="glow"?.42:style==="chalk"?.5:.32);   // light veil — the zoomed scene itself carries the focus
-  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":style==="stitch"?"#E7DFC9":style==="crayon"?"#D9C9A3":style==="printed"?"#10151B":style==="sand"?"#D8CFBA":style==="wood"?"#EFE3C8":style==="frost"?"#0E1626":"#AFD9CC";
+  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":style==="stitch"?"#E7DFC9":style==="crayon"?"#D9C9A3":style==="printed"?"#10151B":style==="sand"?"#D8CFBA":style==="wood"?"#EFE3C8":style==="frost"?"#0E1626":style==="pearl"?"#0E0906":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
   for(var i=0;i<7;i++){
     var px=EGG_POS[i][0], py=EGG_POS[i][1];
     if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
     if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
-    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":style==="stitch"?"#F7F2E4":style==="crayon"?"#EADFBE":style==="printed"?"#1F2833":style==="sand"?"#E5DECB":style==="wood"?"#F5ECD6":style==="frost"?"#1C2A40":"#F4E9D4";
+    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":style==="stitch"?"#F7F2E4":style==="crayon"?"#EADFBE":style==="printed"?"#1F2833":style==="sand"?"#E5DECB":style==="wood"?"#F5ECD6":style==="frost"?"#1C2A40":style==="pearl"?"#221812":"#F4E9D4";
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.fill();
     g.save();
     g.beginPath(); g.arc(px,py,EGG_R-6,0,7); g.clip();
@@ -695,6 +699,9 @@ function eggZoomDraw(g,t,style){
     else if(style==="frost"){ g.strokeStyle="rgba(216,235,245,.22)"; g.lineWidth=9;   // rime rim, glow faked wide+narrow
       g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
       g.strokeStyle="#DCEBF5"; g.lineWidth=2.2; }
+    else if(style==="pearl"){ g.strokeStyle="rgba(232,168,200,.5)"; g.lineWidth=5;    // a nacre glint under the gold bezel
+      g.beginPath(); g.arc(px,py,EGG_R,-2.4,-.6); g.stroke();
+      g.strokeStyle="rgba(201,162,39,.9)"; g.lineWidth=3; }
     else { g.strokeStyle="rgba(46,110,99,.5)"; g.lineWidth=4; }
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
     g.setLineDash([]);
@@ -3624,6 +3631,223 @@ function sceneFrost(g,t){
   fish.forEach(function(f){drawFrostFish(g,f,t);});
 }
 
+/* ══════════════ SKIN 15: LACQUER & PEARL (store ink) ══════════════
+   Deep black-brown lacquer dusted with gold maki-e. Fish are
+   mother-of-pearl inlay, iridescent bands shifting as they
+   turn. The serpent is a creature that remembers being the
+   artisan's INLAY KNIFE — slim steel with a polished agate
+   burnisher for a head; its trail is a gleam in the lacquer
+   that dulls back to black. A caught fish is pried from the
+   bed: one full flash of color, then a recess that fills
+   with gold and dims. */
+var PEARLHUE=["#E8A8C8","#A8E0D0","#A8C4E8","#E8DCC0"];
+var PEARLGOLD="#C9A227";
+var lacquerTex=null;
+function makeLacquer(){
+  var c=document.createElement("canvas"); c.width=W; c.height=H;
+  var g=c.getContext("2d");
+  var grd=g.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0,"#211712"); grd.addColorStop(.55,"#17100C"); grd.addColorStop(1,"#0E0906");
+  g.fillStyle=grd; g.fillRect(0,0,W,H);
+  g.lineCap="round";
+  for(var i=0;i<3;i++){                          // maki-e cloud swashes
+    var cy2=rand(H*.15,H*.85), cx2=rand(W*.1,W*.7);
+    g.strokeStyle="rgba(201,162,39,"+rand(.05,.1)+")"; g.lineWidth=rand(30,70);
+    g.beginPath(); g.moveTo(cx2,cy2);
+    g.quadraticCurveTo(cx2+rand(150,300),cy2+rand(-60,60),cx2+rand(400,700),cy2+rand(-30,30));
+    g.stroke();
+  }
+  for(i=0;i<900;i++){                            // gold dust settled in the finish
+    g.fillStyle="rgba(232,201,106,"+rand(.04,.16)+")";
+    g.beginPath(); g.arc(rand(0,W),rand(0,H),rand(.4,1.3),0,7); g.fill();
+  }
+  return c;
+}
+function pearlFishPath(g,s,wag){
+  g.moveTo(s,0);
+  g.bezierCurveTo(s*.55,-s*.38,-s*.35,-s*.34,-s,wag*s*.28);
+  g.bezierCurveTo(-s*.35,s*.34,s*.55,s*.38,s,0);
+}
+function drawPearlFish(g,f,t){
+  var s=f.size*1.1, seed=f.fullSize*2.9;
+  g.save(); g.translate(f.x,f.y); g.rotate(f.a);
+  var wag=Math.sin(f.phase)*.45;
+  g.save();
+  g.beginPath(); pearlFishPath(g,s,wag); g.clip();             // the shell, banded and alive
+  var shift=f.a*1.2+t*.00045+seed;
+  for(var b=0;b<7;b++){
+    var bx=s*.95-b*s*.3;
+    g.fillStyle=PEARLHUE[(b+f.species+Math.floor(shift))%4];
+    g.globalAlpha=.75+.25*Math.sin(shift*2+b);
+    g.save(); g.translate(bx,0); g.rotate(.5);
+    g.fillRect(-s*.17,-s,s*.34,s*2); g.restore();
+  }
+  g.globalAlpha=.35; g.fillStyle="#FFFFFF";                    // the sheen that slides over the shell
+  var gx=Math.sin(shift*1.7)*s*.5;
+  g.save(); g.translate(gx,0); g.rotate(.5);
+  g.fillRect(-s*.09,-s,s*.18,s*2); g.restore();
+  g.globalAlpha=1; g.restore();
+  g.strokeStyle=PEARLGOLD; g.lineWidth=1.8; g.globalAlpha=.9;  // set in a gold bezel
+  g.beginPath(); pearlFishPath(g,s,wag); g.stroke();
+  g.beginPath();                                               // the tail: two slivers of shell
+  g.moveTo(-s*.92,wag*s*.28); g.lineTo(-s*1.45,wag*s*.7-s*.32);
+  g.moveTo(-s*.92,wag*s*.28); g.lineTo(-s*1.38,wag*s*.7+s*.28);
+  g.stroke(); g.globalAlpha=1;
+  g.fillStyle=PEARLHUE[f.species];
+  g.beginPath(); g.moveTo(-s*.92,wag*s*.28);
+  g.lineTo(-s*1.42,wag*s*.7-s*.28); g.lineTo(-s*1.34,wag*s*.7+s*.24); g.closePath();
+  g.globalAlpha=.5; g.fill(); g.globalAlpha=1;
+  var ey=f.odd?s*.13:-s*.06;                                   // a bead of dark lacquer for an eye
+  g.strokeStyle="rgba(232,201,106,.9)"; g.lineWidth=1.4;
+  g.beginPath(); g.arc(s*.58,ey,s*.08,0,7); g.stroke();
+  g.fillStyle="#17100C"; g.beginPath(); g.arc(s*.58,ey,s*.055,0,7); g.fill();
+  g.restore();
+}
+var gleamTrail=[];
+function drawPearlPred(g){
+  for(var w2=gleamTrail.length-1;w2>=0;w2--){ if(++gleamTrail[w2][2]>260)gleamTrail.splice(w2,1); }
+  if(pred.active)gleamTrail.unshift([pred.x,pred.y,0]);
+  g.lineCap="round";
+  for(var i=2;i<gleamTrail.length;i+=2){         // a gleam in the lacquer, dulling back to black
+    var q0=gleamTrail[i-2], q1=gleamTrail[i], k=1-q1[2]/260;
+    g.strokeStyle="rgba(255,240,210,"+(.1*k)+")"; g.lineWidth=26;
+    g.beginPath(); g.moveTo(q0[0],q0[1]); g.lineTo(q1[0],q1[1]); g.stroke();
+    g.strokeStyle="rgba(255,246,224,"+(.22*k)+")"; g.lineWidth=7;
+    g.beginPath(); g.moveTo(q0[0],q0[1]); g.lineTo(q1[0],q1[1]); g.stroke();
+  }
+  if(!pred.active||pred.segs.length<6)return;
+  var n=pred.segs.length;
+  for(i=2;i<n;i+=2){                             // slim steel, one bright edge
+    var p0=pred.segs[i-2], p1=pred.segs[i], taper=1-(i/n)*.65;
+    g.strokeStyle="#565C64"; g.lineWidth=10*taper+2.5;
+    g.beginPath(); g.moveTo(p0[0],p0[1]); g.lineTo(p1[0],p1[1]); g.stroke();
+    g.strokeStyle="rgba(226,232,240,.75)"; g.lineWidth=2.6*taper+.8;
+    g.beginPath(); g.moveTo(p0[0],p0[1]-1.4); g.lineTo(p1[0],p1[1]-1.4); g.stroke();
+  }
+  g.save(); g.translate(pred.x,pred.y); g.rotate(pred.a);
+  g.fillStyle="#8A5A3A";                         // the agate burnisher
+  g.beginPath(); g.ellipse(11,0,14,9.5,0,0,7); g.fill();
+  g.strokeStyle="#C08A5A"; g.lineWidth=2.2;      // its banding
+  g.beginPath(); g.ellipse(11,0,10,6.6,0,0,7); g.stroke();
+  g.strokeStyle="#E8C49A"; g.lineWidth=1.4;
+  g.beginPath(); g.ellipse(11,0,6,3.8,0,0,7); g.stroke();
+  g.fillStyle="#2A1A10"; g.beginPath(); g.arc(13,0,2.6,0,7); g.fill();   // the dark band is its eye
+  g.fillStyle="rgba(255,246,224,.85)"; g.beginPath(); g.arc(14.2,-1.1,1,0,7); g.fill();
+  g.restore();
+}
+function scenePearl(g,t){
+  if(!lacquerTex)lacquerTex=makeLacquer();
+  g.drawImage(lacquerTex,0,0);
+  g.save(); g.globalAlpha=.05+.02*Math.sin(t*.0005);           // amber light sliding over the finish
+  var rg2=g.createLinearGradient(W*.7,0,W*.45,H);
+  rg2.addColorStop(0,"#E8C96A"); rg2.addColorStop(1,"rgba(232,201,106,0)");
+  g.fillStyle=rg2; rayPath(g); g.fill(); g.restore();
+  motes.forEach(function(m){                                   // loose gold dust
+    var tw=.4+.6*Math.abs(Math.sin(t*.001+m.tw));
+    g.fillStyle="rgba(232,201,106,"+(.3*tw)+")";
+    g.beginPath(); g.arc(m.x,m.y,m.r*.7,0,7); g.fill();
+  });
+  g.lineCap="round";
+  KELP.forEach(function(k){                                    // maki-e reeds in gold
+    var kx=W*k.fx, sway=kelpSway(k,t);
+    g.strokeStyle="rgba(201,162,39,.7)"; g.lineWidth=k.w*.3;
+    g.beginPath(); g.moveTo(kx,H+20);
+    g.quadraticCurveTo(kx+sway*.4,H*.8,kx+sway,k.top); g.stroke();
+    for(var L=0;L<4;L++){
+      var frac=.35+L*.18, ly=H+20-(H+20-k.top)*frac;
+      var lx=kx+sway*frac*frac*1.6, side=(L%2?1:-1);
+      var bend=.25*Math.sin(t*.0012+k.ph+L);
+      g.strokeStyle="rgba(201,162,39,"+(.4+.12*(L%2))+")"; g.lineWidth=k.w*.16;
+      g.beginPath(); g.moveTo(lx,ly);
+      g.quadraticCurveTo(lx+side*36,ly-44+bend*14,lx+side*(84+k.i*7),ly-56-k.i*5+bend*26); g.stroke();
+      for(var d2=1;d2<4;d2++){                                 // dusted, not drawn
+        g.fillStyle="rgba(232,201,106,"+(.3-d2*.06)+")";
+        g.beginPath(); g.arc(lx+side*(20*d2)+bend*6,ly-14*d2,1.1,0,7); g.fill();
+      }
+    }
+  });
+  ripples.forEach(function(rp){                                // rings of settling gold dust
+    var a=Math.min(.6,rp.a*2);
+    g.save(); g.setLineDash([2,8]); g.lineDashOffset=rp.r*.7;
+    g.strokeStyle="rgba(232,201,106,"+a+")"; g.lineWidth=2.2;
+    g.beginPath(); g.arc(rp.x,rp.y,rp.r,0,7); g.stroke();
+    g.restore();
+  });
+  food.forEach(function(fd){                                   // chips of shell
+    g.save(); g.translate(fd.x,fd.y); g.rotate(fd.spin);
+    g.fillStyle="rgba("+(fd.tint?"168,224,208":"232,168,200")+","+(.85*fd.alpha)+")";
+    g.beginPath(); g.moveTo(-fd.size*.6,fd.size*.4); g.lineTo(0,-fd.size*.6);
+    g.lineTo(fd.size*.6,fd.size*.3); g.closePath(); g.fill();
+    g.strokeStyle="rgba(255,246,224,"+(.5*fd.alpha)+")"; g.lineWidth=1;
+    g.beginPath(); g.moveTo(-fd.size*.4,fd.size*.25); g.lineTo(fd.size*.3,-fd.size*.3); g.stroke();
+    g.restore();
+  });
+  eggs.forEach(function(e){                                    // seven seed pearls
+    var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
+    for(var i=0;i<7;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
+      g.fillStyle="#E8DCC0";
+      g.beginPath(); g.arc(ex+dx,ey+dy,3.9,0,7); g.fill();
+      g.fillStyle="rgba(232,168,200,.5)";
+      g.beginPath(); g.arc(ex+dx+1,ey+dy+.8,1.6,0,7); g.fill();
+      g.fillStyle="rgba(255,255,255,.95)";
+      g.beginPath(); g.arc(ex+dx-1.2,ey+dy-1.2,1.2,0,7); g.fill();
+    }
+  });
+  deathFx.forEach(function(fx){                                // PRIED FROM THE BED: one last flash, then gold
+    var k=1-fx.age/130, s=(fx.size||40)*1.1;
+    g.save(); g.translate(fx.x,fx.y); g.rotate(fx.a||0);
+    if(fx.age>10){                                             // the recess it leaves
+      var rk=Math.min(1,(fx.age-10)/20);
+      g.fillStyle="rgba(6,3,2,"+(.9*rk*k)+")";
+      g.beginPath(); pearlFishPath(g,s,0); g.fill();
+      var gk=Math.max(0,Math.min(1,(fx.age-45)/50));           // gold pooling in
+      if(gk>0){
+        g.fillStyle="rgba(201,162,39,"+(.55*gk*k)+")";
+        g.beginPath(); pearlFishPath(g,s*.96,0); g.fill();
+      }
+      g.strokeStyle="rgba(232,201,106,"+(.8*rk*k)+")"; g.lineWidth=1.6;
+      g.beginPath(); pearlFishPath(g,s,0); g.stroke();
+    }
+    var lift=Math.max(0,fx.age-6);                             // the inlay, tilting up and away
+    if(lift<60){
+      var la=Math.max(0,1-lift/55), flash=Math.max(0,1-Math.abs(fx.age-18)/12);
+      g.save(); g.translate(lift*1.1,-lift*1.5); g.rotate(-lift*.012);
+      g.globalAlpha=la;
+      g.save(); g.beginPath(); pearlFishPath(g,s,0); g.clip();
+      for(var b=0;b<7;b++){
+        g.fillStyle=PEARLHUE[(b+fx.species)%4];
+        g.save(); g.translate(s*.95-b*s*.3,0); g.rotate(.5);
+        g.fillRect(-s*.17,-s,s*.34,s*2); g.restore();
+      }
+      if(flash>0){ g.fillStyle="rgba(255,252,240,"+(.85*flash)+")"; g.fillRect(-s*1.2,-s,s*2.4,s*2); }
+      g.restore();
+      g.strokeStyle=PEARLGOLD; g.lineWidth=1.6;
+      g.beginPath(); pearlFishPath(g,s,0); g.stroke();
+      g.restore(); g.globalAlpha=1;
+    }
+    fx.parts.forEach(function(p,pi){                           // splinters of shell
+      g.fillStyle="rgba("+(pi%2?"168,196,232":"232,168,200")+","+(.7*k)+")";
+      g.save(); g.translate(p.dx*1.2,p.dy*1.2); g.rotate(p.spin);
+      g.beginPath(); g.moveTo(-p.sz*.5,p.sz*.3); g.lineTo(0,-p.sz*.5); g.lineTo(p.sz*.5,p.sz*.25);
+      g.closePath(); g.fill(); g.restore();
+    });
+    g.restore();
+  });
+  GAME.rings.forEach(function(rg){                             // gold rings set in the finish
+    if(rg.fade<=0)return;
+    var a=rg.done?rg.fade*.45:.8, bob=Math.sin(t*.001+rg.ph)*7;
+    g.strokeStyle="rgba(201,162,39,"+a+")"; g.lineWidth=3.4;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,0,7); g.stroke();
+    g.strokeStyle="rgba(255,246,224,"+(a*.6)+")"; g.lineWidth=1.4;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,-2.4,-.8); g.stroke();
+    g.strokeStyle="rgba(232,168,200,"+(a*.5)+")"; g.lineWidth=1.4;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,.7,2.1); g.stroke();
+  });
+  drawPearlPred(g);
+  fish.forEach(function(f){drawPearlFish(g,f,t);});
+}
+
 /* ─── Director ────────────────────────────────────────────── */
 var DIRECTIONS=[
   {key:"ink",  name:"1 · Ink Wash",  blurb:"Brushstroke koi, ink-ring ripples, calligraphic reeds — and a serpent of darker ink.", scene:sceneInk},
@@ -3646,7 +3870,8 @@ var SWATCH={
   printed:`#14181D url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 9 H52 M0 18 H52 M0 27 H52' stroke='%235AC8DC' stroke-width='.7' opacity='.3'/><path d='M6 24 Q16 12 27 18 T48 15' stroke='%23F28C28' stroke-width='3.4' fill='none' stroke-linecap='round'/><path d='M6 20 Q16 8 27 14' stroke='%23FFC38A' stroke-width='1.4' fill='none' stroke-linecap='round' opacity='.9'/></svg>") center/cover`,
   sand:`#D8CFBA url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><ellipse cx='17' cy='17' rx='13' ry='8' fill='none' stroke='%23918872' stroke-width='1.6'/><ellipse cx='17' cy='17' rx='7.5' ry='4.6' fill='none' stroke='%23918872' stroke-width='1.3' opacity='.7'/><ellipse cx='38' cy='24' rx='4.6' ry='3.5' fill='%234A4640'/><ellipse cx='31' cy='27.5' rx='3.4' ry='2.6' fill='%2356606B'/><ellipse cx='44' cy='28' rx='3' ry='2.3' fill='%236E5B48'/></svg>") center/cover`,
   wood:`#EFE3C8 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M7 17 Q17 8 27 14 T47 11' stroke='%23C33D2E' stroke-width='4' fill='none' stroke-linecap='round' opacity='.75' transform='translate(2,-1.5)'/><path d='M7 17 Q17 8 27 14 T47 11' stroke='%232A241C' stroke-width='2.6' fill='none' stroke-linecap='round'/><path d='M8 28 Q14 22 20 28 M20 28 Q26 22 32 28 M32 28 Q38 22 44 28' stroke='%232A241C' stroke-width='1.8' fill='none' opacity='.6'/></svg>") center/cover`,
-  frost:`#13203A url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M8 28 Q20 20 30 14 T48 6' stroke='%23E8F4FC' stroke-width='1.8' fill='none' stroke-linecap='round'/><path d='M18 22 L22 14 M18 22 L12 18 M30 14 L33 7 M30 14 L24 11 M40 10 L43 4 M40 10 L35 6' stroke='%23BFDCEE' stroke-width='1.3' fill='none' stroke-linecap='round' opacity='.85'/><circle cx='44' cy='27' r='1.4' fill='%23E8F4FC'/><circle cx='12' cy='9' r='1' fill='%23BFDCEE'/></svg>") center/cover`
+  frost:`#13203A url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M8 28 Q20 20 30 14 T48 6' stroke='%23E8F4FC' stroke-width='1.8' fill='none' stroke-linecap='round'/><path d='M18 22 L22 14 M18 22 L12 18 M30 14 L33 7 M30 14 L24 11 M40 10 L43 4 M40 10 L35 6' stroke='%23BFDCEE' stroke-width='1.3' fill='none' stroke-linecap='round' opacity='.85'/><circle cx='44' cy='27' r='1.4' fill='%23E8F4FC'/><circle cx='12' cy='9' r='1' fill='%23BFDCEE'/></svg>") center/cover`,
+  pearl:`#17100C url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M6 20 Q16 11 27 16 T48 13' stroke='%23E8A8C8' stroke-width='3.2' fill='none' stroke-linecap='round'/><path d='M6 23 Q16 14 27 19 T48 16' stroke='%23A8E0D0' stroke-width='2.2' fill='none' stroke-linecap='round' opacity='.9'/><path d='M6 26 Q16 17 27 22 T48 19' stroke='%23A8C4E8' stroke-width='1.6' fill='none' stroke-linecap='round' opacity='.8'/><circle cx='11' cy='31' r='1' fill='%23E8C96A'/><circle cx='24' cy='30' r='.8' fill='%23E8C96A'/><circle cx='39' cy='31' r='1.1' fill='%23E8C96A'/></svg>") center/cover`
 };
 /* ─── the ink collection: store inks join the base three ──── */
 var CATALOG=[
@@ -3694,6 +3919,10 @@ var CATALOG=[
    tease:"a frosted midnight windowpane — and the warm fingertip",
    blurb:"A winter window at night — fish of feathered ice-fern, frost climbing from the sill, ripples blooming crystal by crystal — and a warm fingertip melting a clear channel through it all. What it touches runs down the glass.",
    scene:sceneFrost},
+  {key:"pearl", name:"Lacquer & Pearl", price:10,
+   tease:"black lacquer, shell inlay, gold dust — and the burnisher",
+   blurb:"Deep lacquer dusted with gold, fish of mother-of-pearl shifting color as they turn — and the artisan's inlay knife, its agate head leaving a gleam that dulls. A caught fish flashes once, and its recess fills with gold.",
+   scene:scenePearl},
 ];
 var owned=(function(){ try{ var v=JSON.parse(localStorage.getItem("st_inks")); return Array.isArray(v)?v:[]; }catch(e){ return []; } })();
 function saveInks(){ try{ localStorage.setItem("st_inks",JSON.stringify(owned)); }catch(e){} }
