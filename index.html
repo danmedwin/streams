@@ -18,16 +18,70 @@ body{background:var(--bg); color:var(--text); font-family:"Avenir Next","Helveti
 .titlebar{padding:16px 4px 0;}
 .titlebar h1{font-size:17px; font-weight:600; letter-spacing:.02em;}
 .titlebar h1 small{color:var(--muted); font-weight:400; margin-left:8px;}
-.tabs{display:flex; gap:6px; align-items:center; flex-wrap:wrap; padding:10px 4px 0;}
-.tabs button{font-family:inherit; font-size:14px; padding:8px 16px; border-radius:99px; cursor:pointer;
-  transition:background .6s ease, color .6s ease, border-color .6s ease, box-shadow .6s ease;}
-.tabs button:focus-visible{outline:2px solid currentColor; outline-offset:2px;}
-/* auto button: circular, icon-only — deliberately unlike the skin tabs */
-#autoBtn{width:40px; height:40px; border-radius:50%; padding:0; display:grid; place-items:center; border-style:dashed !important;}
-#autoBtn svg{width:19px; height:19px;}
-#autoBtn.on{border-style:solid !important;}
+/* ─── chrome: ONE quiet system, whatever ink is flowing ─────
+   the tank wears three translucent objects (zen · jar · bell);
+   the jar opens the drawer: THE STREAM and THE SHORE. */
+.stagebtn{position:absolute; z-index:5; width:42px; height:42px; border-radius:50%;
+  display:grid; place-items:center; background:rgba(8,8,12,.34); color:rgba(255,255,255,.85);
+  border:none; cursor:pointer; opacity:.4; transition:opacity .25s ease;}
+.stagebtn:hover, .stagebtn:focus-visible{opacity:1;}
+.stagebtn:focus-visible{outline:2px solid rgba(255,255,255,.7); outline-offset:2px;}
+.stagebtn svg{width:19px; height:19px;}
+#zenBtn{top:10px; right:10px;}
+#bellBtn{bottom:10px; right:10px;}
+#jarBtn{bottom:10px; left:10px;}
+#jarBtn .badge{position:absolute; top:-4px; right:-3px; min-width:19px; height:19px; border-radius:10px;
+  background:#EAE6DC; color:#17161C; font-size:10.5px; font-weight:600; display:grid; place-items:center; padding:0 5px;}
+body.zen #bellBtn, body.zen #jarBtn{display:none;}
+#bellPop{position:absolute; right:10px; bottom:62px; z-index:6; width:216px;
+  background:#1D1B24; border:1px solid #2E2B38; border-radius:12px; padding:14px;
+  box-shadow:0 14px 40px rgba(0,0,0,.5); text-align:left;}
+#bellPop[hidden]{display:none;}
+#bellPop .lbl{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8B8577; margin-bottom:10px;}
+#bellPop .act{width:100%; font-family:inherit; font-size:13px; padding:8px; border-radius:8px; cursor:pointer;
+  background:#EAE6DC; color:#17161C; border:none; font-weight:600; margin-bottom:8px;}
+#bellPop .act:disabled{opacity:.4; cursor:default;}
+#bellPop label{display:flex; gap:8px; align-items:center; font-size:13px; color:#C9C4B6; padding:3px 0; cursor:pointer;}
+/* the drawer */
+#drawer{position:absolute; left:0; right:0; z-index:10; margin-top:-8px;
+  border:1px solid #2E2B38; border-radius:0 0 16px 16px; background:#191720F2; padding:16px 16px 10px;
+  box-shadow:0 22px 50px rgba(0,0,0,.55); backdrop-filter:blur(4px);
+  animation:drawerout .28s ease;}
+#drawer[hidden]{display:none;}
+@keyframes drawerout{from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:none;}}
+.lanehead{display:flex; align-items:center; gap:10px; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8B8577;}
+.lanehead .hint2{letter-spacing:.02em; text-transform:none; font-size:11.5px; opacity:.75;}
+.lanechips{display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; padding:16px 2px 10px; min-height:78px;}
+#shorelane{border-top:1px dashed #2E2B38; margin-top:4px; padding-top:10px;}
+.ichip{position:relative; background:none; border:none; padding:0; cursor:grab; text-align:center; touch-action:none; font-family:inherit;}
+.ichip:active{cursor:grabbing;}
+.ichip .swb{display:block; width:52px; height:36px; border-radius:4px; border:1px solid #3A3644;
+  background-size:cover; margin:0 auto; position:relative; overflow:hidden;
+  transition:border-color .2s ease, width .2s ease, height .2s ease;}
+.ichip .nm{display:block; font-size:11px; color:#C9C4B6; margin-top:5px; white-space:nowrap;}
+.ichip.cur .swb{width:62px; height:43px; border:2px solid #EAE6DC;}
+.gapnext{align-self:center; font-size:10px; color:#B5AF9F; white-space:nowrap; margin:0 -8px; padding-bottom:14px;}
+#streamchips .gapnext+.ichip::before{display:none;}
+.ichip:focus-visible{outline:2px solid #EAE6DC; outline-offset:3px;}
+.ichip.dragging{opacity:.3;}
+#streamchips .ichip+.ichip::before{content:"→"; position:absolute; left:-16px; top:12px; color:#4A4656;}
+.ichip.locked{cursor:default;}
+.ichip.locked .swb{filter:grayscale(.3) brightness(.8);}
+.ichip.locked .swb .hatch{position:absolute; inset:0;
+  background:repeating-linear-gradient(45deg, rgba(20,19,26,.55) 0 6px, transparent 6px 12px);}
+.ichip .price{display:block; font-size:10.5px; color:#8B8577; margin-top:3px;}
+.ichip .minib{display:inline-block; font-family:inherit; font-size:10.5px; padding:3px 9px; border-radius:99px;
+  border:1px solid #4A4656; background:none; color:#C9C4B6; cursor:pointer; margin:4px 2px 0; transition:border-color .2s ease;}
+.ichip .minib:hover{border-color:#B5AF9F;}
+.transport{display:flex; gap:12px; align-items:center; flex-wrap:wrap; border-top:1px solid #2E2B38; margin-top:6px; padding-top:11px; font-size:12.5px; color:#8B8577;}
+.transport button{font-family:inherit; font-size:12.5px; padding:6px 14px; border-radius:99px; cursor:pointer;
+  background:none; color:#C9C4B6; border:1px solid #3A3644; transition:all .2s ease;}
+.transport button:hover{border-color:#8B8577;}
+.transport button.on{background:#EAE6DC; color:#17161C; border-color:#EAE6DC;}
+.transport button:focus-visible, .ichip .minib:focus-visible{outline:2px solid #EAE6DC; outline-offset:2px;}
+.dragghost{position:fixed; z-index:99; pointer-events:none; opacity:.9;}
 main{flex:1; display:grid; place-items:center; padding:20px;}
-main > div{width:min(960px,100%);}
+main > div{width:min(960px,100%); position:relative;}
 .stage{width:100%; aspect-ratio:16/9; border-radius:14px; overflow:hidden; position:relative;
   box-shadow:0 10px 40px rgba(0,0,0,.5); border:1px solid var(--line);}
 canvas.view{width:100%; height:100%; display:block; cursor:pointer;}
@@ -65,138 +119,81 @@ body[data-skin="glass"] #hud{                /* an inscription in a small leaded
   font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#F2E3B6;
   padding:7px 18px; background:#1C2F58; border:3px solid #14141C; border-radius:3px;
   box-shadow:inset 0 0 0 1px rgba(210,225,255,.18), 2px 3px 9px rgba(0,0,10,.5);}
-/* selected mode: membership shows as an inner ring on the chip itself —
-   nothing changes size, so the row never shifts as modes cycle */
-.tabs button[role="tab"]{position:relative; transition:background .6s ease, color .6s ease,
-  border-color .6s ease, box-shadow .6s ease, opacity .4s ease;}
-.tabs button[role="tab"]::after{content:""; position:absolute; inset:4px; border-radius:99px;
-  border:1.8px solid currentColor; opacity:0; transition:opacity .4s ease; pointer-events:none;}
-body.mode-selected .tabs button[role="tab"].inrot::after{opacity:.85;}
-body.mode-selected .tabs button[role="tab"]:not(.inrot){opacity:.42;}
-/* zen mode: nothing but the tank */
-body.zen .titlebar, body.zen .tabs, body.zen .caption, body.zen .panelrow, body.zen #panel, body.zen #store, body.zen footer{display:none;}
+/* zen mode: nothing but the tank (the zen button stays, wearing an ×) */
+body.zen .titlebar, body.zen .caption, body.zen #drawer, body.zen footer{display:none;}
 body.zen main{padding:0; min-height:100dvh;}
 body.zen main > div{width:100%; max-width:none; display:grid; place-items:center; min-height:100dvh;}
 body.zen .stage{width:min(100vw, calc(100dvh * 16 / 9)); border-radius:0; border:none; box-shadow:none;}
-#zenExit{position:absolute; top:10px; right:10px; z-index:5; width:38px; height:38px; border-radius:50%;
-  display:none; place-items:center; background:rgba(0,0,0,.28); color:rgba(255,255,255,.75);
-  border:none; cursor:pointer; opacity:.22; transition:opacity .3s ease;}
-#zenExit:hover, #zenExit:focus-visible{opacity:1;}
-#zenExit svg{width:16px; height:16px;}
-body.zen #zenExit{display:grid;}
-.tabs .zenbtn{width:40px; height:40px; border-radius:12px; padding:0; display:flex; align-items:center; justify-content:center;}
-.tabs .zenbtn svg{width:19px; height:19px; display:block; flex:none;}
-#autoBtn{display:flex; align-items:center; justify-content:center;}
-#autoBtn svg{display:block; flex:none;}
 .caption{margin:14px auto 0; display:flex; justify-content:space-between; gap:16px; align-items:baseline; padding:0 4px;}
 .caption .name{font-size:15px; font-weight:600; white-space:nowrap;}
 .caption .blurb{font-size:13.5px; color:var(--muted); text-align:right; text-wrap:pretty; transition:opacity .8s ease;}
-/* tank controls */
-.panelrow{margin-top:10px; padding:0 4px;}
-#panelToggle, #storeToggle{background:none; border:none; cursor:pointer; font-family:inherit; font-size:13px;
-  color:var(--muted); text-decoration:underline; text-underline-offset:3px; padding:2px 0;
-  transition:color .3s ease;}
-#panelToggle:hover, #storeToggle:hover{color:var(--text);}
-.panelrow{color:var(--muted); font-size:13px;}
-#panel, #store{margin-top:10px; padding:12px 14px; border-radius:12px; border:1px solid var(--line);
-  display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:13px;
-  transition:background .6s ease, border-color .6s ease, color .6s ease;}
-#panel[hidden], #store[hidden]{display:none;}
-#panel .lbl, #store .lbl{opacity:.7; margin-left:6px;}
-#store b{font-weight:600; margin-left:4px;}
-#panel button, #store button{font-family:inherit; font-size:13px; padding:6px 13px; border-radius:99px; cursor:pointer;
-  transition:background .6s ease, color .6s ease, border-color .6s ease, opacity .3s ease;}
-#panel button:disabled, #store button:disabled{opacity:.35; cursor:default;}
-#store button.on:disabled{opacity:.8;}
+footer b{color:inherit;}
 footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; letter-spacing:.04em;}
 @media (max-width:700px){ .caption{flex-direction:column; gap:4px;} .caption .blurb{text-align:left;} }
 
-/* ─── skin-aware UI: the chrome dresses to match the scene ── */
-body[data-skin="ink"] .tabs button, body[data-skin="ink"] #panel button, body[data-skin="ink"] #store button{
-  background:#F1EBDD; color:#57503F; border:1px solid #CFC7AE;}
-body[data-skin="ink"] .tabs button.on, body[data-skin="ink"] #panel button.on, body[data-skin="ink"] #store button.on{
-  background:#22201C; color:#F1EBDD; border-color:#22201C;}
-body[data-skin="ink"] #panel, body[data-skin="ink"] #store{background:#F1EBDD; border-color:#CFC7AE; color:#57503F;}
-body[data-skin="ink"] #autoBtn.on{box-shadow:0 0 0 3px rgba(34,32,28,.15);}
-
-body[data-skin="glow"] .tabs button, body[data-skin="glow"] #panel button, body[data-skin="glow"] #store button{
-  background:#0A1230; color:#8FBBDD; border:1px solid #1E2C55;}
-body[data-skin="glow"] .tabs button.on, body[data-skin="glow"] #panel button.on, body[data-skin="glow"] #store button.on{
-  background:#3FE0D0; color:#04222B; border-color:#3FE0D0; box-shadow:0 0 16px rgba(63,224,208,.45);}
-body[data-skin="glow"] #panel, body[data-skin="glow"] #store{background:#0A1230; border-color:#1E2C55; color:#8FBBDD;}
-body[data-skin="glow"] #autoBtn.on{box-shadow:0 0 14px rgba(63,224,208,.5);}
-
-body[data-skin="paper"] .tabs button, body[data-skin="paper"] #panel button, body[data-skin="paper"] #store button{
-  background:#F4E9D4; color:#2E6E63; border:1px solid #D9C9A8;}
-body[data-skin="paper"] .tabs button.on, body[data-skin="paper"] #panel button.on, body[data-skin="paper"] #store button.on{
-  background:#E8654F; color:#FFFDF5; border-color:#E8654F;}
-body[data-skin="paper"] #panel, body[data-skin="paper"] #store{background:#F4E9D4; border-color:#D9C9A8; color:#2E6E63;}
-body[data-skin="paper"] #autoBtn.on{box-shadow:0 0 0 3px rgba(232,101,79,.25);}
-
-body[data-skin="chalk"] .tabs button, body[data-skin="chalk"] #panel button, body[data-skin="chalk"] #store button{
-  background:#294137; color:#E8E6DC; border:1px solid #4C6156;}
-body[data-skin="chalk"] .tabs button.on, body[data-skin="chalk"] #panel button.on, body[data-skin="chalk"] #store button.on{
-  background:#F4F2E9; color:#232A27; border-color:#F4F2E9;}
-body[data-skin="chalk"] #panel, body[data-skin="chalk"] #store{background:#294137; border-color:#4C6156; color:#E8E6DC;}
-body[data-skin="chalk"] #autoBtn.on{box-shadow:0 0 0 3px rgba(244,242,233,.22);}
-
-body[data-skin="laser"] .tabs button, body[data-skin="laser"] #panel button, body[data-skin="laser"] #store button{
-  background:#E7CFA5; color:#6B4423; border:1px solid #C9A870;}
-body[data-skin="laser"] .tabs button.on, body[data-skin="laser"] #panel button.on, body[data-skin="laser"] #store button.on{
-  background:#3A2410; color:#EEDCB8; border-color:#3A2410;}
-body[data-skin="laser"] #panel, body[data-skin="laser"] #store{background:#E7CFA5; border-color:#C9A870; color:#6B4423;}
-body[data-skin="laser"] #autoBtn.on{box-shadow:0 0 0 3px rgba(58,36,16,.2);}
-
-body[data-skin="glass"] .tabs button, body[data-skin="glass"] #panel button, body[data-skin="glass"] #store button{
-  background:#1C2F58; color:#BCD0EE; border:1px solid #3A5588;}
-body[data-skin="glass"] .tabs button.on, body[data-skin="glass"] #panel button.on, body[data-skin="glass"] #store button.on{
-  background:#E0A32E; color:#2A2410; border-color:#E0A32E;}
-body[data-skin="glass"] #panel, body[data-skin="glass"] #store{background:#1C2F58; border-color:#3A5588; color:#BCD0EE;}
-body[data-skin="glass"] #autoBtn.on{box-shadow:0 0 0 3px rgba(224,163,46,.3);}
+/* per-skin chrome is gone — only the in-tank HUD still speaks each ink's language */
 </style>
 </head>
 <body>
 <main>
   <div>
     <div class="stage"><canvas id="cv" class="view" width="1920" height="1080"></canvas><div id="hud"></div>
-      <button id="zenExit" aria-label="bring back the controls" title="bring back the controls">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
-      </button>
-    </div>
-    <div class="titlebar">
-      <h1>Streams<small>one school of fish · three inks · every element flows between them</small></h1>
-    </div>
-    <div class="tabs" role="tablist">
-      <button id="t0" class="on" role="tab">1 · Ink Wash</button>
-      <button id="t1" role="tab">2 · Deep Glow</button>
-      <button id="t2" role="tab">3 · Paper Reef</button>
-      <button id="autoBtn" class="on"></button>
-      <button id="zenBtn" class="zenbtn" aria-label="just the tank — hide everything else" title="just the tank">
+      <button id="zenBtn" class="stagebtn" aria-label="just the tank — hide everything else" title="just the tank">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="9 3 3 3 3 9"/><polyline points="15 3 21 3 21 9"/>
           <polyline points="9 21 3 21 3 15"/><polyline points="15 21 21 21 21 15"/>
         </svg>
       </button>
+      <button id="jarBtn" class="stagebtn" aria-label="the inkwell — pearls and inks" title="the inkwell">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3.5h8M9.5 3.5v3L6.5 9.5v9a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-9l-3-3v-3"/>
+          <circle cx="10.6" cy="16.6" r="1.25" fill="currentColor" stroke="none"/>
+          <circle cx="13.9" cy="17.4" r="1.25" fill="currentColor" stroke="none"/>
+          <circle cx="12.4" cy="14" r="1.25" fill="currentColor" stroke="none"/>
+        </svg>
+        <span class="badge" id="pearlBadge">0</span>
+      </button>
+      <button id="bellBtn" class="stagebtn" aria-label="call the serpent" title="the serpent">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M3 16.5c2.6-5.5 5.6-5.5 8.2-2.2s5.6 3.3 8.2-2.2"/>
+          <circle cx="19.9" cy="10.4" r="1.2" fill="currentColor" stroke="none"/>
+        </svg>
+      </button>
+      <div id="bellPop" hidden>
+        <div class="lbl">The serpent</div>
+        <button class="act" id="summonBtn">Summon it now</button>
+        <label><input type="radio" name="visitmode" value="random" checked> random visit</label>
+        <label><input type="radio" name="visitmode" value="eat"> it eats a fish</label>
+        <label><input type="radio" name="visitmode" value="nocatch"> hunts, never catches</label>
+        <label><input type="radio" name="visitmode" value="peaceful"> peaceful</label>
+      </div>
+    </div>
+    <div id="drawer" hidden>
+      <div id="streamlane">
+        <div class="lanehead">The Stream <span class="hint2">— these inks flow, in this order · tap to swim · drag to move</span></div>
+        <div class="lanechips" id="streamchips"></div>
+      </div>
+      <div id="shorelane">
+        <div class="lanehead">The Shore <span class="hint2">— resting inks, and inks still waiting to be bought</span></div>
+        <div class="lanechips" id="shorechips"></div>
+      </div>
+      <div class="transport">
+        <button id="flowBtn" class="on">⏸ pause</button>
+        <span id="nextLbl">next ink in 24s</span>
+        <button id="driftBtn">⇄ drift</button>
+        <span style="margin-left:auto;" id="pearlLbl">⚬ 0 pearls</span>
+      </div>
+    </div>
+    <div class="titlebar">
+      <h1>Streams<small>one school of fish · many inks · every element flows between them</small></h1>
     </div>
     <div class="caption">
       <span class="name" id="capName"></span>
       <span class="blurb" id="capBlurb"></span>
     </div>
-    <div class="panelrow"><button id="panelToggle">≋ tank controls</button> · <button id="storeToggle" class="panellink">⚬ the inkwell</button></div>
-    <div id="store" hidden></div>
-    <div id="panel" hidden>
-      <button id="summonBtn">Summon the serpent</button>
-      <button id="startleBtn" disabled>Startle it away</button>
-      <span class="lbl">Next visit:</span>
-      <button class="mode on" data-m="random">Random</button>
-      <button class="mode" data-m="eat">Eat a fish</button>
-      <button class="mode" data-m="nocatch">No catch</button>
-      <button class="mode" data-m="peaceful">Peaceful</button>
-      <span class="lbl" id="pearlLbl"></span>
-    </div>
   </div>
 </main>
-<footer>Streams · v0.32 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.33 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -1794,6 +1791,16 @@ var DIRECTIONS=[
   {key:"glow", name:"2 · Deep Glow", blurb:"Lanternfish, bioluminescent ripple-rings, glowing sea whips — and a gulper eel with a hungry little lure.", scene:sceneGlow},
   {key:"paper",name:"3 · Paper Reef",blurb:"Cut-paper fish, paper-ring ripples, leafy kelp, rising bubbles — and a storybook sea serpent.", scene:scenePaper},
 ];
+/* every ink carries its own portrait — the chrome never re-costumes.
+   A new store ink needs: CATALOG entry + SWATCH entry + a #hud style. */
+var SWATCH={
+  ink:`#F1EBDD url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M6 24 Q17 10 28 18 T48 14' stroke='%23232019' stroke-width='5' fill='none' stroke-linecap='round'/></svg>") center/cover`,
+  glow:`radial-gradient(circle at 60% 45%, #3FE0D0 0 4px, rgba(63,224,208,.5) 9px, rgba(63,224,208,.1) 16px, transparent 22px), linear-gradient(180deg,#070B1C,#0A1230)`,
+  paper:`linear-gradient(180deg,#BFE3D9 0 30%, #7FB7A4 30% 55%, #54968B 55% 78%, #2E6E63 78%)`,
+  chalk:`#26443A url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M6 22 Q16 12 26 18 T46 15' stroke='%23F4F2E9' stroke-width='3' fill='none' stroke-linecap='round' opacity='.9'/><path d='M8 27 Q18 21 28 25' stroke='%23F4F2E9' stroke-width='1.6' fill='none' opacity='.4'/></svg>") center/cover`,
+  laser:`#DFC49A url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 9 H52 M0 19 H52 M0 29 H52' stroke='%23B98E5A' stroke-width='1' opacity='.5'/><path d='M7 25 Q19 8 31 16 T48 12' stroke='%23472B10' stroke-width='4' fill='none' stroke-linecap='round'/></svg>") center/cover`,
+  glass:`linear-gradient(90deg, transparent 0 47%, #14141C 47% 53%, transparent 53%), linear-gradient(0deg, transparent 0 45%, #14141C 45% 55%, transparent 55%), linear-gradient(135deg,#1F3A66 0 46%, #2A5578 46% 74%, #1F5C55 74%)`
+};
 /* ─── the ink collection: store inks join the base three ──── */
 var CATALOG=[
   {key:"chalk", name:"Chalkboard", price:25,
@@ -1811,13 +1818,8 @@ var CATALOG=[
 ];
 var owned=(function(){ try{ var v=JSON.parse(localStorage.getItem("st_inks")); return Array.isArray(v)?v:[]; }catch(e){ return []; } })();
 function saveInks(){ try{ localStorage.setItem("st_inks",JSON.stringify(owned)); }catch(e){} }
-function addInkToTank(cat){                    // one chip, one DIRECTIONS entry; rotation handled by caller
-  var idx=DIRECTIONS.length;
-  DIRECTIONS.push({key:cat.key, name:(idx+1)+" · "+cat.name, blurb:cat.blurb, scene:cat.scene});
-  var b=document.createElement("button");
-  b.id="t"+idx; b.setAttribute("role","tab"); b.textContent=(idx+1)+" · "+cat.name;
-  document.querySelector(".tabs").insertBefore(b,document.getElementById("autoBtn"));
-  bindChip(idx);
+function addInkToTank(cat){
+  DIRECTIONS.push({key:cat.key, name:(DIRECTIONS.length+1)+" · "+cat.name, blurb:cat.blurb, scene:cat.scene});
 }
 CATALOG.forEach(function(c){ if(owned.indexOf(c.key)>=0)addInkToTank(c); });
 
@@ -1826,73 +1828,164 @@ cvA.width=cvB.width=W; cvA.height=cvB.height=H;
 var gA=cvA.getContext("2d"),gB=cvB.getContext("2d");
 
 var cur=0,nxt=-1,fadeT=0,lastSwitch=0,last=0;
-/* which skins ride the auto-rotation (manual tabs always work) */
-var rotation=(function(){
+/* ─── the flow: which inks ride THE STREAM, in what order ── */
+var flow=(function(){
   try{
-    var r=JSON.parse(localStorage.getItem("st_rotation"));
-    if(Array.isArray(r)){
-      r=r.slice(0,DIRECTIONS.length);
-      while(r.length<DIRECTIONS.length)r.push(true);   // newly owned inks join the flow
-      if(r.some(Boolean))return r;
-    }
+    var v=JSON.parse(localStorage.getItem("st_flow"));
+    if(v&&Array.isArray(v.stream)&&v.stream.length)return {stream:v.stream, playing:v.playing!==false, shuffle:!!v.shuffle};
   }catch(e){}
-  var d=[]; for(var di=0;di<DIRECTIONS.length;di++)d.push(true); return d;
+  var mig={stream:[], playing:true, shuffle:false};          // migrate the pre-drawer dials
+  try{
+    var rot=JSON.parse(localStorage.getItem("st_rotation"))||[];
+    var mode=localStorage.getItem("st_automode");
+    DIRECTIONS.forEach(function(d,i){ if(rot[i]!==false)mig.stream.push(d.key); });
+    if(mode==="off")mig.playing=false;
+    if(mode==="random")mig.shuffle=true;
+  }catch(e){}
+  if(!mig.stream.length)DIRECTIONS.forEach(function(d){ mig.stream.push(d.key); });
+  return mig;
 })();
-function saveRotation(){ try{ localStorage.setItem("st_rotation",JSON.stringify(rotation)); }catch(e){} }
-function nextInRotation(from){
-  var n=DIRECTIONS.length;
-  for(var k=1;k<=n;k++){ var i=(from+k)%n; if(rotation[i])return i; }
-  return from;
-}
-/* the cycle button: auto-play → selected → random → off */
-var AUTOMODES=["auto","selected","random","off"];
-var autoMode=(function(){
-  try{ var m=localStorage.getItem("st_automode"); if(AUTOMODES.indexOf(m)>=0)return m; }catch(e){}
-  return "auto";
-})();
-function saveAutoMode(){ try{ localStorage.setItem("st_automode",autoMode); }catch(e){} }
-function autoAdvanceTarget(){
-  if(autoMode==="off")return -1;
-  if(autoMode==="auto")return (cur+1)%DIRECTIONS.length;
-  if(autoMode==="selected")return nextInRotation(cur);
-  if(DIRECTIONS.length<2)return -1;            // random
-  var i; do{ i=Math.floor(rand(0,DIRECTIONS.length)); }while(i===cur);
-  return i;
-}
-var AUTO_TOP='<path d="M20.5 9A8 8 0 0 0 6.9 5.6L4.5 8"/><polyline points="4.5 3.5 4.5 8 9 8"/>';
-var AUTO_BOT='<path d="M3.5 15a8 8 0 0 0 13.6 3.4l2.4-2.4"/><polyline points="19.5 20.5 19.5 16 15 16"/>';
-function autoIcon(){
-  var open='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">';
-  if(autoMode==="random"){
-    return open+'<polyline points="16 3 21 3 21 8"/><path d="M4 20L21 3"/>'+
-      '<polyline points="21 16 21 21 16 21"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>';
+function saveFlow(){ try{ localStorage.setItem("st_flow",JSON.stringify(flow)); }catch(e){} }
+function keyIdx(k){ for(var i=0;i<DIRECTIONS.length;i++)if(DIRECTIONS[i].key===k)return i; return -1; }
+function advanceTarget(){
+  var keys=flow.stream.filter(function(k){ return keyIdx(k)>=0; });
+  if(!keys.length)return -1;
+  if(flow.shuffle&&keys.length>1){
+    var i; do{ i=keyIdx(keys[Math.floor(rand(0,keys.length))]); }while(i===cur);
+    return i;
   }
-  if(autoMode==="selected"){
-    // arrows part top/bottom to clear room; ALWAYS exactly 3 symbolic dots, however many inks exist
-    var s2=open+'<g transform="translate(0,-2)">'+AUTO_TOP+'</g>'+
-               '<g transform="translate(0,2)">'+AUTO_BOT+'</g>';
-    for(var i=0;i<3;i++){
-      s2+='<circle cx="'+(4.5+i*7.5)+'" cy="12" r="2.4" stroke-width="1.6"'+
-         (rotation[i]?' fill="currentColor"':' fill="none"')+'/>';
+  var p=keys.indexOf(DIRECTIONS[cur].key);
+  return keyIdx(keys[(p+1)%keys.length]);
+}
+/* ─── the drawer: THE STREAM and THE SHORE ────────────────── */
+var PEEK={active:false, backTo:0, until:0, cleanup:-1};
+function catByKey(k){ for(var i=0;i<CATALOG.length;i++)if(CATALOG[i].key===k)return CATALOG[i]; return null; }
+function swFor(key){ return SWATCH[key]||"repeating-linear-gradient(45deg,#26262C 0 6px,#1B1B20 6px 12px)"; }
+function toastHud(msg){
+  var hud=document.getElementById("hud");
+  hud.textContent=msg; hud.classList.add("show");
+  setTimeout(function(){ hud.classList.remove("show"); },3500);
+}
+function startPeek(cat){
+  if(PEEK.active||PEEK.cleanup>=0)return;
+  DIRECTIONS.push({key:cat.key, name:cat.name+" — a taste", blurb:cat.blurb, scene:cat.scene, temp:true});
+  PEEK={active:true, backTo:cur, until:performance.now()+10000, cleanup:DIRECTIONS.length-1};
+  startFade(DIRECTIONS.length-1);
+  toastHud("borrowing this ink for ten seconds…");
+}
+function renderDrawer(){
+  var dr=document.getElementById("drawer");
+  if(!dr||dr.hidden)return;
+  var showing=(nxt>=0)?nxt:cur;                // mid-fade, the incoming ink wears the badge
+  var curKey=DIRECTIONS[showing]?DIRECTIONS[showing].key:"";
+  function ownedChip(key){
+    var d=DIRECTIONS[keyIdx(key)];
+    return '<button class="ichip'+(key===curKey?" cur":"")+'" data-key="'+key+'">'+
+      '<span class="swb"></span>'+
+      '<span class="nm">'+d.name.replace(/^\d+ · /,"")+'</span></button>';
+  }
+  var sh="", inStream=flow.stream.filter(function(k){ return keyIdx(k)>=0; });
+  inStream.forEach(function(k,pi){
+    sh+=ownedChip(k);
+    if(!flow.shuffle&&flow.playing&&k===curKey&&pi<inStream.length-1)
+      sh+='<span class="gapnext" id="gapNext">…</span>';
+  });
+  document.getElementById("streamchips").innerHTML=sh||'<span class="hint2" style="color:#8B8577;font-size:12px;">the stream is empty — drag an ink up from the shore</span>';
+  var ho="";
+  DIRECTIONS.forEach(function(d){ if(!d.temp&&flow.stream.indexOf(d.key)<0)ho+=ownedChip(d.key); });
+  CATALOG.forEach(function(c){
+    if(owned.indexOf(c.key)>=0)return;
+    ho+='<div class="ichip locked" data-key="'+c.key+'">'+
+      '<span class="swb"><span class="hatch"></span></span>'+
+      '<span class="nm">'+c.name+'</span><span class="price">'+c.tease+'</span>'+
+      '<span><button class="minib peekb" data-key="'+c.key+'">peek</button>'+
+      '<button class="minib buyb" data-key="'+c.key+'"'+(pearls<c.price?" disabled":"")+'>'+c.price+' ⚬</button></span></div>';
+  });
+  document.getElementById("shorechips").innerHTML=ho;
+  dr.querySelectorAll(".ichip").forEach(function(c){        // set via property: url("…") survives no attribute quoting
+    c.querySelector(".swb").style.background=swFor(c.getAttribute("data-key"));
+    c.querySelector(".swb").style.backgroundSize="cover";
+  });
+  var fb=document.getElementById("flowBtn");
+  fb.textContent=flow.playing?"⏸ pause":"▶ flow";
+  fb.classList.toggle("on",flow.playing);
+  document.getElementById("driftBtn").classList.toggle("on",flow.shuffle);
+  document.getElementById("pearlLbl").textContent="⚬ "+pearls+" pearls";
+  bindDrawer();
+}
+function bindDrawer(){
+  var dr=document.getElementById("drawer");
+  dr.querySelectorAll(".peekb").forEach(function(b){
+    b.onclick=function(e){ e.stopPropagation(); var c=catByKey(b.getAttribute("data-key")); if(c)startPeek(c); };
+  });
+  dr.querySelectorAll(".buyb").forEach(function(b){
+    b.onclick=function(e){ e.stopPropagation(); buyInk(b.getAttribute("data-key")); };
+  });
+  dr.querySelectorAll("button.ichip").forEach(function(ch){ ch.onpointerdown=chipDown; });
+}
+/* drag an ink between the lanes, or along the stream to reorder */
+var drag=null;
+function chipDown(e){
+  if(e.button)return;
+  var el=e.currentTarget;
+  drag={key:el.getAttribute("data-key"), el:el, x:e.clientX, y:e.clientY, moved:false, ghost:null};
+  try{ el.setPointerCapture(e.pointerId); }catch(err){}
+  el.onpointermove=chipMove; el.onpointerup=chipUp; el.onpointercancel=chipUp;
+}
+function chipMove(e){
+  if(!drag)return;
+  var dx=e.clientX-drag.x, dy=e.clientY-drag.y;
+  if(!drag.moved&&dx*dx+dy*dy>64){
+    drag.moved=true;
+    var g=drag.el.cloneNode(true); g.classList.add("dragghost");
+    g.style.width=drag.el.offsetWidth+"px";
+    document.body.appendChild(g); drag.ghost=g;
+    drag.el.classList.add("dragging");
+  }
+  if(drag.ghost){
+    drag.ghost.style.left=(e.clientX-30)+"px";
+    drag.ghost.style.top=(e.clientY-24)+"px";
+  }
+}
+function chipUp(e){
+  if(!drag)return;
+  var d=drag; drag=null;
+  d.el.onpointermove=d.el.onpointerup=d.el.onpointercancel=null;
+  if(d.ghost)d.ghost.remove();
+  d.el.classList.remove("dragging");
+  if(!d.moved){
+    var i=keyIdx(d.key);
+    if(i>=0&&!PEEK.active)startFade(i);
+    return;
+  }
+  var sRect=document.getElementById("streamlane").getBoundingClientRect();
+  var toStream=e.clientY<sRect.bottom;
+  var wasIn=flow.stream.indexOf(d.key)>=0;
+  if(!toStream){
+    if(wasIn){
+      if(flow.stream.length<=1){ toastHud("the stream needs at least one ink"); renderDrawer(); return; }
+      flow.stream.splice(flow.stream.indexOf(d.key),1);
     }
-    return s2+"</svg>";
+  }else{
+    if(wasIn)flow.stream.splice(flow.stream.indexOf(d.key),1);
+    var chips=Array.prototype.slice.call(document.querySelectorAll("#streamchips .ichip")).filter(function(c){ return c.getAttribute("data-key")!==d.key; });
+    var at=chips.length;
+    for(var ci=0;ci<chips.length;ci++){
+      var r=chips[ci].getBoundingClientRect();
+      if(e.clientX<r.left+r.width/2){ at=ci; break; }
+    }
+    flow.stream.splice(at,0,d.key);
   }
-  var s=open+AUTO_TOP+AUTO_BOT;
-  if(autoMode==="off")s+='<line x1="4.5" y1="19.5" x2="19.5" y2="4.5"/>';
-  return s+"</svg>";
+  saveFlow(); renderDrawer();
 }
-var AUTO_TITLES={auto:"auto-play: cycle all styles", selected:"auto-play: selected styles only (tap a chip to include or drop it)", random:"auto-play: random order", off:"auto-play off"};
-function refreshAutoBtn(){
-  autoBtn.innerHTML=autoIcon();
-  autoBtn.classList.toggle("on",autoMode!=="off");
-  document.body.classList.toggle("mode-selected",autoMode==="selected");
-  autoBtn.title=AUTO_TITLES[autoMode];
-  autoBtn.setAttribute("aria-label",AUTO_TITLES[autoMode]);
-}
-function refreshChips(){
-  for(var k=0;k<DIRECTIONS.length;k++){
-    document.getElementById("t"+k).classList.toggle("inrot",rotation[k]);
-  }
+var lastTick=0;
+function updateCountdown(t){
+  var lbl=document.getElementById("nextLbl");
+  if(!lbl)return;
+  var s=Math.max(0,Math.ceil((AUTO_EVERY_MS-(t-lastSwitch))/1000));
+  lbl.textContent=PEEK.active?"tasting…":(flow.playing?"next ink in "+s+"s":"the stream is still");
+  var gn=document.getElementById("gapNext");
+  if(gn)gn.textContent=PEEK.active?"…":(s+"s →");
 }
 function ease(x){ return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2; }
 function setCaption(i){
@@ -1901,7 +1994,7 @@ function setCaption(i){
   var b=document.getElementById("capBlurb");
   b.style.opacity=0;
   setTimeout(function(){ b.textContent=DIRECTIONS[i].blurb; b.style.opacity=1; },400);
-  for(var k=0;k<DIRECTIONS.length;k++)document.getElementById("t"+k).classList.toggle("on",k===i);
+  renderDrawer();
 }
 function startFade(i,t){
   if(i===cur&&nxt<0)return;
@@ -1920,10 +2013,18 @@ function renderScene(g,i,t){
 function loop(t){
   var dt=Math.min(3,(t-last)/16.7); last=t;
   worldStep(dt,t);
-  if(nxt<0&&t-lastSwitch>AUTO_EVERY_MS){
-    var ni=autoAdvanceTarget();
+  if(PEEK.active&&t>PEEK.until&&nxt<0){
+    var back=PEEK.backTo; PEEK.active=false;
+    startFade(back,t);
+  }
+  if(PEEK.cleanup>=0&&!PEEK.active&&nxt<0&&cur!==PEEK.cleanup){
+    DIRECTIONS.splice(PEEK.cleanup,1); PEEK.cleanup=-1; renderDrawer();
+  }
+  if(nxt<0&&!PEEK.active&&flow.playing&&t-lastSwitch>AUTO_EVERY_MS){
+    var ni=advanceTarget();
     if(ni>=0&&ni!==cur)startFade(ni,t); else lastSwitch=t;
   }
+  if(t-lastTick>500){ lastTick=t; updateCountdown(t); }
   if(nxt>=0){
     fadeT+=(dt*16.7)/FADE_MS;
     renderScene(gA,cur,t);
@@ -1937,95 +2038,61 @@ function loop(t){
   }
   requestAnimationFrame(loop);
 }
-function bindChip(i){
-  document.getElementById("t"+i).onclick=function(){
-    if(autoMode==="selected"){                 // chips become the toggles themselves
-      if(rotation[i]&&rotation.filter(Boolean).length===1)return;  // one stream must keep flowing
-      rotation[i]=!rotation[i]; saveRotation();
-      refreshChips(); refreshAutoBtn();
-      return;
-    }
-    startFade(i);
-  };
-}
-for(var bi=0;bi<3;bi++)bindChip(bi);           // store chips bind themselves in addInkToTank
-var autoBtn=document.getElementById("autoBtn");
-autoBtn.onclick=function(){
-  autoMode=AUTOMODES[(AUTOMODES.indexOf(autoMode)+1)%AUTOMODES.length];
-  saveAutoMode(); lastSwitch=performance.now();
-  refreshAutoBtn();
-};
 document.addEventListener("keydown",function(e){
   if(e.key>="1"&&e.key<="9"&&+e.key<=DIRECTIONS.length)startFade(+e.key-1);
-  if(e.key==="Escape"){ if(EGG.active)eggZoomClose(); else document.body.classList.remove("zen"); }
-});
-document.getElementById("zenBtn").onclick=function(){ document.body.classList.add("zen"); };
-document.getElementById("zenExit").onclick=function(){ document.body.classList.remove("zen"); };
-
-/* ─── Tank controls panel ─────────────────────────────────── */
-var panel=document.getElementById("panel");
-document.getElementById("panelToggle").onclick=function(){
-  panel.hidden=!panel.hidden;
-};
-function updatePanel(){
-  document.getElementById("summonBtn").disabled=pred.active;
-  document.getElementById("startleBtn").disabled=!pred.active;
-  var pl=document.getElementById("pearlLbl");
-  if(pl)pl.textContent="⚬ "+(typeof pearls==="number"?pearls:0)+" pearls";
-  var st=document.getElementById("store");
-  if(st&&!st.hidden)renderStore();
-}
-
-/* ─── The inkwell: spend pearls, gain inks ────────────────── */
-var store=document.getElementById("store");
-document.getElementById("storeToggle").onclick=function(){
-  store.hidden=!store.hidden;
-  if(!store.hidden)renderStore();
-};
-function renderStore(){
-  var h='<span class="lbl">⚬ '+pearls+' pearls in the inkwell</span>';
-  for(var i=0;i<CATALOG.length;i++){
-    var c=CATALOG[i], has=owned.indexOf(c.key)>=0;
-    h+='<b>'+c.name+'</b><span class="lbl">'+c.tease+'</span>';
-    h+=has?'<button class="on" disabled>in the water</button>'
-          :'<button data-ink="'+c.key+'"'+(pearls<c.price?' disabled title="the games pay in pearls"':'')+'>'+c.price+' ⚬</button>';
+  if(e.key==="Escape"){
+    if(EGG.active)eggZoomClose();
+    else if(!document.getElementById("bellPop").hidden)document.getElementById("bellPop").hidden=true;
+    else if(!document.getElementById("drawer").hidden)document.getElementById("drawer").hidden=true;
+    else{ document.body.classList.remove("zen"); zenIcon(); }
   }
-  h+='<span class="lbl">· more inks are still settling…</span>';
-  store.innerHTML=h;
-  Array.prototype.forEach.call(store.querySelectorAll("button[data-ink]"),function(b){
-    b.onclick=function(){ buyInk(b.getAttribute("data-ink")); };
-  });
+});
+
+/* ─── chrome wiring: jar, bell, zen ───────────────────────── */
+var drawer=document.getElementById("drawer");
+document.getElementById("jarBtn").onclick=function(){ drawer.hidden=!drawer.hidden; renderDrawer(); };
+document.getElementById("flowBtn").onclick=function(){ flow.playing=!flow.playing; lastSwitch=performance.now(); saveFlow(); renderDrawer(); };
+document.getElementById("driftBtn").onclick=function(){ flow.shuffle=!flow.shuffle; saveFlow(); renderDrawer(); };
+var bellPop=document.getElementById("bellPop"), bellBtn=document.getElementById("bellBtn");
+bellBtn.onclick=function(e){ e.stopPropagation(); bellPop.hidden=!bellPop.hidden; updatePanel(); };
+document.addEventListener("click",function(e){
+  if(!bellPop.hidden&&!bellPop.contains(e.target)&&!bellBtn.contains(e.target))bellPop.hidden=true;
+});
+document.getElementById("summonBtn").onclick=function(){ summonPred(); bellPop.hidden=true; };
+Array.prototype.forEach.call(document.querySelectorAll('#bellPop input[name="visitmode"]'),function(r){
+  r.onchange=function(){
+    pred.mode=r.value;
+    if(pred.active&&pred.mode==="peaceful"){ pred.visitMode="peaceful"; pred.target=null; if(pred.state==="hunt")pred.state="patrol"; }
+  };
+});
+var ZEN_OPEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 3 3 3 3 9"/><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><polyline points="15 21 21 21 21 15"/></svg>';
+var ZEN_EXIT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>';
+function zenIcon(){
+  var z=document.body.classList.contains("zen"), b=document.getElementById("zenBtn");
+  b.innerHTML=z?ZEN_EXIT:ZEN_OPEN;
+  b.title=z?"bring everything back":"just the tank";
 }
+document.getElementById("zenBtn").onclick=function(){
+  document.body.classList.toggle("zen"); zenIcon();
+};
 function buyInk(key){
-  var cat=null;
-  for(var i=0;i<CATALOG.length;i++)if(CATALOG[i].key===key)cat=CATALOG[i];
+  var cat=catByKey(key);
   if(!cat||owned.indexOf(key)>=0||pearls<cat.price)return;
   pearls-=cat.price; savePearls();
   owned.push(key); saveInks();
   addInkToTank(cat);
-  rotation.push(true); saveRotation();         // a new ink joins the flow at once
-  refreshChips(); refreshAutoBtn(); updatePanel(); renderStore();
-  startFade(DIRECTIONS.length-1);              // and the tank shows it off
-  var hud=document.getElementById("hud");
-  hud.textContent="a new ink joins the water";
-  hud.classList.add("show");
-  setTimeout(function(){ hud.classList.remove("show"); },5000);
+  updatePanel(); renderDrawer();
+  startFade(DIRECTIONS.length-1);              // swim straight to it; it rests on the shore
+  toastHud("a new ink joins the water — resting on the shore");
 }
-document.getElementById("summonBtn").onclick=function(){ summonPred(); };
-document.getElementById("startleBtn").onclick=function(){ startlePred(); };
-Array.prototype.forEach.call(document.querySelectorAll("#panel .mode"),function(btn){
-  btn.onclick=function(){
-    pred.mode=btn.getAttribute("data-m");
-    Array.prototype.forEach.call(document.querySelectorAll("#panel .mode"),function(b){
-      b.classList.toggle("on",b===btn);
-    });
-    if(pred.active&&pred.mode==="peaceful"){ pred.visitMode="peaceful"; pred.target=null; if(pred.state==="hunt")pred.state="patrol"; }
-  };
-});
+function updatePanel(){
+  var s=document.getElementById("summonBtn"); if(s)s.disabled=pred.active;
+  var pb=document.getElementById("pearlBadge"); if(pb)pb.textContent=pearls;
+  renderDrawer();
+}
 
 pred.visitAt=performance.now()+rand(90000,150000);   // first natural visit: 1.5–2.5 min in
 setCaption(0); lastSwitch=performance.now(); updatePanel();
-refreshAutoBtn(); refreshChips();
 requestAnimationFrame(loop);
 </script>
 </body>
