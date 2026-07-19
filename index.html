@@ -206,7 +206,7 @@ footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; lett
     </div>
   </div>
 </main>
-<footer>Streams · v0.37 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.38 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -453,7 +453,7 @@ function eggStep(dt,t){
    wrong side of it. Clicking it opens the Rings game: guide
    the school through rings with food. No clock, no failure.
    Each threaded ring pays a pearl. */
-function loadPearls(){ try{ return parseInt(localStorage.getItem("st_pearls")||"0",10)||0; }catch(e){ return 0; } }
+function loadPearls(){ try{ return Math.max(10,parseInt(localStorage.getItem("st_pearls")||"0",10)||0); }catch(e){ return 10; } }  // testing phase: the jar never opens with fewer than 10
 var pearls=loadPearls();
 function savePearls(){ try{ localStorage.setItem("st_pearls",String(pearls)); }catch(e){} }
 var GAME={active:false, rings:[], threaded:0};
@@ -2493,27 +2493,27 @@ var SWATCH={
 };
 /* ─── the ink collection: store inks join the base three ──── */
 var CATALOG=[
-  {key:"chalk", name:"Chalkboard", price:25,
+  {key:"chalk", name:"Chalkboard", price:10,
    tease:"green slate, chalk-line fish — and the eraser",
    blurb:"Chalk-drawn fish on green slate, dusty ripples, sage reeds — and the board's eraser, wiping as it hunts.",
    scene:sceneChalk},
-  {key:"laser", name:"Laser Burn", price:30,
+  {key:"laser", name:"Laser Burn", price:10,
    tease:"warm plywood, charred cut lines — and the laser head",
    blurb:"Fish cut into warm plywood, char still smoking — and the laser head gliding on its gantry, cutting as it hunts.",
    scene:sceneLaser},
-  {key:"impasto", name:"Impasto", price:40,
+  {key:"impasto", name:"Impasto", price:10,
    tease:"thick oil paint, ridged strokes — and the palette knife",
    blurb:"A sea painted thick — every stroke a ridge of oil, sap-green reeds — and the palette knife, scraping fish from the canvas.",
    scene:sceneImpasto},
-  {key:"blueprint", name:"Blueprint", price:45,
+  {key:"blueprint", name:"Blueprint", price:10,
    tease:"white linework on drafting blue — and the red revision pen",
    blurb:"The aquarium as a measured drawing — schematic fish with centerlines and dimensions — and a living scrawl of red revision ink, striking fish from the record.",
    scene:sceneBP},
-  {key:"glass", name:"Stained Glass", price:35,
+  {key:"glass", name:"Stained Glass", price:10,
    tease:"leaded jewel panes, sun streaming through — and the crack",
    blurb:"A leaded window of deep blue glass, jewel fish set in came, sunlight streaming through — and a crack that spreads, hunting.",
    scene:sceneGlass},
-  {key:"stitch", name:"Embroidery", price:50,
+  {key:"stitch", name:"Embroidery", price:10,
    tease:"linen and satin-stitch thread — and the needle",
    blurb:"A sampler come alive — satin-stitch fish, chain-stitch kelp, ripples sewn in running stitch — and the needle, dipping through the linen, sewing a seam as it hunts.",
    scene:sceneStitch},
