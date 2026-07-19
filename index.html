@@ -162,6 +162,10 @@ body[data-skin="wood"] #hud{                 /* a margin note beside the print, 
   font-family:Georgia,serif; font-size:14px; color:#2A241C; padding:8px 18px;
   background:#F5ECD6; border:2.5px solid #C33D2E; border-radius:2px;
   box-shadow:3px 3px 0 rgba(195,61,46,.25), 2px 3px 9px rgba(80,60,30,.3);}
+body[data-skin="frost"] #hud{                /* written on the fogged glass with a finger */
+  font-family:"Caveat",cursive; font-size:20px; color:#DCEBF5; padding:5px 17px 7px;
+  background:rgba(16,26,44,.72); border:1px solid rgba(220,235,245,.45); border-radius:10px;
+  transform:rotate(-1deg); box-shadow:0 3px 12px rgba(0,0,0,.5);}
 body[data-skin="glass"] #hud{                /* an inscription in a small leaded pane */
   font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#F2E3B6;
   padding:7px 18px; background:#1C2F58; border:3px solid #14141C; border-radius:3px;
@@ -243,7 +247,7 @@ footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; lett
     </div>
   </div>
 </main>
-<footer>Streams · v0.44 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.45 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -635,7 +639,7 @@ function eggZoomStep(dt,t){
    its circle and rotates its fragment. All fragments at rest = one river. */
 function strokeEggPattern(g,style,t){
   var pulse=EGG.solved?(.6+.4*Math.sin((t-EGG.solvedT)*.012)):1;
-  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":style==="stitch"?"166,58,64":style==="crayon"?"58,50,48":style==="printed"?"94,214,240":style==="sand"?"104,96,80":style==="wood"?"42,36,28":"46,110,99";
+  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":style==="stitch"?"166,58,64":style==="crayon"?"58,50,48":style==="printed"?"94,214,240":style==="sand"?"104,96,80":style==="wood"?"42,36,28":style==="frost"?"216,235,245":"46,110,99";
   g.lineCap="round";
   for(var pass=0;pass<(style==="glow"?2:1);pass++){
     g.strokeStyle="rgba("+col+","+((pass===0&&style==="glow")?.22*pulse:(style==="glow"?.9:.85)*pulse)+")";
@@ -655,14 +659,14 @@ function eggZoomDraw(g,t,style){
   if(EGG.zoom<=0||!EGG.egg)return;
   var f=eggZoomFrame(t), e=EGG.egg;
   g.globalAlpha=f.z*(style==="glow"?.42:style==="chalk"?.5:.32);   // light veil — the zoomed scene itself carries the focus
-  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":style==="stitch"?"#E7DFC9":style==="crayon"?"#D9C9A3":style==="printed"?"#10151B":style==="sand"?"#D8CFBA":style==="wood"?"#EFE3C8":"#AFD9CC";
+  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":style==="stitch"?"#E7DFC9":style==="crayon"?"#D9C9A3":style==="printed"?"#10151B":style==="sand"?"#D8CFBA":style==="wood"?"#EFE3C8":style==="frost"?"#0E1626":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
   for(var i=0;i<7;i++){
     var px=EGG_POS[i][0], py=EGG_POS[i][1];
     if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
     if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
-    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":style==="stitch"?"#F7F2E4":style==="crayon"?"#EADFBE":style==="printed"?"#1F2833":style==="sand"?"#E5DECB":style==="wood"?"#F5ECD6":"#F4E9D4";
+    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":style==="stitch"?"#F7F2E4":style==="crayon"?"#EADFBE":style==="printed"?"#1F2833":style==="sand"?"#E5DECB":style==="wood"?"#F5ECD6":style==="frost"?"#1C2A40":"#F4E9D4";
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.fill();
     g.save();
     g.beginPath(); g.arc(px,py,EGG_R-6,0,7); g.clip();
@@ -688,6 +692,9 @@ function eggZoomDraw(g,t,style){
     else if(style==="wood"){ g.strokeStyle="rgba(195,61,46,.6)"; g.lineWidth=4;       // vermilion off-register under the keyline
       g.beginPath(); g.arc(px+3,py-2,EGG_R,0,7); g.stroke();
       g.strokeStyle="rgba(42,36,28,.9)"; g.lineWidth=4.2; }
+    else if(style==="frost"){ g.strokeStyle="rgba(216,235,245,.22)"; g.lineWidth=9;   // rime rim, glow faked wide+narrow
+      g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
+      g.strokeStyle="#DCEBF5"; g.lineWidth=2.2; }
     else { g.strokeStyle="rgba(46,110,99,.5)"; g.lineWidth=4; }
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
     g.setLineDash([]);
@@ -3417,6 +3424,206 @@ function sceneWood(g,t){
   fish.forEach(function(f){drawWoodFish(g,f);});
 }
 
+/* ══════════════ SKIN 14: FIRST FROST (store ink) ══════════════
+   A winter windowpane at night: the glass silvered with frost,
+   fish drawn as feathered ice-ferns. The serpent is a creature
+   that remembers being a WARM FINGERTIP — its trail is not
+   drawn but revealed: a melted channel of clear dark glass,
+   beaded with droplets, slowly frosting shut again. A caught
+   fish is breathed on: it turns to droplets and runs down the
+   pane. Glow is halo sprites only — no shadowBlur. */
+var FROSTNIGHT="#0E1626";
+var nightTex=null;
+function makeNightPane(){
+  var c=document.createElement("canvas"); c.width=W; c.height=H;
+  var g=c.getContext("2d");
+  var grd=g.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0,"#0B1220"); grd.addColorStop(.5,"#16233A"); grd.addColorStop(1,"#0B1220");
+  g.fillStyle=grd; g.fillRect(0,0,W,H);
+  [[W*.22,H*.3,"#E8C98A"],[W*.78,H*.62,"#B8D0E8"],[W*.55,H*.2,"#D8A878"]].forEach(function(b){
+    var lg=g.createRadialGradient(b[0],b[1],0,b[0],b[1],140);  // streetlights somewhere out there
+    lg.addColorStop(0,b[2]+"22"); lg.addColorStop(1,b[2]+"00");
+    g.fillStyle=lg; g.fillRect(b[0]-140,b[1]-140,280,280);
+  });
+  g.fillStyle="rgba(206,226,240,.09)"; g.fillRect(0,0,W,H);     // the milky breath on the glass
+  [[0,0],[W,0],[0,H],[W,H]].forEach(function(cn){               // frost gathers in the corners
+    var fg=g.createRadialGradient(cn[0],cn[1],0,cn[0],cn[1],620);
+    fg.addColorStop(0,"rgba(216,235,245,.34)"); fg.addColorStop(1,"rgba(216,235,245,0)");
+    g.fillStyle=fg; g.fillRect(0,0,W,H);
+  });
+  for(var i=0;i<1600;i++){
+    g.fillStyle="rgba(222,238,248,"+rand(.03,.12)+")";
+    g.beginPath(); g.arc(rand(0,W),rand(0,H),rand(.4,1.4),0,7); g.fill();
+  }
+  return c;
+}
+function frostFern(g,x0,y0,ang,len,seed,alpha){                 // one feathered ice branch
+  var x1=x0+Math.cos(ang)*len, y1=y0+Math.sin(ang)*len;
+  g.strokeStyle="rgba(232,244,252,"+alpha+")"; g.lineWidth=1.8;
+  g.beginPath(); g.moveTo(x0,y0); g.lineTo(x1,y1); g.stroke();
+  g.lineWidth=1.1;
+  for(var q=1;q<4;q++){
+    var fr=q/4, bx=x0+(x1-x0)*fr, by=y0+(y1-y0)*fr, bl=len*.3*(1-fr*.6);
+    g.beginPath(); g.moveTo(bx,by);
+    g.lineTo(bx+Math.cos(ang+.7)*bl,by+Math.sin(ang+.7)*bl); g.stroke();
+    g.beginPath(); g.moveTo(bx,by);
+    g.lineTo(bx+Math.cos(ang-.7)*bl,by+Math.sin(ang-.7)*bl); g.stroke();
+  }
+}
+function drawFrostFish(g,f,t){
+  var s=f.size*1.05, seed=f.fullSize*5.31;
+  g.save(); g.translate(f.x,f.y); g.rotate(f.a);
+  var wag=Math.sin(f.phase)*.4;
+  g.lineCap="round";
+  g.strokeStyle="rgba(159,200,232,.3)"; g.lineWidth=6;          // the cold underglow of the crystal
+  g.beginPath(); g.moveTo(s*.92,0);
+  g.quadraticCurveTo(0,-s*.06,-s,wag*s*.3); g.stroke();
+  g.strokeStyle="#E8F4FC"; g.lineWidth=2.4;                     // the spine
+  g.beginPath(); g.moveTo(s*.92,0);
+  g.quadraticCurveTo(0,-s*.06,-s,wag*s*.3); g.stroke();
+  for(var i=0;i<7;i++){                                         // feathering, alternating sides
+    var fr=i/6, bx=s*.8-fr*s*1.6;
+    var env=Math.sqrt(Math.max(0,1-Math.pow(bx/s,2)));
+    var side=(i%2?1:-1), bl=s*.52*env+4;
+    var ba=side*(1.15+.12*Math.sin(seed+i));
+    frostFern(g,bx,-s*.03+fr*wag*s*.2,ba,bl,seed+i,.75);
+  }
+  var tw=.5+.5*Math.sin(t*.003+f.phase*2);                      // the eye: one live crystal
+  var ey=f.odd?s*.12:-s*.08;
+  drawHalo(g,"#CFE8FF",s*.66,ey,s*.3*(0.7+tw*.4),s*.3*(0.7+tw*.4),.5);
+  g.fillStyle="rgba(232,246,255,"+(.75+.25*tw)+")";
+  g.beginPath(); g.arc(s*.66,ey,s*.05,0,7); g.fill();
+  g.restore();
+}
+var meltTrail=[];
+function drawFrostPred(g,t){
+  for(var w2=meltTrail.length-1;w2>=0;w2--){ if(++meltTrail[w2][2]>430)meltTrail.splice(w2,1); }
+  if(pred.active)meltTrail.unshift([pred.x,pred.y,0]);
+  g.lineCap="round";
+  for(var i=2;i<meltTrail.length;i+=2){          // the melted channel — night showing through, frosting shut
+    var q0=meltTrail[i-2], q1=meltTrail[i], k=1-q1[2]/430;
+    g.strokeStyle="rgba(9,16,30,"+(.62*k)+")"; g.lineWidth=32;
+    g.beginPath(); g.moveTo(q0[0],q0[1]); g.lineTo(q1[0],q1[1]); g.stroke();
+  }
+  for(i=6;i<meltTrail.length;i+=6){              // droplets beading its edges
+    var q=meltTrail[i], k2=1-q[2]/430;
+    var qp=meltTrail[i-2];
+    var dd=Math.atan2(q[1]-qp[1],q[0]-qp[0])+Math.PI/2;
+    g.fillStyle="rgba(220,235,245,"+(.55*k2)+")";
+    g.beginPath(); g.arc(q[0]+Math.cos(dd)*17,q[1]+Math.sin(dd)*17,1.9,0,7); g.fill();
+    g.beginPath(); g.arc(q[0]-Math.cos(dd)*17,q[1]-Math.sin(dd)*17,1.6,0,7); g.fill();
+  }
+  if(!pred.active||pred.segs.length<6)return;
+  var n=pred.segs.length;
+  for(i=n-2;i>=2;i-=2){                          // fading body-warmth behind the tip
+    var p1=pred.segs[i], taper=1-(i/n);
+    g.fillStyle="rgba(232,180,154,"+(.06+.2*taper)+")";
+    g.beginPath(); g.arc(p1[0],p1[1],6+taper*11,0,7); g.fill();
+  }
+  g.save(); g.translate(pred.x,pred.y); g.rotate(pred.a);
+  g.fillStyle="rgba(232,180,154,.22)"; g.beginPath(); g.arc(2,0,19,0,7); g.fill();
+  g.fillStyle="rgba(232,180,154,.45)"; g.beginPath(); g.arc(3,0,12.5,0,7); g.fill();
+  g.fillStyle="#E8B49A"; g.beginPath(); g.arc(4,0,8,0,7); g.fill();   // the warm fingertip
+  g.strokeStyle="rgba(190,130,105,.6)"; g.lineWidth=1.1;              // its print
+  g.beginPath(); g.arc(4,0,5,-1.9,1.9); g.stroke();
+  g.beginPath(); g.arc(4,0,2.8,-1.9,1.9); g.stroke();
+  g.restore();
+}
+function sceneFrost(g,t){
+  if(!nightTex)nightTex=makeNightPane();
+  g.drawImage(nightTex,0,0);
+  g.save(); g.globalAlpha=.06+.025*Math.sin(t*.0005);           // the streetlamp through the pane
+  var rg2=g.createLinearGradient(W*.7,0,W*.45,H);
+  rg2.addColorStop(0,"#F2D9A8"); rg2.addColorStop(1,"rgba(242,217,168,0)");
+  g.fillStyle=rg2; rayPath(g); g.fill(); g.restore();
+  motes.forEach(function(m){                                    // ice sparkles
+    var tw=.3+.7*Math.abs(Math.sin(t*.001+m.tw));
+    if(tw>.75)drawHalo(g,"#CFE8FF",m.x,m.y,7,7,.3*tw);
+    g.fillStyle="rgba(226,240,250,"+(.4*tw)+")";
+    g.beginPath(); g.arc(m.x,m.y,.9,0,7); g.fill();
+  });
+  g.lineCap="round";
+  KELP.forEach(function(k){                                     // frost ferns climbing from the sill
+    var kx=W*k.fx, sway=kelpSway(k,t)*.4;
+    var P0x=kx,P0y=H+10, Cx=kx+sway,Cy=H*.8, P1x=kx+sway*1.6,P1y=k.top+60;
+    g.strokeStyle="rgba(226,240,250,.55)"; g.lineWidth=2.2;
+    g.beginPath(); g.moveTo(P0x,P0y); g.quadraticCurveTo(Cx,Cy,P1x,P1y); g.stroke();
+    for(var q=1;q<6;q++){
+      var fr=q/6, mt=1-fr;
+      var x=mt*mt*P0x+2*mt*fr*Cx+fr*fr*P1x, y=mt*mt*P0y+2*mt*fr*Cy+fr*fr*P1y;
+      var side=(q%2?1:-1), ang=-Math.PI/2+side*(.9-fr*.3);
+      frostFern(g,x,y,ang,(52-fr*26)+k.i*5,k.ph+q,.4);
+    }
+  });
+  ripples.forEach(function(rp){                                 // frost blooms: rings of growing dendrites
+    var a=Math.min(.55,rp.a*2);
+    g.strokeStyle="rgba(216,235,245,"+a+")"; g.lineWidth=1.4;
+    for(var i=0;i<12;i++){
+      var da=i/12*Math.PI*2+rp.r*.006;
+      var x0=rp.x+Math.cos(da)*rp.r, y0=rp.y+Math.sin(da)*rp.r;
+      var x1=rp.x+Math.cos(da)*(rp.r+9), y1=rp.y+Math.sin(da)*(rp.r+9);
+      g.beginPath(); g.moveTo(x0,y0); g.lineTo(x1,y1);
+      g.moveTo(x1,y1); g.lineTo(x1+Math.cos(da+.8)*4,y1+Math.sin(da+.8)*4);
+      g.moveTo(x1,y1); g.lineTo(x1+Math.cos(da-.8)*4,y1+Math.sin(da-.8)*4);
+      g.stroke();
+    }
+  });
+  food.forEach(function(fd){                                    // snow settling on the glass
+    g.save(); g.translate(fd.x,fd.y); g.rotate(fd.spin+t*.0006);
+    g.strokeStyle="rgba(236,246,254,"+(.85*fd.alpha)+")"; g.lineWidth=1.2;
+    for(var q=0;q<3;q++){
+      g.beginPath(); g.moveTo(-Math.cos(q*1.047)*fd.size,-Math.sin(q*1.047)*fd.size);
+      g.lineTo(Math.cos(q*1.047)*fd.size,Math.sin(q*1.047)*fd.size); g.stroke();
+    }
+    g.restore();
+  });
+  eggs.forEach(function(e){                                     // seven beads of ice
+    var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
+    var pulse=.5+.5*Math.sin(t*.004);
+    drawHalo(g,"#CFE8FF",ex,ey,26,22,.2+.15*pulse);
+    for(var i=0;i<7;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
+      g.fillStyle="rgba(226,242,252,"+(.55+.3*pulse)+")";
+      g.beginPath(); g.arc(ex+dx,ey+dy,3.8,0,7); g.fill();
+      g.fillStyle="rgba(255,255,255,.9)";
+      g.beginPath(); g.arc(ex+dx-1.2,ey+dy-1.2,1.1,0,7); g.fill();
+    }
+  });
+  deathFx.forEach(function(fx){                                 // BREATHED ON: droplets run down the pane
+    var k=1-fx.age/130, fs=(fx.size||40)*1.05;
+    var br=Math.min(fs*2.1,10+fx.age*2.4);                      // the breath, clearing a circle
+    g.fillStyle="rgba(9,16,30,"+(.5*k)+")";
+    g.beginPath(); g.arc(fx.x,fx.y,br,0,7); g.fill();
+    g.save(); g.translate(fx.x,fx.y); g.rotate(fx.a||0);        // the fern, losing its feathers
+    g.globalAlpha=Math.max(0,.8-fx.age/40);
+    g.strokeStyle="#E8F4FC"; g.lineWidth=2;
+    g.beginPath(); g.moveTo(fs*.9,0); g.quadraticCurveTo(0,-fs*.06,-fs,0); g.stroke();
+    g.restore(); g.globalAlpha=1;
+    fx.parts.forEach(function(p,pi){                            // droplets, racing their streaks down
+      var fall=fx.age*(1.1+(pi%3)*.5);
+      var dx2=fx.x+p.dx*.5, dy0=fx.y+p.dy*.3;
+      g.strokeStyle="rgba(180,205,225,"+(.3*k)+")"; g.lineWidth=1.2;
+      g.beginPath(); g.moveTo(dx2,dy0); g.lineTo(dx2,dy0+fall); g.stroke();
+      g.fillStyle="rgba(226,242,252,"+(.8*k)+")";
+      g.beginPath(); g.arc(dx2,dy0+fall,2+p.sz*.14,0,7); g.fill();
+    });
+  });
+  GAME.rings.forEach(function(rg){                              // breath rings, wiped clear
+    if(rg.fade<=0)return;
+    var a=(rg.done?rg.fade*.5:.75), bob=Math.sin(t*.001+rg.ph)*7;
+    g.strokeStyle="rgba(9,16,30,"+(a*.55)+")"; g.lineWidth=17;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,0,7); g.stroke();
+    g.strokeStyle="rgba(216,235,245,"+(a*.8)+")"; g.lineWidth=1.6;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r+9,0,7); g.stroke();
+    g.fillStyle="rgba(220,235,245,"+(a*.7)+")";
+    for(var q=0;q<3;q++){
+      g.beginPath(); g.arc(rg.x+(q-1)*rg.r*.4,rg.y+bob+rg.r+4+(q%2)*3,1.8,0,7); g.fill();
+    }
+  });
+  drawFrostPred(g,t);
+  fish.forEach(function(f){drawFrostFish(g,f,t);});
+}
+
 /* ─── Director ────────────────────────────────────────────── */
 var DIRECTIONS=[
   {key:"ink",  name:"1 · Ink Wash",  blurb:"Brushstroke koi, ink-ring ripples, calligraphic reeds — and a serpent of darker ink.", scene:sceneInk},
@@ -3438,7 +3645,8 @@ var SWATCH={
   crayon:`#D9C9A3 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M5 15 Q14 7 25 13 T46 10' stroke='%23D9382E' stroke-width='5.5' fill='none' stroke-linecap='round'/><path d='M7 27 L13 22 L19 28 L25 22 L31 28 L37 22 L43 27' stroke='%233E9B4F' stroke-width='3.6' fill='none' stroke-linecap='round' stroke-linejoin='round' opacity='.9'/></svg>") center/cover`,
   printed:`#14181D url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 9 H52 M0 18 H52 M0 27 H52' stroke='%235AC8DC' stroke-width='.7' opacity='.3'/><path d='M6 24 Q16 12 27 18 T48 15' stroke='%23F28C28' stroke-width='3.4' fill='none' stroke-linecap='round'/><path d='M6 20 Q16 8 27 14' stroke='%23FFC38A' stroke-width='1.4' fill='none' stroke-linecap='round' opacity='.9'/></svg>") center/cover`,
   sand:`#D8CFBA url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><ellipse cx='17' cy='17' rx='13' ry='8' fill='none' stroke='%23918872' stroke-width='1.6'/><ellipse cx='17' cy='17' rx='7.5' ry='4.6' fill='none' stroke='%23918872' stroke-width='1.3' opacity='.7'/><ellipse cx='38' cy='24' rx='4.6' ry='3.5' fill='%234A4640'/><ellipse cx='31' cy='27.5' rx='3.4' ry='2.6' fill='%2356606B'/><ellipse cx='44' cy='28' rx='3' ry='2.3' fill='%236E5B48'/></svg>") center/cover`,
-  wood:`#EFE3C8 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M7 17 Q17 8 27 14 T47 11' stroke='%23C33D2E' stroke-width='4' fill='none' stroke-linecap='round' opacity='.75' transform='translate(2,-1.5)'/><path d='M7 17 Q17 8 27 14 T47 11' stroke='%232A241C' stroke-width='2.6' fill='none' stroke-linecap='round'/><path d='M8 28 Q14 22 20 28 M20 28 Q26 22 32 28 M32 28 Q38 22 44 28' stroke='%232A241C' stroke-width='1.8' fill='none' opacity='.6'/></svg>") center/cover`
+  wood:`#EFE3C8 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M7 17 Q17 8 27 14 T47 11' stroke='%23C33D2E' stroke-width='4' fill='none' stroke-linecap='round' opacity='.75' transform='translate(2,-1.5)'/><path d='M7 17 Q17 8 27 14 T47 11' stroke='%232A241C' stroke-width='2.6' fill='none' stroke-linecap='round'/><path d='M8 28 Q14 22 20 28 M20 28 Q26 22 32 28 M32 28 Q38 22 44 28' stroke='%232A241C' stroke-width='1.8' fill='none' opacity='.6'/></svg>") center/cover`,
+  frost:`#13203A url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M8 28 Q20 20 30 14 T48 6' stroke='%23E8F4FC' stroke-width='1.8' fill='none' stroke-linecap='round'/><path d='M18 22 L22 14 M18 22 L12 18 M30 14 L33 7 M30 14 L24 11 M40 10 L43 4 M40 10 L35 6' stroke='%23BFDCEE' stroke-width='1.3' fill='none' stroke-linecap='round' opacity='.85'/><circle cx='44' cy='27' r='1.4' fill='%23E8F4FC'/><circle cx='12' cy='9' r='1' fill='%23BFDCEE'/></svg>") center/cover`
 };
 /* ─── the ink collection: store inks join the base three ──── */
 var CATALOG=[
@@ -3482,6 +3690,10 @@ var CATALOG=[
    tease:"an ukiyo-e print, a hair off-register — and the gouge",
    blurb:"Bold keyblock koi over flat color that never quite lines up, carved wave-ripples, a red hanko in the corner — and the carver's V-gouge, cutting troughs as it hunts. A caught fish is carved from the block and prints as nothing.",
    scene:sceneWood},
+  {key:"frost", name:"First Frost", price:10,
+   tease:"a frosted midnight windowpane — and the warm fingertip",
+   blurb:"A winter window at night — fish of feathered ice-fern, frost climbing from the sill, ripples blooming crystal by crystal — and a warm fingertip melting a clear channel through it all. What it touches runs down the glass.",
+   scene:sceneFrost},
 ];
 var owned=(function(){ try{ var v=JSON.parse(localStorage.getItem("st_inks")); return Array.isArray(v)?v:[]; }catch(e){ return []; } })();
 function saveInks(){ try{ localStorage.setItem("st_inks",JSON.stringify(owned)); }catch(e){} }
