@@ -124,6 +124,10 @@ body[data-skin="blueprint"] #hud{            /* a note in the title block */
   color:#DFE9F7; padding:8px 16px; background:#123A6E;
   border:1.6px solid rgba(223,233,247,.7); outline:1px solid rgba(223,233,247,.3); outline-offset:3px;
   border-radius:2px; box-shadow:2px 3px 10px rgba(0,10,30,.5);}
+body[data-skin="stitch"] #hud{               /* a sampler patch, hemmed in running stitch */
+  font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#6B4A3A;
+  padding:8px 18px; background:#F1EAD8; border:2px dashed #B8474E; border-radius:3px;
+  transform:rotate(-.6deg); box-shadow:2px 3px 9px rgba(90,70,40,.3);}
 body[data-skin="glass"] #hud{                /* an inscription in a small leaded pane */
   font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#F2E3B6;
   padding:7px 18px; background:#1C2F58; border:3px solid #14141C; border-radius:3px;
@@ -202,7 +206,7 @@ footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; lett
     </div>
   </div>
 </main>
-<footer>Streams · v0.36 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.37 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -594,7 +598,7 @@ function eggZoomStep(dt,t){
    its circle and rotates its fragment. All fragments at rest = one river. */
 function strokeEggPattern(g,style,t){
   var pulse=EGG.solved?(.6+.4*Math.sin((t-EGG.solvedT)*.012)):1;
-  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":"46,110,99";
+  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":style==="stitch"?"166,58,64":"46,110,99";
   g.lineCap="round";
   for(var pass=0;pass<(style==="glow"?2:1);pass++){
     g.strokeStyle="rgba("+col+","+((pass===0&&style==="glow")?.22*pulse:(style==="glow"?.9:.85)*pulse)+")";
@@ -614,14 +618,14 @@ function eggZoomDraw(g,t,style){
   if(EGG.zoom<=0||!EGG.egg)return;
   var f=eggZoomFrame(t), e=EGG.egg;
   g.globalAlpha=f.z*(style==="glow"?.42:style==="chalk"?.5:.32);   // light veil — the zoomed scene itself carries the focus
-  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":"#AFD9CC";
+  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":style==="stitch"?"#E7DFC9":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
   for(var i=0;i<7;i++){
     var px=EGG_POS[i][0], py=EGG_POS[i][1];
     if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
     if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
-    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":"#F4E9D4";
+    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":style==="stitch"?"#F7F2E4":"#F4E9D4";
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.fill();
     g.save();
     g.beginPath(); g.arc(px,py,EGG_R-6,0,7); g.clip();
@@ -636,8 +640,10 @@ function eggZoomDraw(g,t,style){
     else if(style==="glass"){ g.strokeStyle="#14141C"; g.lineWidth=5; }
     else if(style==="impasto"){ g.strokeStyle="rgba(94,74,48,.6)"; g.lineWidth=5; }
     else if(style==="blueprint"){ g.strokeStyle="rgba(223,233,247,.8)"; g.lineWidth=2.4; }
+    else if(style==="stitch"){ g.strokeStyle="rgba(166,58,64,.85)"; g.lineWidth=3.6; g.setLineDash([11,8]); }  // rim sewn in running stitch
     else { g.strokeStyle="rgba(46,110,99,.5)"; g.lineWidth=4; }
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
+    g.setLineDash([]);
   }
   g.restore();
 }
@@ -2209,6 +2215,263 @@ function sceneBP(g,t){
   fish.forEach(function(f){drawBPFish(g,f);});
 }
 
+/* ══════════════ SKIN 9: EMBROIDERY (store ink) ══════════════
+   Linen and thread: satin-stitch fish, chain-stitch kelp,
+   ripples sewn in running stitch. The serpent is a creature
+   that remembers being a NEEDLE — it dips through the fabric
+   as it swims, sewing a seam behind it; a caught fish is
+   unraveled stitch by stitch, and its color rides off
+   threaded through the needle's eye. */
+var STITCHC=[["#B8474E","#E8949A"],["#C9973B","#F0CD8C"],["#47806E","#8FBFA9"],["#50699C","#93AEDC"]];
+var STITCH_RGB=["184,71,78","201,151,59","71,128,110","80,105,156"];
+var LINEN="#EDE6D4";
+var linenTex=null;
+function makeLinen(){
+  var c=document.createElement("canvas"); c.width=W; c.height=H;
+  var g=c.getContext("2d");
+  g.fillStyle=LINEN; g.fillRect(0,0,W,H);
+  g.lineWidth=1;
+  for(var x=0;x<=W;x+=4){ g.strokeStyle="rgba(160,146,116,"+(x%8?.05:.08)+")";
+    g.beginPath(); g.moveTo(x,0); g.lineTo(x,H); g.stroke(); }
+  for(var y=0;y<=H;y+=4){ g.strokeStyle="rgba(160,146,116,"+(y%8?.04:.07)+")";
+    g.beginPath(); g.moveTo(0,y); g.lineTo(W,y); g.stroke(); }
+  for(var i=0;i<260;i++){                        // slubs in the weave
+    var sx=rand(0,W), sy=rand(0,H), horiz=Math.random()<.5;
+    g.strokeStyle="rgba(150,134,102,"+rand(.06,.14)+")"; g.lineWidth=rand(1,2.2);
+    g.beginPath(); g.moveTo(sx,sy);
+    g.lineTo(sx+(horiz?rand(8,26):rand(-2,2)), sy+(horiz?rand(-2,2):rand(8,26))); g.stroke();
+  }
+  g.lineWidth=2;                                 // the washed-out transfer pattern nobody finished
+  for(i=0;i<5;i++){
+    var px=rand(W*.1,W*.9), py=rand(H*.15,H*.85);
+    g.strokeStyle="rgba(96,126,178,.06)";
+    g.beginPath(); g.moveTo(px,py);
+    g.bezierCurveTo(px+rand(-160,160),py+rand(-120,120),px+rand(-160,160),py+rand(-120,120),px+rand(-220,220),py+rand(-80,80));
+    g.stroke();
+  }
+  return c;
+}
+function drawStitchFish(g,f){
+  var s=f.size*1.12, c=STITCHC[f.species];
+  g.save(); g.translate(f.x,f.y); g.rotate(f.a);
+  var wag=Math.sin(f.phase)*.45;
+  g.lineCap="round";
+  var N=13;                                      // satin stitch: parallel threads laid edge to edge
+  for(var i2=0;i2<N;i2++){
+    var fr=i2/(N-1), xi=s*.92-fr*s*1.84;
+    var env=Math.sqrt(Math.max(0,1-Math.pow(xi/s,2)));
+    var hh=Math.max(2,env*s*.36);
+    var yb=wag*s*.3*fr*fr;                       // the rear of the body follows the wag
+    g.strokeStyle=c[0]; g.lineWidth=4.2; g.globalAlpha=.95;
+    g.beginPath(); g.moveTo(xi+hh*.3,yb-hh); g.lineTo(xi-hh*.12,yb+hh); g.stroke();
+    g.strokeStyle=c[1]; g.lineWidth=1.3; g.globalAlpha=.75;   // each thread wears its sheen
+    g.beginPath(); g.moveTo(xi+hh*.3-1.2,yb-hh+1.5); g.lineTo(xi-hh*.12-1.2,yb+hh-1.5); g.stroke();
+  }
+  g.globalAlpha=.55; g.strokeStyle="rgba(90,72,56,.9)"; g.lineWidth=1.7;
+  g.setLineDash([7,4]);                          // back-stitch outline: the pattern line it was sewn to
+  g.beginPath(); g.moveTo(s,0);
+  g.bezierCurveTo(s*.55,-s*.38,-s*.35,-s*.34,-s,wag*s*.28);
+  g.bezierCurveTo(-s*.35,s*.34,s*.55,s*.38,s,0);
+  g.stroke(); g.setLineDash([]);
+  g.globalAlpha=.9; g.strokeStyle=c[0]; g.lineWidth=2.6;
+  for(var k2=0;k2<5;k2++){                       // tail: five long straight stitches, fanned
+    var ta=(k2-2)*.17+wag*.55;
+    g.beginPath(); g.moveTo(-s*.94,wag*s*.28);
+    g.lineTo(-s*.94-Math.cos(ta)*s*.62,wag*s*.28+Math.sin(ta)*s*.62); g.stroke();
+  }
+  g.lineWidth=2.4; g.globalAlpha=.85;
+  for(k2=0;k2<3;k2++){                           // three dorsal stitches
+    var dx2=s*.3-k2*s*.22;
+    g.beginPath(); g.moveTo(dx2,-s*.30); g.lineTo(dx2-s*.14,-s*.52); g.stroke();
+  }
+  var ey=f.odd?s*.14:-s*.06;                     // the odd fish wears its eye low
+  g.globalAlpha=1; g.fillStyle="#3B2F24";        // a french knot for an eye
+  g.beginPath(); g.arc(s*.58,ey,s*.06,0,7); g.fill();
+  g.strokeStyle="rgba(247,242,228,.9)"; g.lineWidth=1.3;
+  g.beginPath(); g.arc(s*.58,ey,s*.06,0,7); g.stroke();
+  g.restore();
+}
+var seamTrail=[], stitchThreadIdx=0;             // the seam it sews, and whose color rides in its eye
+function drawStitchPred(g){
+  for(var w2=seamTrail.length-1;w2>=0;w2--){ if(++seamTrail[w2][2]>460)seamTrail.splice(w2,1); }
+  if(pred.active)seamTrail.unshift([pred.x,pred.y,0,stitchThreadIdx]);   // each stitch remembers its thread
+  g.lineCap="round";
+  for(var i=4;i<seamTrail.length;i+=4){          // a running stitch through the water, fading
+    var q0=seamTrail[i-2], q1=seamTrail[i], k=1-q1[2]/460;
+    g.strokeStyle="rgba("+STITCH_RGB[q1[3]||0]+","+(.55*k)+")"; g.lineWidth=2.6;
+    g.beginPath(); g.moveTo(q0[0],q0[1]); g.lineTo(q1[0],q1[1]); g.stroke();
+  }
+  if(!pred.active||pred.segs.length<6)return;
+  var n=pred.segs.length;
+  function depth(i){ return Math.sin(i*.14-pred.phase*.5)+.55+Math.max(0,10-i)*.12; }  // head always surfaces
+  g.save(); g.setLineDash([4,8]);                // below the linen: only a dotted ghost of it
+  g.strokeStyle="rgba(104,88,66,.3)"; g.lineWidth=2.2;
+  for(i=2;i<n;i+=2){
+    if(depth(i)>0)continue;
+    var p0=pred.segs[i-2], p1=pred.segs[i];
+    g.beginPath(); g.moveTo(p0[0],p0[1]); g.lineTo(p1[0],p1[1]); g.stroke();
+  }
+  g.restore();
+  for(i=2;i<n;i+=2){                             // punctures where it passes through
+    if((depth(i)>0)!==(depth(i-2)>0)){
+      var pp=pred.segs[i];
+      g.strokeStyle="rgba(70,56,40,.4)"; g.lineWidth=3;
+      g.beginPath(); g.moveTo(pp[0]-4,pp[1]-3); g.lineTo(pp[0]+4,pp[1]+3); g.stroke();
+    }
+  }
+  for(i=2;i<n;i+=2){                             // polished steel, tapering to its point of a tail
+    if(depth(i)<=0)continue;
+    p0=pred.segs[i-2]; p1=pred.segs[i];
+    var taper=1-(i/n)*.9;
+    g.strokeStyle="#767E88"; g.lineWidth=11*taper+1.6;
+    g.beginPath(); g.moveTo(p0[0],p0[1]); g.lineTo(p1[0],p1[1]); g.stroke();
+    g.strokeStyle="rgba(226,234,242,.8)"; g.lineWidth=3.6*taper+.6;
+    g.beginPath(); g.moveTo(p0[0]-1.2,p0[1]-1.4); g.lineTo(p1[0]-1.2,p1[1]-1.4); g.stroke();
+  }
+  g.save(); g.translate(pred.x,pred.y); g.rotate(pred.a);
+  g.strokeStyle="#767E88"; g.lineWidth=13;       // the blunt head, where the eye lives
+  g.beginPath(); g.moveTo(-4,0); g.lineTo(15,0); g.stroke();
+  g.strokeStyle="rgba(226,234,242,.85)"; g.lineWidth=4;
+  g.beginPath(); g.moveTo(-3,-2.6); g.lineTo(13,-2.6); g.stroke();
+  g.fillStyle=LINEN;                             // its eye IS a needle's eye — the linen shows through
+  g.beginPath(); g.ellipse(4,0,5.6,2.4,0,0,7); g.fill();
+  g.strokeStyle="#3E444C"; g.lineWidth=1.5;
+  g.beginPath(); g.ellipse(4,0,5.6,2.4,0,0,7); g.stroke();
+  g.strokeStyle=STITCHC[stitchThreadIdx][0]; g.lineWidth=2.4;
+  g.beginPath(); g.moveTo(4,-1);                 // the thread, slack through the eye
+  g.quadraticCurveTo(-8,-11,-26,-4); g.stroke();
+  g.restore();
+}
+function sceneStitch(g,t){
+  if(!linenTex)linenTex=makeLinen();
+  g.drawImage(linenTex,0,0);
+  g.save(); g.globalAlpha=.06+.025*Math.sin(t*.0005);          // a warm wash of window light
+  g.fillStyle="#FFF7E0"; rayPath(g); g.fill(); g.restore();
+  g.save(); g.setLineDash([16,13]);                            // basted with long tacking stitches
+  g.strokeStyle="rgba(214,196,150,.28)"; g.lineWidth=2;
+  for(var rr=0;rr<3;rr++){
+    var fr2=.22+rr*.28;
+    g.beginPath(); g.moveTo(RAY.x0+(RAY.x1-RAY.x0)*fr2,0);
+    g.lineTo(RAY.ex0+(RAY.ex1-RAY.ex0)*fr2,H); g.stroke();
+  }
+  g.restore();
+  motes.forEach(function(m){                                   // drifting snips of thread
+    var tw=.4+.6*Math.abs(Math.sin(t*.001+m.tw));
+    g.strokeStyle="rgba(146,128,98,"+(.3*tw)+")"; g.lineWidth=1.4;
+    g.beginPath(); g.arc(m.x,m.y,3.2,m.tw,m.tw+2.4); g.stroke();
+  });
+  g.lineCap="round";
+  KELP.forEach(function(k){                                    // chain-stitch vines, lazy-daisy leaves
+    var kx=W*k.fx, sway=kelpSway(k,t);
+    var P0x=kx,P0y=H+20, Cx=kx+sway*.4,Cy=H*.8, P1x=kx+sway,P1y=k.top;
+    var prev=null;
+    for(var s2=0;s2<=1.0001;s2+=.055){
+      var mt=1-s2;
+      var x=mt*mt*P0x+2*mt*s2*Cx+s2*s2*P1x, y=mt*mt*P0y+2*mt*s2*Cy+s2*s2*P1y;
+      if(prev){
+        var ang=Math.atan2(y-prev[1],x-prev[0]);
+        g.save(); g.translate((x+prev[0])/2,(y+prev[1])/2); g.rotate(ang);
+        g.strokeStyle="rgba(63,107,85,.75)"; g.lineWidth=2.6;
+        g.beginPath(); g.ellipse(0,0,Math.hypot(x-prev[0],y-prev[1])*.46,4.6,0,0,7); g.stroke();
+        g.restore();
+      }
+      prev=[x,y];
+    }
+    for(var L=0;L<3;L++){
+      var frac=.42+L*.2, mt2=1-frac;
+      var lx=mt2*mt2*P0x+2*mt2*frac*Cx+frac*frac*P1x;
+      var ly=mt2*mt2*P0y+2*mt2*frac*Cy+frac*frac*P1y;
+      var side=(L%2?1:-1), bend=.25*Math.sin(t*.0012+k.ph+L);
+      for(var pt=0;pt<3;pt++){
+        var pa=side>0?-.85+pt*.5+bend:Math.PI+.85-pt*.5-bend;
+        g.save(); g.translate(lx,ly); g.rotate(pa);
+        g.strokeStyle="rgba(94,140,116,.7)"; g.lineWidth=2.2;
+        g.beginPath(); g.ellipse(24+k.i*2,0,22+k.i*2,6.2,0,0,7); g.stroke();
+        g.restore();
+      }
+    }
+  });
+  ripples.forEach(function(rp){                                // rounds of running stitch, sewing outward
+    g.save(); g.setLineDash([8,7]); g.lineDashOffset=-rp.r;
+    g.strokeStyle=STITCHC[rp.species][0];
+    g.globalAlpha=Math.min(.65,rp.a*2); g.lineWidth=2.2;
+    g.beginPath(); g.arc(rp.x,rp.y,rp.r,0,7); g.stroke();
+    g.restore(); g.globalAlpha=1;
+  });
+  food.forEach(function(fd){                                   // spilled buttons from the sewing box
+    g.save(); g.translate(fd.x,fd.y); g.rotate(fd.spin);
+    var r2=fd.size*.78;
+    g.fillStyle="rgba("+(fd.tint?"238,222,180":"246,238,216")+","+fd.alpha+")";
+    g.beginPath(); g.arc(0,0,r2,0,7); g.fill();
+    g.strokeStyle="rgba(150,128,92,"+(.8*fd.alpha)+")"; g.lineWidth=1.2;
+    g.beginPath(); g.arc(0,0,r2,0,7); g.stroke();
+    g.fillStyle="rgba(110,92,64,"+(.85*fd.alpha)+")";
+    g.beginPath(); g.arc(-r2*.32,0,r2*.14,0,7); g.fill();
+    g.beginPath(); g.arc(r2*.32,0,r2*.14,0,7); g.fill();
+    g.restore();
+  });
+  eggs.forEach(function(e){                                    // whitework eyelets in the kelp
+    var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
+    for(var i=0;i<7;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
+      g.fillStyle="rgba(247,242,228,.95)";
+      g.beginPath(); g.arc(ex+dx,ey+dy,4,0,7); g.fill();
+      g.strokeStyle="rgba(120,100,70,.6)"; g.lineWidth=1.3;
+      g.beginPath(); g.arc(ex+dx,ey+dy,4,0,7); g.stroke();
+      g.fillStyle="rgba(90,72,56,.55)";
+      g.beginPath(); g.arc(ex+dx,ey+dy,1.1,0,7); g.fill();
+    }
+  });
+  deathFx.forEach(function(fx){                                // UNRAVELED: it comes apart stitch by stitch
+    if(fx.age<2)stitchThreadIdx=fx.species;                    // the needle keeps what it took
+    var k=1-fx.age/130, c=STITCHC[fx.species], s=(fx.size||40)*1.12;
+    var p=Math.min(1,fx.age/95);                               // how much has come undone — tail first
+    g.save(); g.translate(fx.x,fx.y); g.rotate(fx.a||0);
+    g.lineCap="round";
+    var N=13;
+    for(var i2=0;i2<N;i2++){
+      var fr=i2/(N-1), xi=s*.92-fr*s*1.84;
+      if(fr>1-p)continue;
+      var env=Math.sqrt(Math.max(0,1-Math.pow(xi/s,2))), hh=Math.max(2,env*s*.36);
+      g.strokeStyle=c[0]; g.globalAlpha=.9*k; g.lineWidth=4.2;
+      g.beginPath(); g.moveTo(xi+hh*.3,-hh); g.lineTo(xi-hh*.12,hh); g.stroke();
+    }
+    g.setLineDash([2.5,7]);                                    // the punched holes the thread leaves behind
+    g.strokeStyle="rgba(120,100,70,"+(.5*k)+")"; g.lineWidth=2;
+    g.beginPath(); g.moveTo(s,0);
+    g.bezierCurveTo(s*.55,-s*.38,-s*.35,-s*.34,-s,0);
+    g.bezierCurveTo(-s*.35,s*.34,s*.55,s*.38,s,0);
+    g.stroke(); g.setLineDash([]);
+    var ux=s*.92-(1-p)*s*1.84;                                 // the loose thread, streaming away
+    g.strokeStyle=c[0]; g.globalAlpha=.85*k; g.lineWidth=2.2;
+    g.beginPath(); g.moveTo(ux,0);
+    var len=60+p*260;
+    for(var q2=14;q2<=len;q2+=14){
+      g.lineTo(ux-q2*.9,-q2*.5+Math.sin(q2*.09+fx.age*.06)*13);
+    }
+    g.stroke();
+    g.globalAlpha=1; g.restore();
+  });
+  GAME.rings.forEach(function(rg){                             // rings → little wooden embroidery hoops
+    if(rg.fade<=0)return;
+    var a=rg.done?rg.fade*.45:.85, bob=Math.sin(t*.001+rg.ph)*7;
+    g.globalAlpha=a;
+    g.strokeStyle="#8F6A3E"; g.lineWidth=2;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r+4.5,0,7); g.stroke();
+    g.strokeStyle="#B98E5A"; g.lineWidth=7;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,0,7); g.stroke();
+    g.strokeStyle="#D8B586"; g.lineWidth=2.4;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r-4,0,7); g.stroke();
+    g.save(); g.translate(rg.x,rg.y+bob-rg.r);                 // the tightening screw up top
+    g.fillStyle="#9AA1AA"; g.fillRect(-4,-14,8,14);
+    g.fillStyle="#7C838C"; g.fillRect(-9,-20,18,8);
+    g.restore();
+    g.globalAlpha=1;
+  });
+  drawStitchPred(g);
+  fish.forEach(function(f){drawStitchFish(g,f);});
+}
+
 /* ─── Director ────────────────────────────────────────────── */
 var DIRECTIONS=[
   {key:"ink",  name:"1 · Ink Wash",  blurb:"Brushstroke koi, ink-ring ripples, calligraphic reeds — and a serpent of darker ink.", scene:sceneInk},
@@ -2225,7 +2488,8 @@ var SWATCH={
   laser:`#DFC49A url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 9 H52 M0 19 H52 M0 29 H52' stroke='%23B98E5A' stroke-width='1' opacity='.5'/><path d='M7 25 Q19 8 31 16 T48 12' stroke='%23472B10' stroke-width='4' fill='none' stroke-linecap='round'/></svg>") center/cover`,
   glass:`linear-gradient(90deg, transparent 0 47%, #14141C 47% 53%, transparent 53%), linear-gradient(0deg, transparent 0 45%, #14141C 45% 55%, transparent 55%), linear-gradient(135deg,#1F3A66 0 46%, #2A5578 46% 74%, #1F5C55 74%)`,
   impasto:`#E6DFCC url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M6 12 Q18 6 30 11' stroke='%23C2452E' stroke-width='7' fill='none' stroke-linecap='round'/><path d='M12 22 Q26 16 42 20' stroke='%23D9A431' stroke-width='7' fill='none' stroke-linecap='round'/><path d='M8 30 Q22 26 34 29' stroke='%233E7A5E' stroke-width='6' fill='none' stroke-linecap='round'/></svg>") center/cover`,
-  blueprint:`#123A6E url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 12 H52 M0 24 H52 M13 0 V36 M26 0 V36 M39 0 V36' stroke='%23DFE9F7' stroke-width='.6' opacity='.35'/><path d='M10 18 Q20 10 30 15 T50 13' stroke='%23EFF5FC' stroke-width='2' fill='none' stroke-linecap='round'/><path d='M14 27 L38 27' stroke='%23E03A2E' stroke-width='2' stroke-linecap='round'/></svg>") center/cover`
+  blueprint:`#123A6E url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 12 H52 M0 24 H52 M13 0 V36 M26 0 V36 M39 0 V36' stroke='%23DFE9F7' stroke-width='.6' opacity='.35'/><path d='M10 18 Q20 10 30 15 T50 13' stroke='%23EFF5FC' stroke-width='2' fill='none' stroke-linecap='round'/><path d='M14 27 L38 27' stroke='%23E03A2E' stroke-width='2' stroke-linecap='round'/></svg>") center/cover`,
+  stitch:`#EDE6D4 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M5 16 Q15 8 26 14 T47 11' stroke='%23B8474E' stroke-width='3' fill='none' stroke-linecap='round' stroke-dasharray='6 4.5'/><path d='M8 27 Q20 21 34 25 T48 24' stroke='%235E8C74' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-dasharray='4 4' opacity='.85'/></svg>") center/cover`
 };
 /* ─── the ink collection: store inks join the base three ──── */
 var CATALOG=[
@@ -2249,6 +2513,10 @@ var CATALOG=[
    tease:"leaded jewel panes, sun streaming through — and the crack",
    blurb:"A leaded window of deep blue glass, jewel fish set in came, sunlight streaming through — and a crack that spreads, hunting.",
    scene:sceneGlass},
+  {key:"stitch", name:"Embroidery", price:50,
+   tease:"linen and satin-stitch thread — and the needle",
+   blurb:"A sampler come alive — satin-stitch fish, chain-stitch kelp, ripples sewn in running stitch — and the needle, dipping through the linen, sewing a seam as it hunts.",
+   scene:sceneStitch},
 ];
 var owned=(function(){ try{ var v=JSON.parse(localStorage.getItem("st_inks")); return Array.isArray(v)?v:[]; }catch(e){ return []; } })();
 function saveInks(){ try{ localStorage.setItem("st_inks",JSON.stringify(owned)); }catch(e){} }
