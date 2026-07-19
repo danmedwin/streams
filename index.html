@@ -128,6 +128,10 @@ body[data-skin="stitch"] #hud{               /* a sampler patch, hemmed in runni
   font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#6B4A3A;
   padding:8px 18px; background:#F1EAD8; border:2px dashed #B8474E; border-radius:3px;
   transform:rotate(-.6deg); box-shadow:2px 3px 9px rgba(90,70,40,.3);}
+body[data-skin="crayon"] #hud{               /* crayon on a scrap of construction paper */
+  font-family:"Caveat",cursive; font-size:21px; color:#3A3230; padding:5px 17px 7px;
+  background:#E4D4A8; border:3px solid #D9382E; border-radius:14px 5px 12px 7px;
+  transform:rotate(1deg); box-shadow:2px 3px 9px rgba(90,70,40,.32);}
 body[data-skin="glass"] #hud{                /* an inscription in a small leaded pane */
   font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#F2E3B6;
   padding:7px 18px; background:#1C2F58; border:3px solid #14141C; border-radius:3px;
@@ -206,7 +210,7 @@ footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; lett
     </div>
   </div>
 </main>
-<footer>Streams · v0.38 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.39 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -598,7 +602,7 @@ function eggZoomStep(dt,t){
    its circle and rotates its fragment. All fragments at rest = one river. */
 function strokeEggPattern(g,style,t){
   var pulse=EGG.solved?(.6+.4*Math.sin((t-EGG.solvedT)*.012)):1;
-  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":style==="stitch"?"166,58,64":"46,110,99";
+  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":style==="stitch"?"166,58,64":style==="crayon"?"58,50,48":"46,110,99";
   g.lineCap="round";
   for(var pass=0;pass<(style==="glow"?2:1);pass++){
     g.strokeStyle="rgba("+col+","+((pass===0&&style==="glow")?.22*pulse:(style==="glow"?.9:.85)*pulse)+")";
@@ -618,14 +622,14 @@ function eggZoomDraw(g,t,style){
   if(EGG.zoom<=0||!EGG.egg)return;
   var f=eggZoomFrame(t), e=EGG.egg;
   g.globalAlpha=f.z*(style==="glow"?.42:style==="chalk"?.5:.32);   // light veil — the zoomed scene itself carries the focus
-  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":style==="stitch"?"#E7DFC9":"#AFD9CC";
+  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":style==="stitch"?"#E7DFC9":style==="crayon"?"#D9C9A3":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
   for(var i=0;i<7;i++){
     var px=EGG_POS[i][0], py=EGG_POS[i][1];
     if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
     if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
-    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":style==="stitch"?"#F7F2E4":"#F4E9D4";
+    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":style==="stitch"?"#F7F2E4":style==="crayon"?"#EADFBE":"#F4E9D4";
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.fill();
     g.save();
     g.beginPath(); g.arc(px,py,EGG_R-6,0,7); g.clip();
@@ -641,6 +645,7 @@ function eggZoomDraw(g,t,style){
     else if(style==="impasto"){ g.strokeStyle="rgba(94,74,48,.6)"; g.lineWidth=5; }
     else if(style==="blueprint"){ g.strokeStyle="rgba(223,233,247,.8)"; g.lineWidth=2.4; }
     else if(style==="stitch"){ g.strokeStyle="rgba(166,58,64,.85)"; g.lineWidth=3.6; g.setLineDash([11,8]); }  // rim sewn in running stitch
+    else if(style==="crayon"){ g.strokeStyle="rgba(58,50,48,.8)"; g.lineWidth=7; }  // a fat waxy ring
     else { g.strokeStyle="rgba(46,110,99,.5)"; g.lineWidth=4; }
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
     g.setLineDash([]);
@@ -2472,6 +2477,245 @@ function sceneStitch(g,t){
   fish.forEach(function(f){drawStitchFish(g,f);});
 }
 
+/* ══════════════ SKIN 10: CRAYON (store ink) ══════════════
+   Construction paper and wax: fish in fat kid-drawn strokes
+   that color outside their lines. The serpent is a creature
+   that remembers being a CRAYON — sharpened cone head, torn
+   paper wrapper trailing frills, and it never draws neatly:
+   a wild scribble follows it everywhere. A caught fish is
+   scribbled out, then flakes away as wax shavings, leaving
+   a coloring-book outline nobody filled in. */
+var CRAYONC=[["#D9382E","#E98A80"],["#2B6CC4","#7FA8DE"],["#3E9B4F","#8CC494"],["#F28C28","#F7BC7F"]];
+var kraftTex=null;
+function makeKraft(){
+  var c=document.createElement("canvas"); c.width=W; c.height=H;
+  var g=c.getContext("2d");
+  g.fillStyle="#D9C9A3"; g.fillRect(0,0,W,H);
+  for(var i=0;i<1600;i++){                      // the tooth of the paper
+    g.fillStyle=Math.random()<.5?"rgba(120,100,64,"+rand(.02,.06)+")":"rgba(255,248,228,"+rand(.02,.06)+")";
+    g.beginPath(); g.arc(rand(0,W),rand(0,H),rand(.6,1.8),0,7); g.fill();
+  }
+  g.lineCap="round";
+  for(i=0;i<4;i++){                             // someone tested their colors in the corners
+    var cx2=rand(0,1)<.5?rand(60,240):rand(W-240,W-60), cy2=rand(0,1)<.5?rand(50,170):rand(H-170,H-50);
+    g.strokeStyle="rgba("+(i%2?"217,56,46":"43,108,196")+",.07)"; g.lineWidth=rand(5,8);
+    g.beginPath(); g.moveTo(cx2,cy2);
+    for(var z=1;z<5;z++)g.lineTo(cx2+z*22,cy2+(z%2?-14:14));
+    g.stroke();
+  }
+  return c;
+}
+/* a waxy stroke: the crisp line plus a dry grain pass beside it */
+function waxStroke(g,col,lw,a,path){
+  g.strokeStyle=col; g.lineWidth=lw; g.globalAlpha=a;
+  g.beginPath(); path(0,0); g.stroke();
+  g.lineWidth=lw*.55; g.globalAlpha=a*.35;
+  g.beginPath(); path(1.6,1.1); g.stroke();
+  g.globalAlpha=1;
+}
+function drawCrayonFish(g,f){
+  var s=f.size*1.15, c=CRAYONC[f.species];
+  g.save(); g.translate(f.x,f.y); g.rotate(f.a);
+  var wag=Math.sin(f.phase)*.45;
+  g.lineCap="round"; g.lineJoin="round";
+  for(var h=0;h<7;h++){                          // the coloring-in: fat slanted strokes, outside the lines
+    var hx=s*.76-h*s*.27, env=Math.sqrt(Math.max(0,1-Math.pow(hx/s,2)));
+    var hh=env*s*.4+3;
+    waxStroke(g,c[1],s*.27,.55,function(ox,oy){
+      g.moveTo(hx+hh*.34+ox,-hh*1.18+oy); g.lineTo(hx-hh*.22+ox,hh*1.24+oy);
+    });
+  }
+  waxStroke(g,c[0],4.6,.9,function(ox,oy){       // the outline, top run — stops short of closing
+    g.moveTo(s*.96+ox,-s*.03+oy);
+    g.bezierCurveTo(s*.55+ox,-s*.4+oy,-s*.35+ox,-s*.36+oy,-s+ox,wag*s*.26+oy);
+  });
+  waxStroke(g,c[0],4.6,.9,function(ox,oy){       // bottom run — overshoots past the nose
+    g.moveTo(-s*.94+ox,wag*s*.3+s*.05+oy);
+    g.bezierCurveTo(-s*.3+ox,s*.38+oy,s*.6+ox,s*.36+oy,s*1.08+ox,s*.06+oy);
+  });
+  waxStroke(g,c[0],4.2,.85,function(ox,oy){      // a two-stroke V of a tail
+    g.moveTo(-s*.9+ox,wag*s*.26+oy); g.lineTo(-s*1.5+ox,wag*s*.7-s*.4+oy);
+  });
+  waxStroke(g,c[0],4.2,.85,function(ox,oy){
+    g.moveTo(-s*.9+ox,wag*s*.26+oy); g.lineTo(-s*1.44+ox,wag*s*.7+s*.34+oy);
+  });
+  var ey=f.odd?s*.16:-s*.05;                     // a big kid-drawn eye, dot not quite centered
+  g.fillStyle="#F6F1E4"; g.beginPath(); g.arc(s*.52,ey,s*.14,0,7); g.fill();
+  g.strokeStyle="#3A3230"; g.lineWidth=2.6;
+  g.beginPath(); g.arc(s*.52,ey,s*.14,.4,6.6); g.stroke();
+  g.fillStyle="#3A3230"; g.beginPath(); g.arc(s*.56,ey+s*.03,s*.055,0,7); g.fill();
+  g.restore();
+}
+var scribbleTrail=[];
+function drawCrayonPred(g){
+  for(var w2=scribbleTrail.length-1;w2>=0;w2--){ if(++scribbleTrail[w2][2]>430)scribbleTrail.splice(w2,1); }
+  if(pred.active)scribbleTrail.unshift([pred.x,pred.y,0]);
+  g.lineCap="round"; g.lineJoin="round";
+  if(scribbleTrail.length>4){                    // it cannot draw neatly: the trail loops and wanders
+    g.strokeStyle="rgba(58,50,48,.4)"; g.lineWidth=5;
+    g.beginPath();
+    for(var i=0;i<scribbleTrail.length;i+=2){
+      var q=scribbleTrail[i], k=1-q[2]/430, wob=(Math.sin(i*.9)+.7*Math.sin(i*.31+2))*13*k;
+      var qa=i<scribbleTrail.length-2?Math.atan2(scribbleTrail[i+2][1]-q[1],scribbleTrail[i+2][0]-q[0]):0;
+      var x=q[0]+Math.cos(qa+Math.PI/2)*wob, y=q[1]+Math.sin(qa+Math.PI/2)*wob;
+      if(!i)g.moveTo(x,y); else g.lineTo(x,y);
+    }
+    g.stroke();
+    g.strokeStyle="rgba(58,50,48,.14)"; g.lineWidth=2.6;   // dry wax beside the line
+    g.beginPath();
+    for(i=0;i<scribbleTrail.length;i+=2){
+      q=scribbleTrail[i]; k=1-q[2]/430; wob=(Math.sin(i*.9)+.7*Math.sin(i*.31+2))*13*k;
+      qa=i<scribbleTrail.length-2?Math.atan2(scribbleTrail[i+2][1]-q[1],scribbleTrail[i+2][0]-q[0]):0;
+      x=q[0]+Math.cos(qa+Math.PI/2)*(wob+3), y=q[1]+Math.sin(qa+Math.PI/2)*(wob+2);
+      if(!i)g.moveTo(x,y); else g.lineTo(x,y);
+    }
+    g.stroke();
+  }
+  if(!pred.active||pred.segs.length<6)return;
+  var n=pred.segs.length;
+  for(i=2;i<n;i+=2){                             // the waxy body
+    var p0=pred.segs[i-2], p1=pred.segs[i], taper=1-(i/n)*.55;
+    g.strokeStyle="#3A3230"; g.lineWidth=26*taper+6;
+    g.beginPath(); g.moveTo(p0[0],p0[1]); g.lineTo(p1[0],p1[1]); g.stroke();
+  }
+  var w0=Math.floor(n*.28), w1=Math.floor(n*.78);
+  for(i=w0+(w0%2);i<w1;i+=2){                    // the paper wrapper, label worn soft
+    p0=pred.segs[i-2]; p1=pred.segs[i]; taper=1-(i/n)*.55;
+    g.strokeStyle="rgba(201,191,175,.9)"; g.lineWidth=17*taper+4;
+    g.beginPath(); g.moveTo(p0[0],p0[1]); g.lineTo(p1[0],p1[1]); g.stroke();
+  }
+  for(i=w0+(w0%2);i<w1;i+=6){                    // torn frills flap off the wrapper's edge
+    p0=pred.segs[i-2]; p1=pred.segs[i];
+    var fa=Math.atan2(p1[1]-p0[1],p1[0]-p0[0])+((i/6)%2?1:-1)*Math.PI/2;
+    var fl=7+Math.abs(Math.sin(i*1.7))*8;
+    g.strokeStyle="rgba(201,191,175,.75)"; g.lineWidth=4;
+    g.beginPath(); g.moveTo(p1[0],p1[1]);
+    g.lineTo(p1[0]+Math.cos(fa)*fl,p1[1]+Math.sin(fa)*fl); g.stroke();
+  }
+  g.save(); g.translate(pred.x,pred.y); g.rotate(pred.a);
+  g.fillStyle="#C9B49A";                         // the sharpened cone
+  g.beginPath(); g.moveTo(30,0); g.lineTo(4,-13); g.lineTo(4,13); g.closePath(); g.fill();
+  g.strokeStyle="rgba(90,72,50,.5)"; g.lineWidth=1.6;
+  g.beginPath(); g.moveTo(30,0); g.lineTo(4,-13); g.lineTo(4,13); g.closePath(); g.stroke();
+  g.fillStyle="#3A3230";                         // wax point
+  g.beginPath(); g.moveTo(31,0); g.lineTo(19,-5.5); g.lineTo(19,5.5); g.closePath(); g.fill();
+  g.fillStyle="#2A2422";                         // the pigment core is its eye
+  g.beginPath(); g.arc(10,0,4.6,0,7); g.fill();
+  g.fillStyle="rgba(246,241,228,.9)"; g.beginPath(); g.arc(11.6,-1.4,1.5,0,7); g.fill();
+  g.restore();
+}
+function sceneCrayon(g,t){
+  if(!kraftTex)kraftTex=makeKraft();
+  g.drawImage(kraftTex,0,0);
+  g.save(); g.globalAlpha=.09+.03*Math.sin(t*.0005);           // sunshine, scribbled in
+  g.lineCap="round"; g.strokeStyle="#F2D06B"; g.lineWidth=26;
+  for(var rr=0;rr<4;rr++){
+    var fr2=.14+rr*.24;
+    g.beginPath(); g.moveTo(RAY.x0+(RAY.x1-RAY.x0)*fr2,-20);
+    g.lineTo(RAY.ex0+(RAY.ex1-RAY.ex0)*fr2,H+20); g.stroke();
+  }
+  g.restore();
+  motes.forEach(function(m){                                   // crayon shavings, drifting
+    var tw=.4+.6*Math.abs(Math.sin(t*.001+m.tw));
+    g.strokeStyle="rgba(120,100,64,"+(.2*tw)+")"; g.lineWidth=2.4;
+    g.beginPath(); g.moveTo(m.x-3,m.y+1.5); g.quadraticCurveTo(m.x,m.y-2.5,m.x+3,m.y+1); g.stroke();
+  });
+  g.lineCap="round"; g.lineJoin="round";
+  KELP.forEach(function(k){                                    // tall green zigzag scribbles
+    var kx=W*k.fx, sway=kelpSway(k,t);
+    var segs=9, top=k.top;
+    g.strokeStyle="rgba(62,155,79,.75)"; g.lineWidth=6.5;
+    g.beginPath(); g.moveTo(kx,H+20);
+    for(var z=1;z<=segs;z++){
+      var fr=z/segs, zy=(H+20)-(H+20-top)*fr;
+      g.lineTo(kx+sway*fr*fr+((z%2)?15:-13)*(1-fr*.4),zy);
+    }
+    g.stroke();
+    g.strokeStyle="rgba(62,155,79,.28)"; g.lineWidth=3;        // dry pass
+    g.beginPath(); g.moveTo(kx+2,H+20);
+    for(z=1;z<=segs;z++){
+      fr=z/segs; zy=(H+20)-(H+20-top)*fr;
+      g.lineTo(kx+sway*fr*fr+((z%2)?17:-11)*(1-fr*.4)+2,zy+1);
+    }
+    g.stroke();
+    for(z=2;z<segs;z+=3){                                      // leaf ticks
+      fr=z/segs; zy=(H+20)-(H+20-top)*fr;
+      var lx=kx+sway*fr*fr+((z%2)?15:-13)*(1-fr*.4), side=(z%2?1:-1);
+      var bend=.25*Math.sin(t*.0012+k.ph+z);
+      g.strokeStyle="rgba(62,155,79,.6)"; g.lineWidth=4.5;
+      g.beginPath(); g.moveTo(lx,zy);
+      g.lineTo(lx+side*(46+k.i*5),zy-26+bend*14); g.stroke();
+    }
+  });
+  ripples.forEach(function(rp){                                // splash! marks — every dash its own crayon
+    var seed=Math.floor(rp.x*.37+rp.y*.53);
+    g.globalAlpha=Math.min(.85,rp.a*2.6); g.lineWidth=4.4;
+    for(var i=0;i<7;i++){
+      var da=seed*.7+i*.8976, len=8+7*Math.abs(Math.sin(seed+i*2.3));
+      g.strokeStyle=CRAYONC[(seed+i)%4][0];
+      g.beginPath(); g.moveTo(rp.x+Math.cos(da)*rp.r,rp.y+Math.sin(da)*rp.r*.85);
+      g.lineTo(rp.x+Math.cos(da)*(rp.r+len),rp.y+Math.sin(da)*(rp.r+len)*.85); g.stroke();
+    }
+    g.globalAlpha=1;
+  });
+  food.forEach(function(fd){                                   // crayon-nub crumbs
+    g.save(); g.translate(fd.x,fd.y); g.rotate(fd.spin); g.globalAlpha=fd.alpha;
+    g.strokeStyle=fd.tint?"#2B6CC4":"#D9382E"; g.lineWidth=5; g.lineCap="round";
+    g.beginPath(); g.moveTo(-fd.size*.6,0); g.lineTo(fd.size*.6,0); g.stroke();
+    g.restore(); g.globalAlpha=1;
+  });
+  eggs.forEach(function(e){                                    // wobbly kid-circles that don't quite close
+    var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
+    for(var i=0;i<7;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
+      g.strokeStyle="rgba(246,241,228,.9)"; g.lineWidth=2.2;
+      g.beginPath(); g.arc(ex+dx,ey+dy,4.3,i*.6,i*.6+5.6); g.stroke();
+    }
+  });
+  deathFx.forEach(function(fx){                                // SCRIBBLED OUT, then flaked to shavings
+    var k=1-fx.age/130, c=CRAYONC[fx.species], fs=(fx.size||40)*1.15;
+    g.save(); g.translate(fx.x,fx.y); g.rotate(fx.a||0);
+    g.lineCap="round"; g.lineJoin="round";
+    g.strokeStyle="rgba(58,50,48,"+(.65*k)+")"; g.lineWidth=3.4;   // the outline nobody filled in
+    g.beginPath(); g.moveTo(fs,0);
+    g.bezierCurveTo(fs*.55,-fs*.38,-fs*.35,-fs*.34,-fs,0);
+    g.bezierCurveTo(-fs*.35,fs*.34,fs*.55,fs*.38,fs,0);
+    g.stroke();
+    var legs=Math.min(26,Math.floor(fx.age/1.6)), seed=Math.floor(fx.x*.13);
+    if(legs>1){                                                 // the furious scribble
+      g.strokeStyle="rgba(58,50,48,"+(.8*k)+")"; g.lineWidth=6;
+      g.beginPath();
+      for(var z=0;z<legs;z++){
+        var zx=-fs*1.1+ (z/25)*fs*2.2, zy=Math.sin(seed+z*2.7)*fs*.72;
+        if(!z)g.moveTo(zx,zy); else g.lineTo(zx,zy);
+      }
+      g.stroke();
+    }
+    if(fx.age>40){                                              // wax shavings curl away
+      var sk=Math.min(1,(fx.age-40)/40);
+      fx.parts.forEach(function(p,pi){
+        g.strokeStyle=pi%3?c[0]:"#3A3230"; g.globalAlpha=.8*k;
+        g.lineWidth=3.2;
+        g.beginPath(); g.arc(p.dx*1.4,p.dy*1.4+sk*14,p.sz*.9,p.spin,p.spin+3.6); g.stroke();
+      });
+      g.globalAlpha=1;
+    }
+    g.restore();
+  });
+  GAME.rings.forEach(function(rg){                             // loops drawn round and round
+    if(rg.fade<=0)return;
+    var a=rg.done?rg.fade*.4:.8, bob=Math.sin(t*.001+rg.ph)*7;
+    var col=CRAYONC[Math.floor(rg.ph)%4][0];
+    g.strokeStyle=col; g.globalAlpha=a; g.lineWidth=6;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,rg.ph,rg.ph+6.1); g.stroke();
+    g.lineWidth=4.4;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r*1.05,rg.ph+2.6,rg.ph+5.9); g.stroke();
+    g.globalAlpha=1;
+  });
+  drawCrayonPred(g);
+  fish.forEach(function(f){drawCrayonFish(g,f);});
+}
+
 /* ─── Director ────────────────────────────────────────────── */
 var DIRECTIONS=[
   {key:"ink",  name:"1 · Ink Wash",  blurb:"Brushstroke koi, ink-ring ripples, calligraphic reeds — and a serpent of darker ink.", scene:sceneInk},
@@ -2489,7 +2733,8 @@ var SWATCH={
   glass:`linear-gradient(90deg, transparent 0 47%, #14141C 47% 53%, transparent 53%), linear-gradient(0deg, transparent 0 45%, #14141C 45% 55%, transparent 55%), linear-gradient(135deg,#1F3A66 0 46%, #2A5578 46% 74%, #1F5C55 74%)`,
   impasto:`#E6DFCC url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M6 12 Q18 6 30 11' stroke='%23C2452E' stroke-width='7' fill='none' stroke-linecap='round'/><path d='M12 22 Q26 16 42 20' stroke='%23D9A431' stroke-width='7' fill='none' stroke-linecap='round'/><path d='M8 30 Q22 26 34 29' stroke='%233E7A5E' stroke-width='6' fill='none' stroke-linecap='round'/></svg>") center/cover`,
   blueprint:`#123A6E url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 12 H52 M0 24 H52 M13 0 V36 M26 0 V36 M39 0 V36' stroke='%23DFE9F7' stroke-width='.6' opacity='.35'/><path d='M10 18 Q20 10 30 15 T50 13' stroke='%23EFF5FC' stroke-width='2' fill='none' stroke-linecap='round'/><path d='M14 27 L38 27' stroke='%23E03A2E' stroke-width='2' stroke-linecap='round'/></svg>") center/cover`,
-  stitch:`#EDE6D4 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M5 16 Q15 8 26 14 T47 11' stroke='%23B8474E' stroke-width='3' fill='none' stroke-linecap='round' stroke-dasharray='6 4.5'/><path d='M8 27 Q20 21 34 25 T48 24' stroke='%235E8C74' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-dasharray='4 4' opacity='.85'/></svg>") center/cover`
+  stitch:`#EDE6D4 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M5 16 Q15 8 26 14 T47 11' stroke='%23B8474E' stroke-width='3' fill='none' stroke-linecap='round' stroke-dasharray='6 4.5'/><path d='M8 27 Q20 21 34 25 T48 24' stroke='%235E8C74' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-dasharray='4 4' opacity='.85'/></svg>") center/cover`,
+  crayon:`#D9C9A3 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M5 15 Q14 7 25 13 T46 10' stroke='%23D9382E' stroke-width='5.5' fill='none' stroke-linecap='round'/><path d='M7 27 L13 22 L19 28 L25 22 L31 28 L37 22 L43 27' stroke='%233E9B4F' stroke-width='3.6' fill='none' stroke-linecap='round' stroke-linejoin='round' opacity='.9'/></svg>") center/cover`
 };
 /* ─── the ink collection: store inks join the base three ──── */
 var CATALOG=[
@@ -2517,6 +2762,10 @@ var CATALOG=[
    tease:"linen and satin-stitch thread — and the needle",
    blurb:"A sampler come alive — satin-stitch fish, chain-stitch kelp, ripples sewn in running stitch — and the needle, dipping through the linen, sewing a seam as it hunts.",
    scene:sceneStitch},
+  {key:"crayon", name:"Crayon", price:10,
+   tease:"construction paper, waxy strokes — and the scribbler",
+   blurb:"Fish in fat waxy strokes that color outside their lines, zigzag reeds, splash-mark ripples — and a sharpened crayon creature in a torn wrapper, scribbling out whatever it catches.",
+   scene:sceneCrayon},
 ];
 var owned=(function(){ try{ var v=JSON.parse(localStorage.getItem("st_inks")); return Array.isArray(v)?v:[]; }catch(e){ return []; } })();
 function saveInks(){ try{ localStorage.setItem("st_inks",JSON.stringify(owned)); }catch(e){} }
