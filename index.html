@@ -115,6 +115,10 @@ body[data-skin="laser"] #hud{                /* a branded tag burned into scrap 
   font-family:Georgia,serif; font-size:14px; letter-spacing:.07em; text-transform:uppercase;
   color:#4A2E14; padding:7px 16px; background:#E7CFA5;
   border:2px solid #4A2E14; border-radius:4px; box-shadow:2px 3px 8px rgba(60,35,10,.3);}
+body[data-skin="impasto"] #hud{              /* a note on a scrap of painted canvas */
+  font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#4A3C28;
+  padding:8px 18px; background:#EFE9D8; border:none; border-radius:2px;
+  box-shadow:0 3px 0 #C2452E, 0 6px 0 #D9A431, 2px 9px 12px rgba(60,45,20,.35);}
 body[data-skin="glass"] #hud{                /* an inscription in a small leaded pane */
   font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#F2E3B6;
   padding:7px 18px; background:#1C2F58; border:3px solid #14141C; border-radius:3px;
@@ -193,7 +197,7 @@ footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; lett
     </div>
   </div>
 </main>
-<footer>Streams · v0.33 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.34 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -585,7 +589,7 @@ function eggZoomStep(dt,t){
    its circle and rotates its fragment. All fragments at rest = one river. */
 function strokeEggPattern(g,style,t){
   var pulse=EGG.solved?(.6+.4*Math.sin((t-EGG.solvedT)*.012)):1;
-  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":"46,110,99";
+  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":"46,110,99";
   g.lineCap="round";
   for(var pass=0;pass<(style==="glow"?2:1);pass++){
     g.strokeStyle="rgba("+col+","+((pass===0&&style==="glow")?.22*pulse:(style==="glow"?.9:.85)*pulse)+")";
@@ -605,14 +609,14 @@ function eggZoomDraw(g,t,style){
   if(EGG.zoom<=0||!EGG.egg)return;
   var f=eggZoomFrame(t), e=EGG.egg;
   g.globalAlpha=f.z*(style==="glow"?.42:style==="chalk"?.5:.32);   // light veil — the zoomed scene itself carries the focus
-  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":"#AFD9CC";
+  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
   for(var i=0;i<7;i++){
     var px=EGG_POS[i][0], py=EGG_POS[i][1];
     if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
     if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
-    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":"#F4E9D4";
+    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":"#F4E9D4";
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.fill();
     g.save();
     g.beginPath(); g.arc(px,py,EGG_R-6,0,7); g.clip();
@@ -625,6 +629,7 @@ function eggZoomDraw(g,t,style){
     else if(style==="chalk"){ g.strokeStyle="rgba(244,242,233,.7)"; g.lineWidth=4; }
     else if(style==="laser"){ g.strokeStyle="rgba(74,46,20,.75)"; g.lineWidth=4; }
     else if(style==="glass"){ g.strokeStyle="#14141C"; g.lineWidth=5; }
+    else if(style==="impasto"){ g.strokeStyle="rgba(94,74,48,.6)"; g.lineWidth=5; }
     else { g.strokeStyle="rgba(46,110,99,.5)"; g.lineWidth=4; }
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
   }
@@ -1785,6 +1790,181 @@ function sceneGlass(g,t){
   fish.forEach(function(f){drawGlassFish(g,f);});
 }
 
+/* ══════════════ SKIN 7: IMPASTO (store ink) ══════════════
+   A sea painted THICK. Every stroke is a ridge of oil paint —
+   shadow under, body color, a catch of light on top. The serpent
+   is the PALETTE KNIFE, and it scrapes fish off the canvas. */
+var IMPC=[
+  {m:"#C2452E",l:"#E07B5A",d:"#7E2A1C"},
+  {m:"#D9A431",l:"#EFCB6E",d:"#96701E"},
+  {m:"#3E7A5E",l:"#6FA98A",d:"#27523E"},
+  {m:"#3A5FA8",l:"#6E8CCB",d:"#24406F"}
+];
+var canvasTex=null;
+function makeCanvasTex(){
+  var c=document.createElement("canvas"); c.width=W; c.height=H;
+  var g=c.getContext("2d");
+  g.fillStyle="#E6DFCC"; g.fillRect(0,0,W,H);
+  for(var y=0;y<H;y+=4){                       // linen weave
+    g.strokeStyle="rgba(120,108,86,"+rand(.02,.05)+")"; g.lineWidth=1;
+    g.beginPath(); g.moveTo(0,y); g.lineTo(W,y); g.stroke();
+  }
+  for(var x=0;x<W;x+=4){
+    g.strokeStyle="rgba(255,252,240,"+rand(.02,.05)+")"; g.lineWidth=1;
+    g.beginPath(); g.moveTo(x,0); g.lineTo(x,H); g.stroke();
+  }
+  var UNDER=["#B9C4B4","#C4B79B","#A9B6C0","#C9BFA8"];
+  for(var i=0;i<10;i++){                       // underpainting: big soft daubs of a remembered sea
+    g.save(); g.translate(rand(0,W),rand(H*.2,H));
+    g.rotate(rand(-.4,.4)); g.globalAlpha=rand(.10,.2);
+    g.fillStyle=UNDER[i%4];
+    g.beginPath(); g.ellipse(0,0,rand(180,420),rand(50,110),0,0,7); g.fill();
+    g.restore();
+  }
+  return c;
+}
+function paintStroke(g,build,col,w){           // one ridge of oil: shadow, body, light
+  g.lineCap="round"; g.lineJoin="round";
+  g.strokeStyle=col.d; g.lineWidth=w+2.5;
+  g.save(); g.translate(2,2.4); g.beginPath(); build(); g.stroke(); g.restore();
+  g.strokeStyle=col.m; g.lineWidth=w;
+  g.beginPath(); build(); g.stroke();
+  g.strokeStyle=col.l; g.lineWidth=Math.max(1.6,w*.32);
+  g.save(); g.translate(-1.3,-1.6); g.beginPath(); build(); g.stroke(); g.restore();
+}
+function drawImpastoFish(g,f){
+  var s=f.size*1.05, c=IMPC[f.species];
+  g.save(); g.translate(f.x,f.y); g.rotate(f.a);
+  var wag=Math.sin(f.phase)*.45;
+  paintStroke(g,function(){                    // the tail: one flicked stroke
+    g.moveTo(-s*.45,wag*s*.2);
+    g.quadraticCurveTo(-s*.95,wag*s*.6,-s*1.3,wag*s*.9-s*.16);
+  },c,s*.3);
+  paintStroke(g,function(){                    // the body: one fat loaded stroke
+    g.moveTo(-s*.5,wag*s*.16);
+    g.quadraticCurveTo(0,-s*.12,s*.55,0);
+  },c,s*.6);
+  paintStroke(g,function(){                    // belly light, a second thinner pass
+    g.moveTo(-s*.3,s*.18+wag*s*.1);
+    g.quadraticCurveTo(s*.1,s*.26,s*.45,s*.12);
+  },{m:c.l,l:"#F6EED9",d:c.m},s*.2);
+  var ey=f.odd?s*.16:-s*.08;                   // the odd fish wears its eye low
+  g.fillStyle="#F6EED9"; g.beginPath(); g.arc(s*.42,ey,s*.1,0,7); g.fill();
+  g.fillStyle="#2A241C"; g.beginPath(); g.arc(s*.45,ey,s*.05,0,7); g.fill();
+  g.restore();
+}
+var scrapeTrail=[];
+function drawImpastoPred(g){
+  for(var w2=scrapeTrail.length-1;w2>=0;w2--){ if(++scrapeTrail[w2][2]>320)scrapeTrail.splice(w2,1); }
+  if(pred.active)scrapeTrail.unshift([pred.x,pred.y,0]);
+  g.lineCap="round"; g.lineJoin="round";
+  for(var i=2;i<scrapeTrail.length;i+=2){      // the scrape: paint pushed aside, canvas showing through
+    var q0=scrapeTrail[i-2], q1=scrapeTrail[i], k=1-q1[2]/320;
+    g.strokeStyle="rgba(230,223,204,"+(.5*k)+")"; g.lineWidth=38;
+    g.beginPath(); g.moveTo(q0[0],q0[1]); g.lineTo(q1[0],q1[1]); g.stroke();
+    g.strokeStyle="rgba(122,104,78,"+(.16*k)+")"; g.lineWidth=3;
+    g.beginPath(); g.moveTo(q0[0]-14,q0[1]+14); g.lineTo(q1[0]-14,q1[1]+14); g.stroke();
+  }
+  if(!pred.active)return;
+  g.save(); g.translate(pred.x,pred.y); g.rotate(pred.a);
+  g.fillStyle="rgba(60,50,36,.25)";            // soft shadow under the steel
+  g.beginPath(); g.moveTo(74,3); g.lineTo(-12,17); g.lineTo(-16,5); g.closePath(); g.fill();
+  var steel=g.createLinearGradient(0,-16,0,16);
+  steel.addColorStop(0,"#E4E8EC"); steel.addColorStop(.5,"#B9C0C8"); steel.addColorStop(1,"#8C949E");
+  g.fillStyle=steel;                            // the blade: a long trowel
+  g.beginPath(); g.moveTo(72,0);
+  g.quadraticCurveTo(30,-15,-10,-13);
+  g.quadraticCurveTo(-20,0,-10,13);
+  g.quadraticCurveTo(30,15,72,0);
+  g.closePath(); g.fill();
+  g.strokeStyle="#6E7680"; g.lineWidth=1.6; g.stroke();
+  g.strokeStyle="#5A626C"; g.lineWidth=4;      // the cranked neck
+  g.beginPath(); g.moveTo(-16,0); g.quadraticCurveTo(-30,-4,-38,-12); g.stroke();
+  g.fillStyle="#8C949E";                        // ferrule
+  g.beginPath(); g.roundRect(-46,-19,12,11,3); g.fill();
+  g.fillStyle="#8A5A30";                        // wooden handle
+  g.beginPath(); g.roundRect(-86,-24,42,16,8); g.fill();
+  g.strokeStyle="#5E3C1E"; g.lineWidth=1.4;
+  g.beginPath(); g.roundRect(-86,-24,42,16,8); g.stroke();
+  g.restore();
+}
+function sceneImpasto(g,t){
+  if(!canvasTex)canvasTex=makeCanvasTex();
+  g.drawImage(canvasTex,0,0);
+  g.save(); g.globalAlpha=.07+.03*Math.sin(t*.0005);   // an ochre glaze of light
+  g.fillStyle="#EFCB6E"; rayPath(g); g.fill(); g.restore();
+  motes.forEach(function(m){                    // spatter flecks
+    var tw=.4+.6*Math.abs(Math.sin(t*.001+m.tw));
+    g.fillStyle="rgba(122,104,78,"+(.13*tw)+")";
+    g.beginPath(); g.arc(m.x,m.y,m.r*.85,0,7); g.fill();
+  });
+  var KELPC={m:"#4E7A46",l:"#7CA671",d:"#31512C"};
+  KELP.forEach(function(k){
+    var kx=W*k.fx, sway=kelpSway(k,t);
+    paintStroke(g,function(){
+      g.moveTo(kx,H+20);
+      g.quadraticCurveTo(kx+sway*.4,H*.8,kx+sway,k.top);
+    },KELPC,k.w*.5);
+    for(var L=0;L<4;L++){
+      var frac=.35+L*.18, ly=H+20-(H+20-k.top)*frac;
+      var lx=kx+sway*frac*frac*1.6, side=(L%2?1:-1);
+      var bend=.25*Math.sin(t*.0012+k.ph+L);
+      paintStroke(g,function(){
+        g.moveTo(lx,ly);
+        g.quadraticCurveTo(lx+side*36,ly-40+bend*14,lx+side*(86+k.i*6),ly-52-k.i*4+bend*24);
+      },KELPC,k.w*.3);
+    }
+  });
+  ripples.forEach(function(rp){                 // brush swirls
+    var a=Math.min(.5,rp.a*1.4);
+    g.strokeStyle="rgba(122,104,78,"+a+")"; g.lineWidth=5;
+    g.beginPath(); g.arc(rp.x,rp.y,rp.r,.4,5.9); g.stroke();
+    g.strokeStyle="rgba(255,252,240,"+(a*.7)+")"; g.lineWidth=2;
+    g.beginPath(); g.arc(rp.x-1,rp.y-1,rp.r,.7,5.5); g.stroke();
+  });
+  food.forEach(function(fd){                    // dabs of naples yellow
+    g.fillStyle="rgba(150,112,30,"+(.5*fd.alpha)+")";
+    g.beginPath(); g.arc(fd.x+1.5,fd.y+2,fd.size*.6,0,7); g.fill();
+    g.fillStyle="rgba(239,203,110,"+(.95*fd.alpha)+")";
+    g.beginPath(); g.arc(fd.x,fd.y,fd.size*.55,0,7); g.fill();
+    g.fillStyle="rgba(255,252,240,"+(.8*fd.alpha)+")";
+    g.beginPath(); g.arc(fd.x-fd.size*.15,fd.y-fd.size*.18,fd.size*.2,0,7); g.fill();
+  });
+  eggs.forEach(function(e){
+    var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
+    for(var i=0;i<7;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
+      g.fillStyle="rgba(94,74,48,.4)"; g.beginPath(); g.arc(ex+dx+1,ey+dy+1.4,4.4,0,7); g.fill();
+      g.fillStyle="#F6EED9"; g.beginPath(); g.arc(ex+dx,ey+dy,4.2,0,7); g.fill();
+    }
+  });
+  deathFx.forEach(function(fx){                 // scraped off: one long smear in its own colors
+    var k=1-fx.age/130, c=IMPC[fx.species], fs=(fx.size||40);
+    g.save(); g.translate(fx.x,fx.y); g.rotate(fx.a||0);
+    var len=fs+fx.age*2.2;
+    var gr=g.createLinearGradient(-fs,0,len,0);
+    gr.addColorStop(0,"rgba(230,223,204,0)");
+    gr.addColorStop(.35,c.m+""); gr.addColorStop(1,c.l+"");
+    g.globalAlpha=.6*k; g.fillStyle=gr;
+    g.beginPath(); g.roundRect(-fs,-fs*.34,len+fs,fs*.68,fs*.3); g.fill();
+    g.globalAlpha=1; g.restore();
+    fx.parts.forEach(function(p,pi){            // flung paint
+      g.fillStyle=pi%2?c.m:c.l; g.globalAlpha=.7*k;
+      g.beginPath(); g.arc(fx.x+p.dx,fx.y+p.dy,p.sz*.4,0,7); g.fill();
+    });
+    g.globalAlpha=1;
+  });
+  GAME.rings.forEach(function(rg){              // hoops of ochre paint
+    if(rg.fade<=0)return;
+    var a=rg.done?rg.fade*.5:.8, bob=Math.sin(t*.001+rg.ph)*7;
+    g.globalAlpha=a;
+    paintStroke(g,function(){ g.arc(rg.x,rg.y+bob,rg.r,.3,6.1); },{m:"#D9A431",l:"#EFCB6E",d:"#96701E"},6);
+    g.globalAlpha=1;
+  });
+  drawImpastoPred(g);
+  fish.forEach(function(f){drawImpastoFish(g,f);});
+}
+
 /* ─── Director ────────────────────────────────────────────── */
 var DIRECTIONS=[
   {key:"ink",  name:"1 · Ink Wash",  blurb:"Brushstroke koi, ink-ring ripples, calligraphic reeds — and a serpent of darker ink.", scene:sceneInk},
@@ -1799,7 +1979,8 @@ var SWATCH={
   paper:`linear-gradient(180deg,#BFE3D9 0 30%, #7FB7A4 30% 55%, #54968B 55% 78%, #2E6E63 78%)`,
   chalk:`#26443A url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M6 22 Q16 12 26 18 T46 15' stroke='%23F4F2E9' stroke-width='3' fill='none' stroke-linecap='round' opacity='.9'/><path d='M8 27 Q18 21 28 25' stroke='%23F4F2E9' stroke-width='1.6' fill='none' opacity='.4'/></svg>") center/cover`,
   laser:`#DFC49A url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 9 H52 M0 19 H52 M0 29 H52' stroke='%23B98E5A' stroke-width='1' opacity='.5'/><path d='M7 25 Q19 8 31 16 T48 12' stroke='%23472B10' stroke-width='4' fill='none' stroke-linecap='round'/></svg>") center/cover`,
-  glass:`linear-gradient(90deg, transparent 0 47%, #14141C 47% 53%, transparent 53%), linear-gradient(0deg, transparent 0 45%, #14141C 45% 55%, transparent 55%), linear-gradient(135deg,#1F3A66 0 46%, #2A5578 46% 74%, #1F5C55 74%)`
+  glass:`linear-gradient(90deg, transparent 0 47%, #14141C 47% 53%, transparent 53%), linear-gradient(0deg, transparent 0 45%, #14141C 45% 55%, transparent 55%), linear-gradient(135deg,#1F3A66 0 46%, #2A5578 46% 74%, #1F5C55 74%)`,
+  impasto:`#E6DFCC url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M6 12 Q18 6 30 11' stroke='%23C2452E' stroke-width='7' fill='none' stroke-linecap='round'/><path d='M12 22 Q26 16 42 20' stroke='%23D9A431' stroke-width='7' fill='none' stroke-linecap='round'/><path d='M8 30 Q22 26 34 29' stroke='%233E7A5E' stroke-width='6' fill='none' stroke-linecap='round'/></svg>") center/cover`
 };
 /* ─── the ink collection: store inks join the base three ──── */
 var CATALOG=[
@@ -1811,6 +1992,10 @@ var CATALOG=[
    tease:"warm plywood, charred cut lines — and the laser head",
    blurb:"Fish cut into warm plywood, char still smoking — and the laser head gliding on its gantry, cutting as it hunts.",
    scene:sceneLaser},
+  {key:"impasto", name:"Impasto", price:40,
+   tease:"thick oil paint, ridged strokes — and the palette knife",
+   blurb:"A sea painted thick — every stroke a ridge of oil, sap-green reeds — and the palette knife, scraping fish from the canvas.",
+   scene:sceneImpasto},
   {key:"glass", name:"Stained Glass", price:35,
    tease:"leaded jewel panes, sun streaming through — and the crack",
    blurb:"A leaded window of deep blue glass, jewel fish set in came, sunlight streaming through — and a crack that spreads, hunting.",
