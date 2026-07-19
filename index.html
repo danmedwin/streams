@@ -154,6 +154,10 @@ body[data-skin="printed"] #hud{              /* the printer's little status scre
   color:#7FE3EE; padding:8px 16px; background:rgba(16,21,27,.95);
   border:1px solid rgba(43,181,160,.55); border-left:4px solid #F28C28; border-radius:4px;
   box-shadow:2px 3px 10px rgba(0,0,0,.5);}
+body[data-skin="sand"] #hud{                 /* a wooden garden plaque */
+  font-family:Georgia,serif; font-size:14px; font-style:italic; color:#4A4234;
+  padding:8px 18px; background:#CBBB96; border:2px solid #8A744E; border-radius:6px;
+  box-shadow:2px 3px 8px rgba(70,60,40,.35);}
 body[data-skin="glass"] #hud{                /* an inscription in a small leaded pane */
   font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#F2E3B6;
   padding:7px 18px; background:#1C2F58; border:3px solid #14141C; border-radius:3px;
@@ -235,7 +239,7 @@ footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; lett
     </div>
   </div>
 </main>
-<footer>Streams · v0.42 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.43 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -627,7 +631,7 @@ function eggZoomStep(dt,t){
    its circle and rotates its fragment. All fragments at rest = one river. */
 function strokeEggPattern(g,style,t){
   var pulse=EGG.solved?(.6+.4*Math.sin((t-EGG.solvedT)*.012)):1;
-  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":style==="stitch"?"166,58,64":style==="crayon"?"58,50,48":style==="printed"?"94,214,240":"46,110,99";
+  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":style==="stitch"?"166,58,64":style==="crayon"?"58,50,48":style==="printed"?"94,214,240":style==="sand"?"104,96,80":"46,110,99";
   g.lineCap="round";
   for(var pass=0;pass<(style==="glow"?2:1);pass++){
     g.strokeStyle="rgba("+col+","+((pass===0&&style==="glow")?.22*pulse:(style==="glow"?.9:.85)*pulse)+")";
@@ -647,14 +651,14 @@ function eggZoomDraw(g,t,style){
   if(EGG.zoom<=0||!EGG.egg)return;
   var f=eggZoomFrame(t), e=EGG.egg;
   g.globalAlpha=f.z*(style==="glow"?.42:style==="chalk"?.5:.32);   // light veil — the zoomed scene itself carries the focus
-  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":style==="stitch"?"#E7DFC9":style==="crayon"?"#D9C9A3":style==="printed"?"#10151B":"#AFD9CC";
+  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":style==="stitch"?"#E7DFC9":style==="crayon"?"#D9C9A3":style==="printed"?"#10151B":style==="sand"?"#D8CFBA":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
   for(var i=0;i<7;i++){
     var px=EGG_POS[i][0], py=EGG_POS[i][1];
     if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
     if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
-    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":style==="stitch"?"#F7F2E4":style==="crayon"?"#EADFBE":style==="printed"?"#1F2833":"#F4E9D4";
+    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":style==="stitch"?"#F7F2E4":style==="crayon"?"#EADFBE":style==="printed"?"#1F2833":style==="sand"?"#E5DECB":"#F4E9D4";
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.fill();
     g.save();
     g.beginPath(); g.arc(px,py,EGG_R-6,0,7); g.clip();
@@ -674,6 +678,9 @@ function eggZoomDraw(g,t,style){
     else if(style==="printed"){ g.strokeStyle="rgba(242,140,40,.3)"; g.lineWidth=9;   // live-layer rim, glow faked
       g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
       g.strokeStyle="#F28C28"; g.lineWidth=3; }
+    else if(style==="sand"){ g.strokeStyle="rgba(246,240,226,.7)"; g.lineWidth=2.6;   // a raked rim: light lip under dark cut
+      g.beginPath(); g.arc(px,py+1.8,EGG_R,0,7); g.stroke();
+      g.strokeStyle="rgba(104,96,80,.75)"; g.lineWidth=4.4; }
     else { g.strokeStyle="rgba(46,110,99,.5)"; g.lineWidth=4; }
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
     g.setLineDash([]);
@@ -2978,6 +2985,191 @@ function scenePrint(g,t){
   fish.forEach(function(f){drawPrintFish(g,f,t);});
 }
 
+/* ══════════════ SKIN 12: RAKED SAND (store ink) ══════════════
+   The tank as a karesansui garden, seen from above. Fish are
+   koi-shaped drifts of river pebbles — the garden quietly
+   rearranging itself. The serpent is a creature that remembers
+   being a RAKE: bamboo spine, a fan of tines, a knot for an
+   eye, and it cannot help leaving furrows. A caught fish is
+   scattered with one spiral flourish and raked smooth — as if
+   it was always sand. */
+var SANDBG="#D8CFBA";
+var PEBBLE=[["#4A4640","#6B665E"],["#56606B","#7A8794"],["#6E5B48","#8F7A62"],["#5E6650","#7E8870"]];
+var sandTex=null;
+function makeSandTex(){
+  var c=document.createElement("canvas"); c.width=W; c.height=H;
+  var g=c.getContext("2d");
+  g.fillStyle=SANDBG; g.fillRect(0,0,W,H);
+  for(var i=0;i<2400;i++){
+    g.fillStyle=Math.random()<.5?"rgba(120,110,88,"+rand(.03,.09)+")":"rgba(255,250,235,"+rand(.04,.1)+")";
+    g.beginPath(); g.arc(rand(0,W),rand(0,H),rand(.5,1.5),0,7); g.fill();
+  }
+  return c;
+}
+function sandGroove(g,path,a,lw){                // a furrow: dark cut, light lip below
+  g.strokeStyle="rgba(96,88,72,"+a+")"; g.lineWidth=lw;
+  g.beginPath(); path(0); g.stroke();
+  g.strokeStyle="rgba(246,240,226,"+(a*.8)+")"; g.lineWidth=lw*.55;
+  g.beginPath(); path(1.6); g.stroke();
+}
+function drawSandFish(g,f){
+  var s=f.size, c=PEBBLE[f.species], seed=f.fullSize*7.13;
+  g.lineCap="round";
+  for(var w2=6;w2<f.trail.length;w2+=4){          // the wake it rakes, smoothing away
+    var q0=f.trail[w2-4], q1=f.trail[w2], ka=(1-w2/f.trail.length)*.35;
+    sandGroove(g,function(oy){ g.moveTo(q0[0],q0[1]+oy); g.lineTo(q1[0],q1[1]+oy); },ka*.5,1.8);
+  }
+  g.save(); g.translate(f.x,f.y); g.rotate(f.a);
+  var wag=Math.sin(f.phase)*.4;
+  for(var i=0;i<9;i++){                           // a koi of river pebbles
+    var fr=i/8, px=s*.85-fr*s*1.7;
+    var env=Math.sqrt(Math.max(0,1-Math.pow(px/(s*.95),2)));
+    var pr=(s*.17)*(.4+.8*env)*(.82+.22*Math.sin(seed+i*2.1));
+    var py=Math.sin(seed*1.7+i*2.63)*s*.13*env+(fr>.6?wag*s*.3*(fr-.6)/.4:0);
+    g.fillStyle="rgba(90,82,66,.32)";             // its little shadow on the gravel
+    g.beginPath(); g.ellipse(px+1.6,py+2.4,pr,pr*.8,seed+i,0,7); g.fill();
+    g.fillStyle=c[0];
+    g.beginPath(); g.ellipse(px,py,pr,pr*.8,seed+i,0,7); g.fill();
+    g.fillStyle=c[1]; g.globalAlpha=.55;
+    g.beginPath(); g.ellipse(px-pr*.24,py-pr*.28,pr*.5,pr*.36,seed+i,0,7); g.fill();
+    g.globalAlpha=1;
+  }
+  var ey=f.odd?s*.12:-s*.1;                       // one pale pebble for an eye
+  g.fillStyle="#CFC6B2"; g.beginPath(); g.arc(s*.74,ey,s*.075,0,7); g.fill();
+  g.fillStyle="#3A342A"; g.beginPath(); g.arc(s*.76,ey,s*.03,0,7); g.fill();
+  g.restore();
+}
+var rakeTrail=[];
+function drawSandPred(g){
+  for(var w2=rakeTrail.length-1;w2>=0;w2--){ if(++rakeTrail[w2][2]>380)rakeTrail.splice(w2,1); }
+  if(pred.active)rakeTrail.unshift([pred.x,pred.y,0]);
+  g.lineCap="round";
+  for(var i=4;i<rakeTrail.length;i+=4){           // five parallel furrows, slowly relaxing
+    var q0=rakeTrail[i-4], q1=rakeTrail[i], k=1-q1[2]/380;
+    var dir=Math.atan2(q1[1]-q0[1],q1[0]-q0[0]);
+    var nx=Math.cos(dir+Math.PI/2), ny=Math.sin(dir+Math.PI/2);
+    for(var o=-2;o<=2;o++){
+      var ox=nx*o*7.5, oy=ny*o*7.5;
+      sandGroove(g,function(lift){
+        g.moveTo(q0[0]+ox,q0[1]+oy+lift); g.lineTo(q1[0]+ox,q1[1]+oy+lift);
+      },.3*k,2.2);
+    }
+  }
+  if(!pred.active||pred.segs.length<6)return;
+  var n=pred.segs.length;
+  for(i=2;i<n;i+=2){                              // the bamboo spine
+    var p0=pred.segs[i-2], p1=pred.segs[i], taper=1-(i/n)*.35;
+    g.strokeStyle="#C4B08C"; g.lineWidth=9*taper+3;
+    g.beginPath(); g.moveTo(p0[0],p0[1]); g.lineTo(p1[0],p1[1]); g.stroke();
+    g.strokeStyle="rgba(138,116,78,.6)"; g.lineWidth=2*taper+.8;
+    g.beginPath(); g.moveTo(p0[0],p0[1]-2); g.lineTo(p1[0],p1[1]-2); g.stroke();
+  }
+  for(i=8;i<n;i+=8){                              // bamboo joints
+    p0=pred.segs[i-2]; p1=pred.segs[i];
+    var jd=Math.atan2(p1[1]-p0[1],p1[0]-p0[0])+Math.PI/2, taper2=1-(i/n)*.35;
+    g.strokeStyle="#8A744E"; g.lineWidth=2.4;
+    g.beginPath(); g.moveTo(p1[0]+Math.cos(jd)*6*taper2,p1[1]+Math.sin(jd)*6*taper2);
+    g.lineTo(p1[0]-Math.cos(jd)*6*taper2,p1[1]-Math.sin(jd)*6*taper2); g.stroke();
+  }
+  g.save(); g.translate(pred.x,pred.y); g.rotate(pred.a);
+  g.strokeStyle="#8A744E"; g.lineWidth=5.5;       // the crossbar
+  g.beginPath(); g.moveTo(6,-26); g.lineTo(6,26); g.stroke();
+  g.strokeStyle="#C4B08C"; g.lineWidth=3;         // seven tines
+  for(i=0;i<7;i++){
+    var ty=-24+i*8;
+    g.beginPath(); g.moveTo(6,ty); g.lineTo(27,ty*1.12); g.stroke();
+    g.fillStyle="#8A744E"; g.beginPath(); g.arc(27,ty*1.12,1.7,0,7); g.fill();
+  }
+  g.fillStyle="#4A3E2C"; g.beginPath(); g.arc(0,0,4,0,7); g.fill();   // the knot is its eye
+  g.strokeStyle="rgba(74,62,44,.5)"; g.lineWidth=1.4;
+  g.beginPath(); g.arc(0,0,6.5,0,7); g.stroke();
+  g.restore();
+}
+function sceneSand(g,t){
+  if(!sandTex)sandTex=makeSandTex();
+  g.drawImage(sandTex,0,0);
+  g.save(); g.globalAlpha=.07+.03*Math.sin(t*.0005);           // afternoon light across the gravel
+  g.fillStyle="#FFF6DE"; rayPath(g); g.fill(); g.restore();
+  motes.forEach(function(m){                                   // wind-blown grains
+    var tw=.4+.6*Math.abs(Math.sin(t*.001+m.tw));
+    g.fillStyle="rgba(120,110,88,"+(.18*tw)+")";
+    g.beginPath(); g.arc(m.x,m.y,m.r*.7+.4,0,7); g.fill();
+  });
+  g.lineCap="round";
+  KELP.forEach(function(k){                                    // standing stones, raked round
+    var kx=W*k.fx, baseY=H-26, h=130+k.i*34, rx=32+k.i*5;
+    for(var q=2;q>=0;q--){
+      var rr=rx+26+q*24, ry2=13+q*5.5;
+      sandGroove(g,function(oy){ g.ellipse(kx,baseY+4+oy,rr,ry2,0,0,7); },.32-q*.07,2.2);
+    }
+    g.fillStyle="rgba(90,82,66,.35)";
+    g.beginPath(); g.ellipse(kx+5,baseY+3,rx*1.05,10,0,0,7); g.fill();
+    g.fillStyle="#9A927E";
+    g.beginPath(); g.ellipse(kx,baseY-h/2+8,rx,h/2,0,0,7); g.fill();
+    g.fillStyle="rgba(200,192,170,.5)";
+    g.beginPath(); g.ellipse(kx-rx*.3,baseY-h*.62,rx*.4,h*.3,-.15,0,7); g.fill();
+    g.fillStyle="#7A8560";                                     // the moss cap
+    g.beginPath(); g.ellipse(kx-2,baseY-h+10,rx*.72,12+k.i*2,-.08,0,7); g.fill();
+    var bend=.25*Math.sin(t*.0012+k.ph);                       // a tuft of grass keeps it company
+    g.strokeStyle="rgba(122,133,96,.8)"; g.lineWidth=2.2;
+    for(q=0;q<3;q++){
+      g.beginPath(); g.moveTo(kx+rx*.8+q*7,baseY+2);
+      g.quadraticCurveTo(kx+rx*.8+q*7+bend*8,baseY-16,kx+rx*.8+q*7+bend*20+(q-1)*4,baseY-26-q*4); g.stroke();
+    }
+  });
+  ripples.forEach(function(rp){                                // rings raked into the gravel
+    var a=Math.min(.45,rp.a*1.5);
+    for(var rr=0;rr<3;rr++){
+      var r2=rp.r-rr*8; if(r2<5)continue;
+      sandGroove(g,function(oy){ g.arc(rp.x,rp.y+oy,r2,0,7); },a*(1-rr*.22),2.2);
+    }
+  });
+  food.forEach(function(fd){                                   // fallen cherry petals
+    g.save(); g.translate(fd.x,fd.y); g.rotate(fd.spin);
+    g.fillStyle="rgba(232,175,192,"+(.9*fd.alpha)+")";
+    g.beginPath(); g.ellipse(0,0,fd.size*.85,fd.size*.5,0,0,7); g.fill();
+    g.fillStyle="rgba(246,214,224,"+(.8*fd.alpha)+")";
+    g.beginPath(); g.ellipse(-fd.size*.2,-fd.size*.1,fd.size*.45,fd.size*.26,0,0,7); g.fill();
+    g.restore();
+  });
+  eggs.forEach(function(e){                                    // a clutch of smooth pale pebbles
+    var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
+    for(var i=0;i<7;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
+      g.fillStyle="rgba(90,82,66,.3)";
+      g.beginPath(); g.ellipse(ex+dx+1,ey+dy+1.4,4.4,3.6,0,0,7); g.fill();
+      g.fillStyle="#CFC6B2";
+      g.beginPath(); g.ellipse(ex+dx,ey+dy,4.2,3.4,0,0,7); g.fill();
+      g.fillStyle="rgba(255,250,238,.7)";
+      g.beginPath(); g.ellipse(ex+dx-1,ey+dy-1,1.8,1.2,0,0,7); g.fill();
+    }
+  });
+  deathFx.forEach(function(fx){                                // scattered, then raked smooth
+    var k=1-fx.age/130, c=PEBBLE[fx.species];
+    var th=Math.min(6.8,fx.age*.09);                           // the spiral flourish, drawn in
+    sandGroove(g,function(oy){
+      for(var q2=0;q2<=th;q2+=.16){
+        var sr=6+q2*7.5;
+        var sx=fx.x+Math.cos(q2*1.9)*sr, sy=fx.y+Math.sin(q2*1.9)*sr*.8+oy;
+        if(!q2)g.moveTo(sx,sy); else g.lineTo(sx,sy);
+      }
+    },.4*k,2.4);
+    fx.parts.forEach(function(p,pi){                           // the pebbles, rolling away
+      g.fillStyle=pi%4?c[0]:"#CFC6B2"; g.globalAlpha=.85*k;
+      g.beginPath(); g.ellipse(fx.x+p.dx*1.5,fx.y+p.dy*1.5,p.sz*.6,p.sz*.48,p.spin,0,7); g.fill();
+    });
+    g.globalAlpha=1;
+  });
+  GAME.rings.forEach(function(rg){                             // freshly raked target rings
+    if(rg.fade<=0)return;
+    var a=(rg.done?rg.fade*.5:.7), bob=Math.sin(t*.001+rg.ph)*7;
+    sandGroove(g,function(oy){ g.arc(rg.x,rg.y+bob+oy,rg.r,0,7); },a*.55,3);
+    sandGroove(g,function(oy){ g.arc(rg.x,rg.y+bob+oy,rg.r-10,0,7); },a*.35,2.2);
+  });
+  drawSandPred(g);
+  fish.forEach(function(f){drawSandFish(g,f);});
+}
+
 /* ─── Director ────────────────────────────────────────────── */
 var DIRECTIONS=[
   {key:"ink",  name:"1 · Ink Wash",  blurb:"Brushstroke koi, ink-ring ripples, calligraphic reeds — and a serpent of darker ink.", scene:sceneInk},
@@ -2997,7 +3189,8 @@ var SWATCH={
   blueprint:`#123A6E url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 12 H52 M0 24 H52 M13 0 V36 M26 0 V36 M39 0 V36' stroke='%23DFE9F7' stroke-width='.6' opacity='.35'/><path d='M10 18 Q20 10 30 15 T50 13' stroke='%23EFF5FC' stroke-width='2' fill='none' stroke-linecap='round'/><path d='M14 27 L38 27' stroke='%23E03A2E' stroke-width='2' stroke-linecap='round'/></svg>") center/cover`,
   stitch:`#EDE6D4 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M5 16 Q15 8 26 14 T47 11' stroke='%23B8474E' stroke-width='3' fill='none' stroke-linecap='round' stroke-dasharray='6 4.5'/><path d='M8 27 Q20 21 34 25 T48 24' stroke='%235E8C74' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-dasharray='4 4' opacity='.85'/></svg>") center/cover`,
   crayon:`#D9C9A3 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M5 15 Q14 7 25 13 T46 10' stroke='%23D9382E' stroke-width='5.5' fill='none' stroke-linecap='round'/><path d='M7 27 L13 22 L19 28 L25 22 L31 28 L37 22 L43 27' stroke='%233E9B4F' stroke-width='3.6' fill='none' stroke-linecap='round' stroke-linejoin='round' opacity='.9'/></svg>") center/cover`,
-  printed:`#14181D url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 9 H52 M0 18 H52 M0 27 H52' stroke='%235AC8DC' stroke-width='.7' opacity='.3'/><path d='M6 24 Q16 12 27 18 T48 15' stroke='%23F28C28' stroke-width='3.4' fill='none' stroke-linecap='round'/><path d='M6 20 Q16 8 27 14' stroke='%23FFC38A' stroke-width='1.4' fill='none' stroke-linecap='round' opacity='.9'/></svg>") center/cover`
+  printed:`#14181D url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 9 H52 M0 18 H52 M0 27 H52' stroke='%235AC8DC' stroke-width='.7' opacity='.3'/><path d='M6 24 Q16 12 27 18 T48 15' stroke='%23F28C28' stroke-width='3.4' fill='none' stroke-linecap='round'/><path d='M6 20 Q16 8 27 14' stroke='%23FFC38A' stroke-width='1.4' fill='none' stroke-linecap='round' opacity='.9'/></svg>") center/cover`,
+  sand:`#D8CFBA url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><ellipse cx='17' cy='17' rx='13' ry='8' fill='none' stroke='%23918872' stroke-width='1.6'/><ellipse cx='17' cy='17' rx='7.5' ry='4.6' fill='none' stroke='%23918872' stroke-width='1.3' opacity='.7'/><ellipse cx='38' cy='24' rx='4.6' ry='3.5' fill='%234A4640'/><ellipse cx='31' cy='27.5' rx='3.4' ry='2.6' fill='%2356606B'/><ellipse cx='44' cy='28' rx='3' ry='2.3' fill='%236E5B48'/></svg>") center/cover`
 };
 /* ─── the ink collection: store inks join the base three ──── */
 var CATALOG=[
@@ -3033,6 +3226,10 @@ var CATALOG=[
    tease:"a dark build plate, layer-line fish — and the extruder",
    blurb:"Fish printed layer by layer, top edges still glowing; lattice kelp, slicer-contour ripples — and the extruder creature gliding in on its cable-chain, un-printing whatever it catches.",
    scene:scenePrint},
+  {key:"sand", name:"Raked Sand", price:10,
+   tease:"a quiet gravel garden — and the rake",
+   blurb:"The tank as a zen garden — koi of drifting river pebbles, standing stones, ripples raked in rings — and the rake itself, furrowing the gravel as it hunts. What it catches, it smooths away.",
+   scene:sceneSand},
 ];
 var owned=(function(){ try{ var v=JSON.parse(localStorage.getItem("st_inks")); return Array.isArray(v)?v:[]; }catch(e){ return []; } })();
 function saveInks(){ try{ localStorage.setItem("st_inks",JSON.stringify(owned)); }catch(e){} }
