@@ -52,7 +52,24 @@ body.zen #bellBtn, body.zen #jarBtn{display:none;}
 .lanehead{display:flex; align-items:center; gap:10px; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8B8577;}
 .lanehead .hint2{letter-spacing:.02em; text-transform:none; font-size:11.5px; opacity:.75;}
 .lanechips{display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; padding:16px 2px 10px; min-height:78px;}
-#shorelane{border-top:1px dashed #2E2B38; margin-top:4px; padding-top:10px;}
+/* the shore is dry land: recessed, dimmer, out of the flow */
+#shorelane{background:#131118; margin:10px -16px 0; padding:10px 16px 14px;
+  box-shadow:inset 0 7px 12px -6px rgba(0,0,0,.55), inset 0 -4px 8px -6px rgba(0,0,0,.4);}
+#shorelane .ichip{opacity:.72; transition:opacity .2s ease;}
+#shorelane .ichip:hover, #shorelane .ichip:focus-visible, #wrapshelf.choosing .ichip{opacity:1;}
+/* the wrapped shelf: inks still in their wrappers, one shared pair of buttons */
+#wrapshelf{border:1px dashed #2E2B38; border-radius:12px; padding:10px 14px 4px; margin-top:8px;
+  transition:border-color .25s ease;}
+#wrapshelf[hidden]{display:none;}
+#wrapshelf.choosing{border-color:#8B8577;}
+.wraphead{display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8B8577;}
+.wraphead .hintmsg{letter-spacing:.02em; text-transform:none; font-size:11.5px; color:#B5AF9F;}
+.wrapchips{display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; padding:12px 2px 8px;}
+#wrapshelf.choosing .ichip.locked{cursor:pointer;}
+#wrapshelf.choosing .ichip.locked .swb{filter:none; animation:wrapglow 1.6s ease-in-out infinite;}
+@keyframes wrapglow{0%,100%{border-color:#3A3644; box-shadow:none;}
+  50%{border-color:#EAE6DC; box-shadow:0 0 10px rgba(234,230,220,.4);}}
 .ichip{position:relative; background:none; border:none; padding:0; cursor:grab; text-align:center; touch-action:none; font-family:inherit;}
 .ichip:active{cursor:grabbing;}
 .ichip .swb{display:block; width:52px; height:36px; border-radius:4px; border:1px solid #3A3644;
@@ -69,16 +86,17 @@ body.zen #bellBtn, body.zen #jarBtn{display:none;}
 .ichip.locked .swb{filter:grayscale(.3) brightness(.8);}
 .ichip.locked .swb .hatch{position:absolute; inset:0;
   background:repeating-linear-gradient(45deg, rgba(20,19,26,.55) 0 6px, transparent 6px 12px);}
-.ichip .price{display:block; font-size:10.5px; color:#8B8577; margin-top:3px;}
-.ichip .minib{display:inline-block; font-family:inherit; font-size:10.5px; padding:3px 9px; border-radius:99px;
-  border:1px solid #4A4656; background:none; color:#C9C4B6; cursor:pointer; margin:4px 2px 0; transition:border-color .2s ease;}
-.ichip .minib:hover{border-color:#B5AF9F;}
+.minib{display:inline-block; font-family:inherit; font-size:10.5px; padding:3px 10px; border-radius:99px;
+  border:1px solid #4A4656; background:none; color:#C9C4B6; cursor:pointer; transition:all .2s ease;}
+.minib:hover{border-color:#B5AF9F;}
+.minib.on{background:#EAE6DC; color:#17161C; border-color:#EAE6DC;}
+.minib:disabled{opacity:.4; cursor:default;}
 .transport{display:flex; gap:12px; align-items:center; flex-wrap:wrap; border-top:1px solid #2E2B38; margin-top:6px; padding-top:11px; font-size:12.5px; color:#8B8577;}
 .transport button{font-family:inherit; font-size:12.5px; padding:6px 14px; border-radius:99px; cursor:pointer;
   background:none; color:#C9C4B6; border:1px solid #3A3644; transition:all .2s ease;}
 .transport button:hover{border-color:#8B8577;}
 .transport button.on{background:#EAE6DC; color:#17161C; border-color:#EAE6DC;}
-.transport button:focus-visible, .ichip .minib:focus-visible{outline:2px solid #EAE6DC; outline-offset:2px;}
+.transport button:focus-visible, .minib:focus-visible{outline:2px solid #EAE6DC; outline-offset:2px;}
 .dragghost{position:fixed; z-index:99; pointer-events:none; opacity:.9;}
 main{flex:1; display:grid; place-items:center; padding:20px;}
 main > div{width:min(960px,100%); position:relative;}
@@ -196,8 +214,9 @@ footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; lett
         <div class="lanechips" id="streamchips"></div>
       </div>
       <div id="shorelane">
-        <div class="lanehead">The Shore <span class="hint2">— resting inks, and inks still waiting to be bought</span></div>
+        <div class="lanehead">The Shore <span class="hint2">— inks resting out of the flow</span></div>
         <div class="lanechips" id="shorechips"></div>
+        <div id="wrapshelf" hidden></div>
       </div>
       <div class="transport">
         <button id="flowBtn" class="on">⏸ pause</button>
@@ -215,7 +234,7 @@ footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; lett
     </div>
   </div>
 </main>
-<footer>Streams · v0.40 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.41 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -3057,6 +3076,7 @@ function advanceTarget(){
 }
 /* ─── the drawer: THE STREAM and THE SHORE ────────────────── */
 var PEEK={active:false, backTo:0, until:0, cleanup:-1};
+var SHOP={mode:null, msg:""};                 // "preview" | "buy" — press a button, then choose an ink
 function catByKey(k){ for(var i=0;i<CATALOG.length;i++)if(CATALOG[i].key===k)return CATALOG[i]; return null; }
 function swFor(key){ return SWATCH[key]||"repeating-linear-gradient(45deg,#26262C 0 6px,#1B1B20 6px 12px)"; }
 function toastHud(msg){
@@ -3091,15 +3111,28 @@ function renderDrawer(){
   document.getElementById("streamchips").innerHTML=sh||'<span class="hint2" style="color:#8B8577;font-size:12px;">the stream is empty — drag an ink up from the shore</span>';
   var ho="";
   DIRECTIONS.forEach(function(d){ if(!d.temp&&flow.stream.indexOf(d.key)<0)ho+=ownedChip(d.key); });
-  CATALOG.forEach(function(c){
-    if(owned.indexOf(c.key)>=0)return;
-    ho+='<div class="ichip locked" data-key="'+c.key+'">'+
-      '<span class="swb"><span class="hatch"></span></span>'+
-      '<span class="nm">'+c.name+'</span><span class="price">'+c.tease+'</span>'+
-      '<span><button class="minib peekb" data-key="'+c.key+'">peek</button>'+
-      '<button class="minib buyb" data-key="'+c.key+'"'+(pearls<c.price?" disabled":"")+'>'+c.price+' ⚬</button></span></div>';
-  });
+  var locked=CATALOG.filter(function(c){ return owned.indexOf(c.key)<0; });
+  if(!ho)ho='<span class="hint2" style="color:#5E5A4F;font-size:12px;align-self:center;">nothing is resting — every ink you own is riding the stream</span>';
   document.getElementById("shorechips").innerHTML=ho;
+  var ws=document.getElementById("wrapshelf");
+  ws.hidden=!locked.length;
+  if(locked.length){                          // the wrapped shelf: bare chips, one shared pair of buttons
+    ws.classList.toggle("choosing",!!SHOP.mode);
+    var hint=SHOP.mode==="preview"?"preview which ink? · esc to never mind"
+            :SHOP.mode==="buy"?"make which ink yours? · esc to never mind"
+            :SHOP.msg||("— "+locked.length+(locked.length>1?" inks":" ink")+" waiting");
+    var wc="";
+    locked.forEach(function(c){
+      wc+='<div class="ichip locked" data-key="'+c.key+'">'+
+        '<span class="swb"><span class="hatch"></span></span>'+
+        '<span class="nm">'+c.name+'</span></div>';
+    });
+    ws.innerHTML='<div class="wraphead">Still wrapped'+
+      '<button class="minib'+(SHOP.mode==="preview"?" on":"")+'" id="prevAllBtn">preview</button>'+
+      '<button class="minib'+(SHOP.mode==="buy"?" on":"")+'" id="buyAllBtn"'+(pearls<10?" disabled":"")+'>10 ⚬</button>'+
+      '<span class="hintmsg">'+hint+'</span></div>'+
+      '<div class="wrapchips">'+wc+'</div>';
+  }
   dr.querySelectorAll(".ichip").forEach(function(c){        // set via property: url("…") survives no attribute quoting
     c.querySelector(".swb").style.background=swFor(c.getAttribute("data-key"));
     c.querySelector(".swb").style.backgroundSize="cover";
@@ -3113,11 +3146,22 @@ function renderDrawer(){
 }
 function bindDrawer(){
   var dr=document.getElementById("drawer");
-  dr.querySelectorAll(".peekb").forEach(function(b){
-    b.onclick=function(e){ e.stopPropagation(); var c=catByKey(b.getAttribute("data-key")); if(c)startPeek(c); };
-  });
-  dr.querySelectorAll(".buyb").forEach(function(b){
-    b.onclick=function(e){ e.stopPropagation(); buyInk(b.getAttribute("data-key")); };
+  var pb=document.getElementById("prevAllBtn");
+  if(pb)pb.onclick=function(){ SHOP.mode=(SHOP.mode==="preview")?null:"preview"; SHOP.msg=""; renderDrawer(); };
+  var bb=document.getElementById("buyAllBtn");
+  if(bb)bb.onclick=function(){ SHOP.mode=(SHOP.mode==="buy")?null:"buy"; SHOP.msg=""; renderDrawer(); };
+  dr.querySelectorAll("#wrapshelf .ichip.locked").forEach(function(ch){
+    ch.onclick=function(){
+      var c=catByKey(ch.getAttribute("data-key"));
+      if(!c)return;
+      if(SHOP.mode==="preview"){ SHOP.mode=null; startPeek(c); renderDrawer(); }
+      else if(SHOP.mode==="buy"){ SHOP.mode=null; buyInk(c.key); }
+      else{                                    // no mode picked yet — point at the buttons
+        SHOP.msg="press preview or 10 ⚬ first, then choose";
+        renderDrawer();
+        setTimeout(function(){ if(!SHOP.mode&&SHOP.msg){ SHOP.msg=""; renderDrawer(); } },2400);
+      }
+    };
   });
   dr.querySelectorAll("button.ichip").forEach(function(ch){ ch.onpointerdown=chipDown; });
 }
@@ -3216,7 +3260,9 @@ function loop(t){
     startFade(back,t);
   }
   if(PEEK.cleanup>=0&&!PEEK.active&&nxt<0&&cur!==PEEK.cleanup){
-    DIRECTIONS.splice(PEEK.cleanup,1); PEEK.cleanup=-1; renderDrawer();
+    DIRECTIONS.splice(PEEK.cleanup,1);
+    if(cur>PEEK.cleanup)cur--;                 // an ink bought mid-taste sits above the temp slot
+    PEEK.cleanup=-1; renderDrawer();
   }
   if(nxt<0&&!PEEK.active&&flow.playing&&t-lastSwitch>AUTO_EVERY_MS){
     var ni=advanceTarget();
@@ -3240,6 +3286,7 @@ document.addEventListener("keydown",function(e){
   if(e.key>="1"&&e.key<="9"&&+e.key<=DIRECTIONS.length)startFade(+e.key-1);
   if(e.key==="Escape"){
     if(EGG.active)eggZoomClose();
+    else if(SHOP.mode){ SHOP.mode=null; SHOP.msg=""; renderDrawer(); }
     else if(!document.getElementById("bellPop").hidden)document.getElementById("bellPop").hidden=true;
     else if(!document.getElementById("drawer").hidden)document.getElementById("drawer").hidden=true;
     else{ document.body.classList.remove("zen"); zenIcon(); }
@@ -3248,7 +3295,7 @@ document.addEventListener("keydown",function(e){
 
 /* ─── chrome wiring: jar, bell, zen ───────────────────────── */
 var drawer=document.getElementById("drawer");
-document.getElementById("jarBtn").onclick=function(){ drawer.hidden=!drawer.hidden; renderDrawer(); };
+document.getElementById("jarBtn").onclick=function(){ drawer.hidden=!drawer.hidden; SHOP.mode=null; SHOP.msg=""; renderDrawer(); };
 document.getElementById("flowBtn").onclick=function(){ flow.playing=!flow.playing; lastSwitch=performance.now(); saveFlow(); renderDrawer(); };
 document.getElementById("driftBtn").onclick=function(){ flow.shuffle=!flow.shuffle; saveFlow(); renderDrawer(); };
 var bellPop=document.getElementById("bellPop"), bellBtn=document.getElementById("bellBtn");
