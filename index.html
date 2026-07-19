@@ -158,6 +158,10 @@ body[data-skin="sand"] #hud{                 /* a wooden garden plaque */
   font-family:Georgia,serif; font-size:14px; font-style:italic; color:#4A4234;
   padding:8px 18px; background:#CBBB96; border:2px solid #8A744E; border-radius:6px;
   box-shadow:2px 3px 8px rgba(70,60,40,.35);}
+body[data-skin="wood"] #hud{                 /* a margin note beside the print, sealed in red */
+  font-family:Georgia,serif; font-size:14px; color:#2A241C; padding:8px 18px;
+  background:#F5ECD6; border:2.5px solid #C33D2E; border-radius:2px;
+  box-shadow:3px 3px 0 rgba(195,61,46,.25), 2px 3px 9px rgba(80,60,30,.3);}
 body[data-skin="glass"] #hud{                /* an inscription in a small leaded pane */
   font-family:Georgia,serif; font-size:14.5px; font-style:italic; color:#F2E3B6;
   padding:7px 18px; background:#1C2F58; border:3px solid #14141C; border-radius:3px;
@@ -239,7 +243,7 @@ footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; lett
     </div>
   </div>
 </main>
-<footer>Streams · v0.43 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.44 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -631,7 +635,7 @@ function eggZoomStep(dt,t){
    its circle and rotates its fragment. All fragments at rest = one river. */
 function strokeEggPattern(g,style,t){
   var pulse=EGG.solved?(.6+.4*Math.sin((t-EGG.solvedT)*.012)):1;
-  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":style==="stitch"?"166,58,64":style==="crayon"?"58,50,48":style==="printed"?"94,214,240":style==="sand"?"104,96,80":"46,110,99";
+  var col=style==="ink"?"35,32,28":style==="glow"?"127,247,232":style==="chalk"?"244,242,233":style==="laser"?"74,46,20":style==="glass"?"20,20,28":style==="impasto"?"94,74,48":style==="blueprint"?"223,233,247":style==="stitch"?"166,58,64":style==="crayon"?"58,50,48":style==="printed"?"94,214,240":style==="sand"?"104,96,80":style==="wood"?"42,36,28":"46,110,99";
   g.lineCap="round";
   for(var pass=0;pass<(style==="glow"?2:1);pass++){
     g.strokeStyle="rgba("+col+","+((pass===0&&style==="glow")?.22*pulse:(style==="glow"?.9:.85)*pulse)+")";
@@ -651,14 +655,14 @@ function eggZoomDraw(g,t,style){
   if(EGG.zoom<=0||!EGG.egg)return;
   var f=eggZoomFrame(t), e=EGG.egg;
   g.globalAlpha=f.z*(style==="glow"?.42:style==="chalk"?.5:.32);   // light veil — the zoomed scene itself carries the focus
-  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":style==="stitch"?"#E7DFC9":style==="crayon"?"#D9C9A3":style==="printed"?"#10151B":style==="sand"?"#D8CFBA":"#AFD9CC";
+  g.fillStyle=style==="ink"?"#EFE9DA":style==="glow"?"#04071A":style==="chalk"?"#16281F":style==="laser"?"#DFC49A":style==="glass"?"#16233F":style==="impasto"?"#DCD5C2":style==="blueprint"?"#0C2B54":style==="stitch"?"#E7DFC9":style==="crayon"?"#D9C9A3":style==="printed"?"#10151B":style==="sand"?"#D8CFBA":style==="wood"?"#EFE3C8":"#AFD9CC";
   g.fillRect(0,0,W,H); g.globalAlpha=1;
   g.save(); g.translate(f.cx,f.cy); g.scale(f.sc,f.sc);
   for(var i=0;i<7;i++){
     var px=EGG_POS[i][0], py=EGG_POS[i][1];
     if(style==="paper"){ g.fillStyle="rgba(20,40,38,.3)"; g.beginPath(); g.arc(px+7,py+10,EGG_R,0,7); g.fill(); }
     if(style==="glow")drawHalo(g,"#3FE0D0",px,py,EGG_R*1.5,EGG_R*1.5,.22);
-    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":style==="stitch"?"#F7F2E4":style==="crayon"?"#EADFBE":style==="printed"?"#1F2833":style==="sand"?"#E5DECB":"#F4E9D4";
+    g.fillStyle=style==="ink"?"#F6F1E2":style==="glow"?"rgba(8,15,36,.96)":style==="chalk"?"#2C4237":style==="laser"?"#E7CFA5":style==="glass"?"rgba(216,228,244,.94)":style==="impasto"?"#EFE9D8":style==="blueprint"?"#1A4076":style==="stitch"?"#F7F2E4":style==="crayon"?"#EADFBE":style==="printed"?"#1F2833":style==="sand"?"#E5DECB":style==="wood"?"#F5ECD6":"#F4E9D4";
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.fill();
     g.save();
     g.beginPath(); g.arc(px,py,EGG_R-6,0,7); g.clip();
@@ -681,6 +685,9 @@ function eggZoomDraw(g,t,style){
     else if(style==="sand"){ g.strokeStyle="rgba(246,240,226,.7)"; g.lineWidth=2.6;   // a raked rim: light lip under dark cut
       g.beginPath(); g.arc(px,py+1.8,EGG_R,0,7); g.stroke();
       g.strokeStyle="rgba(104,96,80,.75)"; g.lineWidth=4.4; }
+    else if(style==="wood"){ g.strokeStyle="rgba(195,61,46,.6)"; g.lineWidth=4;       // vermilion off-register under the keyline
+      g.beginPath(); g.arc(px+3,py-2,EGG_R,0,7); g.stroke();
+      g.strokeStyle="rgba(42,36,28,.9)"; g.lineWidth=4.2; }
     else { g.strokeStyle="rgba(46,110,99,.5)"; g.lineWidth=4; }
     g.beginPath(); g.arc(px,py,EGG_R,0,7); g.stroke();
     g.setLineDash([]);
@@ -3170,6 +3177,246 @@ function sceneSand(g,t){
   fish.forEach(function(f){drawSandFish(g,f);});
 }
 
+/* ══════════════ SKIN 13: WOODBLOCK (store ink) ══════════════
+   An ukiyo-e print still on its block: bold carved keyblock
+   outlines over flat color that sits a hair off-register —
+   the woodblock signature. The serpent is a creature that
+   remembers being a V-GOUGE: steel channel, brass ferrule,
+   a mushroom palm-handle for a tail. It carves as it swims.
+   A caught fish is carved out of the block and flips away as
+   one chip, leaving bare wood that prints as nothing. */
+var WOODC=["#2E4A6B","#C33D2E","#C9962E","#4A6B4E"];
+var WOODKEY="#2A241C", WOODBARE="#D9B98A";
+var washiTex=null;
+function makeWashi(){
+  var c=document.createElement("canvas"); c.width=W; c.height=H;
+  var g=c.getContext("2d");
+  g.fillStyle="#EFE3C8"; g.fillRect(0,0,W,H);
+  g.lineCap="round";
+  for(var i=0;i<44;i++){                         // the grain of the block, ghosting through
+    var gy=i/44*H+rand(-8,8), amp=rand(3,10), ph=rand(0,7);
+    g.strokeStyle="rgba(150,120,80,"+rand(.04,.09)+")"; g.lineWidth=rand(1,2.2);
+    g.beginPath();
+    for(var x=0;x<=W;x+=40)g[x?"lineTo":"moveTo"](x,gy+Math.sin(x*.004+ph)*amp);
+    g.stroke();
+  }
+  for(i=0;i<3;i++){                              // knots
+    var kx2=rand(W*.1,W*.9), ky2=rand(H*.15,H*.85);
+    for(var q=1;q<4;q++){
+      g.strokeStyle="rgba(150,120,80,"+(0.1-q*.02)+")"; g.lineWidth=1.6;
+      g.beginPath(); g.ellipse(kx2,ky2,q*14,q*9,rand(0,.6),0,7); g.stroke();
+    }
+  }
+  for(i=0;i<500;i++){
+    g.fillStyle="rgba(160,140,100,"+rand(.03,.08)+")";
+    g.beginPath(); g.arc(rand(0,W),rand(0,H),rand(.5,1.4),0,7); g.fill();
+  }
+  g.strokeStyle="#C33D2E"; g.lineWidth=5;        // the hanko seal
+  g.strokeRect(W-128,H-150,72,72);
+  g.lineCap="butt"; g.lineWidth=7;
+  g.beginPath(); g.moveTo(W-112,H-130); g.lineTo(W-74,H-130); g.stroke();
+  g.beginPath(); g.moveTo(W-92,H-130); g.lineTo(W-92,H-96); g.stroke();
+  g.beginPath(); g.moveTo(W-110,H-96); g.lineTo(W-72,H-102); g.stroke();
+  g.lineCap="round";
+  g.strokeStyle="rgba(42,36,28,.75)"; g.lineWidth=4;   // the carver's column of marks
+  for(i=0;i<4;i++){
+    var my=H-330+i*44;
+    g.beginPath(); g.moveTo(W-104,my); g.lineTo(W-82,my+8); g.stroke();
+    g.beginPath(); g.moveTo(W-98,my+16); g.lineTo(W-86,my+14); g.stroke();
+  }
+  return c;
+}
+function woodFishPath(g,s,wag,ox,oy){
+  g.moveTo(s+ox,oy);
+  g.bezierCurveTo(s*.55+ox,-s*.38+oy,-s*.35+ox,-s*.34+oy,-s+ox,wag*s*.28+oy);
+  g.bezierCurveTo(-s*.35+ox,s*.34+oy,s*.55+ox,s*.38+oy,s+ox,oy);
+}
+function drawWoodFish(g,f){
+  var s=f.size*1.15, col=WOODC[f.species], seed=f.fullSize*3.7;
+  var mx=2.6+Math.sin(seed)*1.6, my=-1.8+Math.cos(seed)*1.2;   // this print's registration error
+  g.save(); g.translate(f.x,f.y); g.rotate(f.a);
+  var wag=Math.sin(f.phase)*.45;
+  g.fillStyle=col; g.globalAlpha=.8;             // the color block, off-register
+  g.beginPath(); woodFishPath(g,s,wag,mx,my); g.fill();
+  g.beginPath();                                 // color under the tail too
+  g.moveTo(-s*.9+mx,wag*s*.28+my); g.lineTo(-s*1.5+mx,wag*s*.7-s*.38+my);
+  g.lineTo(-s*1.42+mx,wag*s*.7+s*.32+my); g.closePath(); g.fill();
+  g.globalAlpha=1;
+  g.strokeStyle=WOODKEY; g.lineWidth=5; g.lineCap="round"; g.lineJoin="round";
+  g.beginPath(); woodFishPath(g,s,wag,0,0); g.stroke();        // the keyblock line
+  g.beginPath();
+  g.moveTo(-s*.9,wag*s*.28); g.lineTo(-s*1.5,wag*s*.7-s*.38);
+  g.lineTo(-s*1.42,wag*s*.7+s*.32); g.closePath(); g.stroke();
+  g.lineWidth=2.2; g.globalAlpha=.55;            // carved wave-scales
+  for(var k2=0;k2<3;k2++){
+    g.beginPath(); g.arc(s*.1-k2*s*.32,-s*.05,s*.3,.6,2.5); g.stroke();
+  }
+  g.globalAlpha=.7; g.lineWidth=3;               // one carved gill stroke
+  g.beginPath(); g.moveTo(s*.42,-s*.18); g.quadraticCurveTo(s*.3,0,s*.42,s*.2); g.stroke();
+  g.globalAlpha=1;
+  var ey=f.odd?s*.14:-s*.06;                     // a bold printed eye
+  g.lineWidth=3.4;
+  g.beginPath(); g.arc(s*.62,ey,s*.1,0,7); g.stroke();
+  g.fillStyle=WOODKEY; g.beginPath(); g.arc(s*.64,ey,s*.045,0,7); g.fill();
+  g.restore();
+}
+var gougeTrail=[];
+function drawWoodPred(g){
+  for(var w2=gougeTrail.length-1;w2>=0;w2--){ if(++gougeTrail[w2][2]>320)gougeTrail.splice(w2,1); }
+  if(pred.active)gougeTrail.unshift([pred.x,pred.y,0]);
+  g.lineCap="round";
+  for(var i=2;i<gougeTrail.length;i+=2){         // the trough it carves
+    var q0=gougeTrail[i-2], q1=gougeTrail[i], k=1-q1[2]/320;
+    g.strokeStyle="rgba(90,66,40,"+(.5*k)+")"; g.lineWidth=11;
+    g.beginPath(); g.moveTo(q0[0],q0[1]); g.lineTo(q1[0],q1[1]); g.stroke();
+    g.strokeStyle="rgba(217,185,138,"+(.9*k)+")"; g.lineWidth=8;
+    g.beginPath(); g.moveTo(q0[0],q0[1]); g.lineTo(q1[0],q1[1]); g.stroke();
+  }
+  for(i=10;i<gougeTrail.length;i+=10){           // shavings curl off the cut
+    var q=gougeTrail[i], k2=1-q[2]/320;
+    g.strokeStyle="rgba(201,162,104,"+(.8*k2)+")"; g.lineWidth=2.6;
+    g.beginPath(); g.arc(q[0]+8,q[1]-7,4.5,i*.8,i*.8+4.2); g.stroke();
+  }
+  if(!pred.active||pred.segs.length<6)return;
+  var n=pred.segs.length;
+  for(i=2;i<n;i+=2){                             // the steel channel shaft
+    var p0=pred.segs[i-2], p1=pred.segs[i], taper=1-(i/n)*.6;
+    g.strokeStyle="#6E7278"; g.lineWidth=13*taper+3.5;
+    g.beginPath(); g.moveTo(p0[0],p0[1]); g.lineTo(p1[0],p1[1]); g.stroke();
+    g.strokeStyle="#D5DAE0"; g.lineWidth=3.6*taper+1;
+    g.beginPath(); g.moveTo(p0[0],p0[1]-1.5); g.lineTo(p1[0],p1[1]-1.5); g.stroke();
+  }
+  var tl=pred.segs[n-1], t2=pred.segs[n-3]||tl;  // the mushroom palm-handle
+  var ta=Math.atan2(tl[1]-t2[1],tl[0]-t2[0]);
+  g.save(); g.translate(tl[0],tl[1]); g.rotate(ta);
+  g.fillStyle="#B98E5A"; g.beginPath(); g.arc(6,0,12,0,7); g.fill();
+  g.fillStyle="#8A6A3E"; g.beginPath(); g.ellipse(10,0,7,10,0,-1.6,1.6); g.fill();
+  g.restore();
+  var fp=pred.segs[6]||pred.segs[n-1];           // brass ferrule
+  var fa=Math.atan2(pred.y-fp[1],pred.x-fp[0])+Math.PI/2;
+  g.strokeStyle="#C9A227"; g.lineWidth=6;
+  g.beginPath(); g.moveTo(fp[0]+Math.cos(fa)*9,fp[1]+Math.sin(fa)*9);
+  g.lineTo(fp[0]-Math.cos(fa)*9,fp[1]-Math.sin(fa)*9); g.stroke();
+  g.save(); g.translate(pred.x,pred.y); g.rotate(pred.a);
+  g.strokeStyle="#D5DAE0"; g.lineWidth=4.5;      // the V of the tip
+  g.beginPath(); g.moveTo(2,-9); g.lineTo(21,0); g.lineTo(2,9); g.stroke();
+  g.strokeStyle="#4A4E55"; g.lineWidth=2.2;
+  g.beginPath(); g.moveTo(4,-5.5); g.lineTo(16,0); g.lineTo(4,5.5); g.stroke();
+  g.fillStyle="#2A241C"; g.beginPath(); g.arc(7,0,3,0,7); g.fill();   // the eye in the bevel
+  g.fillStyle="rgba(230,236,244,.9)"; g.beginPath(); g.arc(8.2,-1.2,1.1,0,7); g.fill();
+  g.restore();
+}
+function sceneWood(g,t){
+  if(!washiTex)washiTex=makeWashi();
+  g.drawImage(washiTex,0,0);
+  g.save(); g.globalAlpha=.07+.025*Math.sin(t*.0005);
+  g.fillStyle="#FFF8E2"; rayPath(g); g.fill(); g.restore();
+  motes.forEach(function(m){                                   // paper fibers
+    var tw=.4+.6*Math.abs(Math.sin(t*.001+m.tw));
+    g.strokeStyle="rgba(160,140,100,"+(.22*tw)+")"; g.lineWidth=1.2;
+    g.beginPath(); g.moveTo(m.x-Math.cos(m.tw)*3,m.y-Math.sin(m.tw)*3);
+    g.lineTo(m.x+Math.cos(m.tw)*3,m.y+Math.sin(m.tw)*3); g.stroke();
+  });
+  g.lineCap="round"; g.lineJoin="round";
+  KELP.forEach(function(k){                                    // reeds printed off-register
+    var kx=W*k.fx, sway=kelpSway(k,t);
+    g.strokeStyle="rgba(74,107,78,.75)"; g.lineWidth=k.w*.55;
+    g.beginPath(); g.moveTo(kx+3,H+20-2);
+    g.quadraticCurveTo(kx+sway*.4+3,H*.8-2,kx+sway+3,k.top-2); g.stroke();
+    g.strokeStyle=WOODKEY; g.lineWidth=k.w*.28;
+    g.beginPath(); g.moveTo(kx,H+20);
+    g.quadraticCurveTo(kx+sway*.4,H*.8,kx+sway,k.top); g.stroke();
+    for(var L=0;L<3;L++){                                      // hooked scallop leaves
+      var frac=.4+L*.2, ly=H+20-(H+20-k.top)*frac;
+      var lx=kx+sway*frac*frac*1.6, side=(L%2?1:-1);
+      var bend=.25*Math.sin(t*.0012+k.ph+L);
+      g.strokeStyle="rgba(74,107,78,.7)"; g.lineWidth=k.w*.4;
+      g.beginPath(); g.moveTo(lx+3,ly-2);
+      g.quadraticCurveTo(lx+side*50+3,ly-30+bend*14-2,lx+side*(74+k.i*6)+3,ly-8+bend*20-2); g.stroke();
+      g.strokeStyle=WOODKEY; g.lineWidth=k.w*.2;
+      g.beginPath(); g.moveTo(lx,ly);
+      g.quadraticCurveTo(lx+side*50,ly-30+bend*14,lx+side*(74+k.i*6),ly-8+bend*20); g.stroke();
+    }
+  });
+  ripples.forEach(function(rp){                                // carved wave-rings, bulging like seigaiha
+    var a=Math.min(.5,rp.a*1.6);
+    g.strokeStyle="rgba(42,36,28,"+a+")"; g.lineWidth=2.2;
+    g.beginPath();
+    for(var b=0;b<8;b++){
+      var a0=b/8*Math.PI*2+rp.r*.008, a1=(b+1)/8*Math.PI*2+rp.r*.008, am=(a0+a1)/2;
+      var x0=rp.x+Math.cos(a0)*rp.r, y0=rp.y+Math.sin(a0)*rp.r;
+      if(!b)g.moveTo(x0,y0);
+      g.quadraticCurveTo(rp.x+Math.cos(am)*rp.r*1.3,rp.y+Math.sin(am)*rp.r*1.3,
+        rp.x+Math.cos(a1)*rp.r,rp.y+Math.sin(a1)*rp.r);
+    }
+    g.stroke();
+  });
+  food.forEach(function(fd){                                   // dabs of seal paste
+    g.fillStyle="rgba(195,61,46,"+(.9*fd.alpha)+")";
+    g.beginPath(); g.arc(fd.x,fd.y,fd.size*.55,0,7); g.fill();
+    g.fillStyle="rgba(140,30,20,"+(.5*fd.alpha)+")";
+    g.beginPath(); g.arc(fd.x+1,fd.y+1,fd.size*.28,0,7); g.fill();
+  });
+  eggs.forEach(function(e){                                    // printed roe: bold rings, ochre off-register
+    var ex=W*e.k.fx+kelpSway(e.k,t), ey=e.k.top+46;
+    for(var i=0;i<7;i++){
+      var dx=i?Math.cos(-Math.PI/2+(i-1)*1.0472)*11:0, dy=i?Math.sin(-Math.PI/2+(i-1)*1.0472)*9:0;
+      g.fillStyle="rgba(201,150,46,.8)";
+      g.beginPath(); g.arc(ex+dx+1.4,ey+dy-1,3.2,0,7); g.fill();
+      g.strokeStyle=WOODKEY; g.lineWidth=2;
+      g.beginPath(); g.arc(ex+dx,ey+dy,4.2,0,7); g.stroke();
+    }
+  });
+  deathFx.forEach(function(fx){                                // CARVED OUT: the chip flips away
+    var k=1-fx.age/130, col=WOODC[fx.species], fs=(fx.size||40)*1.15;
+    g.save(); g.translate(fx.x,fx.y); g.rotate(fx.a||0);
+    if(fx.age>12){                                             // bare wood where a fish used to print
+      var wk=Math.min(1,(fx.age-12)/24);
+      g.fillStyle="rgba(205,168,114,"+(.95*wk*k)+")";
+      g.beginPath(); woodFishPath(g,fs,0,0,0); g.fill();
+      g.strokeStyle="rgba(122,90,52,"+(.85*wk*k)+")"; g.lineWidth=2.6;   // the cut edge of the recess
+      g.beginPath(); woodFishPath(g,fs,0,0,0); g.stroke();
+      g.strokeStyle="rgba(150,110,66,"+(.6*wk*k)+")"; g.lineWidth=1.4;
+      for(var q2=-1;q2<=1;q2++){
+        g.beginPath(); g.moveTo(-fs*.8,q2*fs*.14);
+        g.quadraticCurveTo(0,q2*fs*.14+4,fs*.8,q2*fs*.14); g.stroke();
+      }
+    }
+    var ga=Math.min(1,fx.age/26);                              // the gouge line, cut around it
+    g.strokeStyle="rgba(90,66,40,"+(.7*k)+")"; g.lineWidth=4;
+    g.save(); g.setLineDash([14,9]);
+    g.beginPath(); g.arc(0,0,fs*1.35,-1.6,-1.6+ga*6.28); g.stroke();
+    g.restore();
+    var lift=Math.max(0,fx.age-20);                            // the chip itself, flipping off the block
+    if(lift<80){
+      g.save(); g.translate(lift*1.4,-lift*1.7); g.rotate(lift*.014);
+      g.globalAlpha=Math.max(0,1-lift/75);
+      g.fillStyle=col; g.globalAlpha*= .85;
+      g.beginPath(); woodFishPath(g,fs,0,2.6,-1.8); g.fill();
+      g.globalAlpha=Math.max(0,1-lift/75);
+      g.strokeStyle=WOODKEY; g.lineWidth=5;
+      g.beginPath(); woodFishPath(g,fs,0,0,0); g.stroke();
+      g.restore();
+    }
+    fx.parts.forEach(function(p,pi){                           // curls of carved wood
+      g.strokeStyle="rgba(201,162,104,"+(.8*k)+")"; g.lineWidth=2.4;
+      g.beginPath(); g.arc(p.dx*1.3,p.dy*1.3,p.sz*.6,p.spin,p.spin+4); g.stroke();
+    });
+    g.globalAlpha=1; g.restore();
+  });
+  GAME.rings.forEach(function(rg){                             // carved rings, color off-register
+    if(rg.fade<=0)return;
+    var a=rg.done?rg.fade*.45:.75, bob=Math.sin(t*.001+rg.ph)*7;
+    g.strokeStyle="rgba(195,61,46,"+(a*.7)+")"; g.lineWidth=3;
+    g.beginPath(); g.arc(rg.x+3,rg.y+bob-2,rg.r,0,7); g.stroke();
+    g.strokeStyle="rgba(42,36,28,"+a+")"; g.lineWidth=5;
+    g.beginPath(); g.arc(rg.x,rg.y+bob,rg.r,.25,6.05); g.stroke();
+    g.globalAlpha=1;
+  });
+  drawWoodPred(g);
+  fish.forEach(function(f){drawWoodFish(g,f);});
+}
+
 /* ─── Director ────────────────────────────────────────────── */
 var DIRECTIONS=[
   {key:"ink",  name:"1 · Ink Wash",  blurb:"Brushstroke koi, ink-ring ripples, calligraphic reeds — and a serpent of darker ink.", scene:sceneInk},
@@ -3190,7 +3437,8 @@ var SWATCH={
   stitch:`#EDE6D4 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M5 16 Q15 8 26 14 T47 11' stroke='%23B8474E' stroke-width='3' fill='none' stroke-linecap='round' stroke-dasharray='6 4.5'/><path d='M8 27 Q20 21 34 25 T48 24' stroke='%235E8C74' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-dasharray='4 4' opacity='.85'/></svg>") center/cover`,
   crayon:`#D9C9A3 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M5 15 Q14 7 25 13 T46 10' stroke='%23D9382E' stroke-width='5.5' fill='none' stroke-linecap='round'/><path d='M7 27 L13 22 L19 28 L25 22 L31 28 L37 22 L43 27' stroke='%233E9B4F' stroke-width='3.6' fill='none' stroke-linecap='round' stroke-linejoin='round' opacity='.9'/></svg>") center/cover`,
   printed:`#14181D url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M0 9 H52 M0 18 H52 M0 27 H52' stroke='%235AC8DC' stroke-width='.7' opacity='.3'/><path d='M6 24 Q16 12 27 18 T48 15' stroke='%23F28C28' stroke-width='3.4' fill='none' stroke-linecap='round'/><path d='M6 20 Q16 8 27 14' stroke='%23FFC38A' stroke-width='1.4' fill='none' stroke-linecap='round' opacity='.9'/></svg>") center/cover`,
-  sand:`#D8CFBA url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><ellipse cx='17' cy='17' rx='13' ry='8' fill='none' stroke='%23918872' stroke-width='1.6'/><ellipse cx='17' cy='17' rx='7.5' ry='4.6' fill='none' stroke='%23918872' stroke-width='1.3' opacity='.7'/><ellipse cx='38' cy='24' rx='4.6' ry='3.5' fill='%234A4640'/><ellipse cx='31' cy='27.5' rx='3.4' ry='2.6' fill='%2356606B'/><ellipse cx='44' cy='28' rx='3' ry='2.3' fill='%236E5B48'/></svg>") center/cover`
+  sand:`#D8CFBA url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><ellipse cx='17' cy='17' rx='13' ry='8' fill='none' stroke='%23918872' stroke-width='1.6'/><ellipse cx='17' cy='17' rx='7.5' ry='4.6' fill='none' stroke='%23918872' stroke-width='1.3' opacity='.7'/><ellipse cx='38' cy='24' rx='4.6' ry='3.5' fill='%234A4640'/><ellipse cx='31' cy='27.5' rx='3.4' ry='2.6' fill='%2356606B'/><ellipse cx='44' cy='28' rx='3' ry='2.3' fill='%236E5B48'/></svg>") center/cover`,
+  wood:`#EFE3C8 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 36'><path d='M7 17 Q17 8 27 14 T47 11' stroke='%23C33D2E' stroke-width='4' fill='none' stroke-linecap='round' opacity='.75' transform='translate(2,-1.5)'/><path d='M7 17 Q17 8 27 14 T47 11' stroke='%232A241C' stroke-width='2.6' fill='none' stroke-linecap='round'/><path d='M8 28 Q14 22 20 28 M20 28 Q26 22 32 28 M32 28 Q38 22 44 28' stroke='%232A241C' stroke-width='1.8' fill='none' opacity='.6'/></svg>") center/cover`
 };
 /* ─── the ink collection: store inks join the base three ──── */
 var CATALOG=[
@@ -3230,6 +3478,10 @@ var CATALOG=[
    tease:"a quiet gravel garden — and the rake",
    blurb:"The tank as a zen garden — koi of drifting river pebbles, standing stones, ripples raked in rings — and the rake itself, furrowing the gravel as it hunts. What it catches, it smooths away.",
    scene:sceneSand},
+  {key:"wood", name:"Woodblock", price:10,
+   tease:"an ukiyo-e print, a hair off-register — and the gouge",
+   blurb:"Bold keyblock koi over flat color that never quite lines up, carved wave-ripples, a red hanko in the corner — and the carver's V-gouge, cutting troughs as it hunts. A caught fish is carved from the block and prints as nothing.",
+   scene:sceneWood},
 ];
 var owned=(function(){ try{ var v=JSON.parse(localStorage.getItem("st_inks")); return Array.isArray(v)?v:[]; }catch(e){ return []; } })();
 function saveInks(){ try{ localStorage.setItem("st_inks",JSON.stringify(owned)); }catch(e){} }
