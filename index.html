@@ -251,7 +251,7 @@ footer{text-align:center; color:var(--muted); font-size:12px; padding:16px; lett
     </div>
   </div>
 </main>
-<footer>Streams · v0.46 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
+<footer>Streams · v0.47 · number keys switch · <b>click the water to feed · click the serpent to shoo it</b> · one fish is not like the others…</footer>
 <script>
 "use strict";
 /* ══════════════════════════════════════════════════════════
@@ -4180,7 +4180,7 @@ document.addEventListener("keydown",function(e){
     else if(SHOP.mode){ SHOP.mode=null; SHOP.msg=""; renderDrawer(); }
     else if(!document.getElementById("bellPop").hidden)document.getElementById("bellPop").hidden=true;
     else if(!document.getElementById("drawer").hidden)document.getElementById("drawer").hidden=true;
-    else{ document.body.classList.remove("zen"); zenIcon(); }
+    else{ document.body.classList.remove("zen"); zenIcon(); leaveFullscreen(); }
   }
 });
 
@@ -4208,8 +4208,30 @@ function zenIcon(){
   b.innerHTML=z?ZEN_EXIT:ZEN_OPEN;
   b.title=z?"bring everything back":"just the tank";
 }
+/* zen goes truly fullscreen where the browser allows it (the button
+   click is the required user gesture); iPhone Safari has no Fullscreen
+   API, so there zen simply fills the window as before */
+function goFullscreen(){
+  var el=document.documentElement, fn=el.requestFullscreen||el.webkitRequestFullscreen;
+  if(fn){ try{ var p=fn.call(el); if(p&&p.catch)p.catch(function(){}); }catch(e){} }
+}
+function leaveFullscreen(){
+  if(document.fullscreenElement||document.webkitFullscreenElement){
+    var fn=document.exitFullscreen||document.webkitExitFullscreen;
+    if(fn){ try{ var p=fn.call(document); if(p&&p.catch)p.catch(function(){}); }catch(e){} }
+  }
+}
+function syncZenToFullscreen(){                  // browser-level exit (Esc) also leaves zen
+  if(!(document.fullscreenElement||document.webkitFullscreenElement)&&document.body.classList.contains("zen")){
+    document.body.classList.remove("zen"); zenIcon();
+  }
+}
+document.addEventListener("fullscreenchange",syncZenToFullscreen);
+document.addEventListener("webkitfullscreenchange",syncZenToFullscreen);
 document.getElementById("zenBtn").onclick=function(){
+  var entering=!document.body.classList.contains("zen");
   document.body.classList.toggle("zen"); zenIcon();
+  if(entering)goFullscreen(); else leaveFullscreen();
 };
 function buyInk(key){
   var cat=catByKey(key);
